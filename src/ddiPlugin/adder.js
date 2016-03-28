@@ -1,17 +1,17 @@
 "use strict";
 
-var Widget = require('./widget').Widget,
+var Widget = require('./../ui/widget').Widget,
     util = require('../util');
 
 var $ = util.$;
 var _t = util.gettext;
 
-var NS = 'annotator-adderhl';
+var NS = 'annotator-adder';
 
 
 // Adder shows and hides an annotation adder button that can be clicked on to
 // create an annotation.
-var Adder = Widget.extend({
+var ddiAdder = Widget.extend({
 
     constructor: function (options) {
         Widget.call(this, options);
@@ -74,7 +74,9 @@ var Adder = Widget.extend({
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
                 top: position.top,
-                left: position.left
+
+                // avoid overlapping with drug mention editor
+                left: position.left + 35
             });
         }
         Widget.prototype.show.call(this);
@@ -124,6 +126,7 @@ var Adder = Widget.extend({
     // Returns nothing.
     _onClick: function (event) {
         // Do nothing for right-clicks, middle-clicks, etc.
+
         if (event.which > 1) {
             return;
         }
@@ -135,27 +138,31 @@ var Adder = Widget.extend({
         this.ignoreMouseup = false;
 
         // Create a new annotation
+
         if (this.annotation !== null && typeof this.onCreate === 'function') {
-            this.annotation.annotationType = "DrugMention";
+            this.annotation.annotationType = "DDI";
             this.onCreate(this.annotation, event);
         }
     }
 });
 
-Adder.template = [
+// from hypothesis
+// Guest.prototype.html = jQuery.extend({}, Annotator.prototype.html, {
+//   adder: '<div class="annotator-adder">\n  <button class="h-icon-insert-comment" data-action="comment" title="New Note"></button>\n  <button class="h-icon-border-color" data-action="highlight" title="Highlight"></button>\n</div>'
+// });
 
-    '<div class="annotator-adderhl annotator-hide">',
-
-    '  <button type="button" title="Highlight">' + _t('Annotate') + '</button>',
+ddiAdder.template = [
+    '<div class="annotator-adder annotator-hide">',
+    '  <button type="button" title="DDI" onclick="showright(),editorload()">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 
 // Configuration options
-Adder.options = {
+ddiAdder.options = {
     // Callback, called when the user clicks the adder when an
     // annotation is loaded.
     onCreate: null
 };
 
+exports.ddiAdder = ddiAdder;
 
-exports.Adder = Adder;

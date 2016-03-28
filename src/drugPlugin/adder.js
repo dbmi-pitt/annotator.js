@@ -1,17 +1,17 @@
 "use strict";
 
-var Widget = require('../widget').Widget,
-    util = require('../../util');
+var Widget = require('./../ui/widget').Widget,
+    util = require('../util');
 
 var $ = util.$;
 var _t = util.gettext;
 
-var NS = 'annotator-adder';
+var NS = 'annotator-adderhl';
 
 
 // Adder shows and hides an annotation adder button that can be clicked on to
 // create an annotation.
-var ddiAdder = Widget.extend({
+var Adder = Widget.extend({
 
     constructor: function (options) {
         Widget.call(this, options);
@@ -74,9 +74,7 @@ var ddiAdder = Widget.extend({
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
                 top: position.top,
-
-                // avoid overlapping with drug mention editor
-                left: position.left + 35
+                left: position.left
             });
         }
         Widget.prototype.show.call(this);
@@ -126,7 +124,6 @@ var ddiAdder = Widget.extend({
     // Returns nothing.
     _onClick: function (event) {
         // Do nothing for right-clicks, middle-clicks, etc.
-
         if (event.which > 1) {
             return;
         }
@@ -138,31 +135,27 @@ var ddiAdder = Widget.extend({
         this.ignoreMouseup = false;
 
         // Create a new annotation
-
         if (this.annotation !== null && typeof this.onCreate === 'function') {
-            this.annotation.annotationType = "DDI";
+            this.annotation.annotationType = "DrugMention";
             this.onCreate(this.annotation, event);
         }
     }
 });
 
-// from hypothesis
-// Guest.prototype.html = jQuery.extend({}, Annotator.prototype.html, {
-//   adder: '<div class="annotator-adder">\n  <button class="h-icon-insert-comment" data-action="comment" title="New Note"></button>\n  <button class="h-icon-border-color" data-action="highlight" title="Highlight"></button>\n</div>'
-// });
+Adder.template = [
 
-ddiAdder.template = [
-    '<div class="annotator-adder annotator-hide">',
-    '  <button type="button" title="DDI" onclick="showright()">' + _t('Annotate') + '</button>',
+    '<div class="annotator-adderhl annotator-hide">',
+
+    '  <button type="button" title="Highlight">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 
 // Configuration options
-ddiAdder.options = {
+Adder.options = {
     // Callback, called when the user clicks the adder when an
     // annotation is loaded.
     onCreate: null
 };
 
-exports.ddiAdder = ddiAdder;
 
+exports.Adder = Adder;
