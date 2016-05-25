@@ -3,6 +3,8 @@
 var Widget = require('./../ui/widget').Widget,
     util = require('../util');
 
+//var Viewer = require('../viewer').Viewer
+
 var $ = util.$,
     _t = util.gettext;
 
@@ -55,7 +57,7 @@ function parseLinks(data, rel, cond) {
 
 
 // Public: Creates an element for viewing annotations.
-var Viewer = exports.Viewer = Widget.extend({
+var mpViewer = exports.mpViewer = Widget.extend({
 
     // Public: Creates an instance of the Viewer object.
     //
@@ -73,34 +75,40 @@ var Viewer = exports.Viewer = Widget.extend({
     // Returns a new Viewer instance.
     constructor: function (options) {
         Widget.call(this, options);
-
-        this.itemTemplate = Viewer.itemTemplate;
+        
+	    console.log("mpviewer - constructor");
+        
+        this.itemTemplate = mpViewer.itemTemplate;
         this.fields = [];
         this.annotations = [];
         this.hideTimer = null;
         this.hideTimerDfd = null;
         this.hideTimerActivity = null;
         this.mouseDown = false;
-        this.render = function (annotation) {
-
-            if (annotation.quote && annotation.annotationType == "DrugMention" && annotation.created) {
-                var returnText = "<div class='annotator-ddi'>By " + annotation.email + " on " + annotation.updated + "</div>" +
-                    "<br>" + annotation.annotationType +
-                    ": <span class='annotator-ddi-active'>" + annotation.quote + "</span>"
-
-                return returnText;
+        this.render = function (annotation, fieldName) {
+	        var claim = annotation.argues
+	        if (claim.label) {
+                
+		        var returnText =
+                    "<div  class='annotator-mp'> By " + annotation.email + " on " + annotation.updated + "</div>" +
+                    "<table class='viewertable' style='float:left;'>" +
+                    "<tr><td>Claim: " + claim.label + "</td></tr>" +
+                    "<tr><td>" + fieldName + "</td></tr>" + 
+                "</table>";
+		        
+ 		        return returnText;
             } else {
                 return null;
             }
+	        
         };
-
-
+        
         var self = this;
 
         if (this.options.defaultFields) {
             this.addField({
-                load: function (field, annotation) {
-                    $(field).html(self.render(annotation));
+                load: function (field, annotation, controller, fieldName) {   
+                    $(field).html(self.render(annotation, fieldName));
                 }
             });
         }
@@ -124,7 +132,6 @@ var Viewer = exports.Viewer = Widget.extend({
 	    // mouse over event handling
             // $(this.options.autoViewHighlights)
             //     .on("mouseover." + NS, '.annotator-hl', function (event) {
-		    
             //         // If there are many overlapping highlights, still only
             //         // call _onHighlightMouseover once.
             //         if (event.target === this) {
@@ -136,24 +143,22 @@ var Viewer = exports.Viewer = Widget.extend({
             //     });
 
 	    // click event handling
-	    $(this.options.autoViewHighlights)
-                //.on("click." + NS, '#annotator-hl', function (event) {
-                .on("click." + NS, 'span[name="annotator-hl"]', function (event) {
+            $(this.options.autoViewHighlights)
+                //.on("click." + NS, '#annotator-ddi', function (event) {
+                .on("click." + NS, 'span[name="annotator-mp"]', function (event) {
                     if (event.target === this) {
                         self._onHighlightMouseover(event);
                     }
                 });
-
+	    
             $(this.document.body)
                 .on("mousedown." + NS, function (e) {
                     if (e.which === 1) {
-			//console.log("HL change mousedown to true");
                         self.mouseDown = true;
                     }
                 })
                 .on("mouseup." + NS, function (e) {
                     if (e.which === 1) {
-			//console.log("HL change mousedown to false");
                         self.mouseDown = false;
                     }
                 });
@@ -199,13 +204,11 @@ var Viewer = exports.Viewer = Widget.extend({
     //
     // Returns nothing.
     show: function (position) {
+
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
-                //top: position.top,
-                left: position.left,
-                top:position.top
-                //left:200,
-                //width:200px
+                top: position.top,
+                left: position.left
             });
         }
 
@@ -227,26 +230,26 @@ var Viewer = exports.Viewer = Widget.extend({
     //
     // Examples
     //
-    //   viewer.load([annotation1, annotation2, annotation3])
+    //   viewer.load([{annotation: annotation1, fieldName: dose1}, annotation2, annotation3])
     //
     // Returns nothing.
     load: function (annotations, position) {
+
         this.annotations = annotations || [];
 
         var list = this.element.find('ul:first').empty();
 
         for (var i = 0, len = this.annotations.length; i < len; i++) {
-            var annotation = this.annotations[i];
+            var annotation = this.annotations[i].annotation;
+            var fieldName = this.annotations[i].fieldName;
 
-            // skip load ddi annotation
-            if (annotation.annotationType == "DrugMention"){
-                this._annotationItem(annotation)
+            if (annotation.annotationType == "MP"){
+                this._annotationItem(annotation, fieldName)
                     .appendTo(list)
                     .data('annotation', annotation);
+                this.show(position);
             }
         }
-
-        this.show(position);
     },
 
     // Public: Set the annotation renderer.
@@ -259,7 +262,7 @@ var Viewer = exports.Viewer = Widget.extend({
     },
 
     // Private: create the list item for a single annotation
-    _annotationItem: function (annotation) {
+    _annotationItem: function (annotation, fieldName) {
         var item = $(this.itemTemplate).clone();
 
         var controls = item.find('.annotator-controls'),
@@ -273,8 +276,8 @@ var Viewer = exports.Viewer = Widget.extend({
             {'type': 'text/html'}
         );
         var hasValidLink = (links.length > 0 &&
-        typeof links[0].href !== 'undefined' &&
-        links[0].href !== null);
+                            typeof links[0].href !== 'undefined' &&
+                            links[0].href !== null);
 
         if (hasValidLink) {
             link.attr('href', links[0].href);
@@ -307,7 +310,7 @@ var Viewer = exports.Viewer = Widget.extend({
         for (var i = 0, len = this.fields.length; i < len; i++) {
             var field = this.fields[i];
             var element = $(field.element).clone().appendTo(item)[0];
-            field.load(element, annotation, controller);
+            field.load(element, annotation, controller, fieldName);
         }
 
         return item;
@@ -356,6 +359,9 @@ var Viewer = exports.Viewer = Widget.extend({
         var item = $(event.target)
             .parents('.annotator-annotation')
             .data('annotation');
+
+        console.log("mp viewer - onEditClick");
+
         this.hide();
         this.options.onEdit(item);
     },
@@ -377,6 +383,7 @@ var Viewer = exports.Viewer = Widget.extend({
     // event - An Event object.
     //
     // Returns nothing.
+    
     _onCancelClick: function (event) {
         this.hide();
     },
@@ -386,11 +393,10 @@ var Viewer = exports.Viewer = Widget.extend({
     // event - An Event object.
     //
     // Returns nothing.
+    
     _onHighlightMouseover: function (event) {
         // If the mouse button is currently depressed, we're probably trying to
         // make a selection, so we shouldn't show the viewer.
-	
-	//console.log("hlviewer - _onHighlightMouseover called - mouseDown:" + this.mouseDown);
 	
         if (this.mouseDown) {
             return;
@@ -399,11 +405,15 @@ var Viewer = exports.Viewer = Widget.extend({
         var self = this;
         this._startHideTimer(true)
             .done(function () {
+
+                console.log("mpviewer - _onHighlightMouseover");
+		
                 var annotations = $(event.target)
                     .parents('.annotator-hl')
                     .addBack()
                     .map(function (_, elem) {
-                        return $(elem).data("annotation");
+                        //return $(elem).data("annotation");
+                        return { annotation: $(elem).data("annotation"), fieldName: $(elem).attr("fieldname")};
                     })
                     .toArray();
 
@@ -422,6 +432,7 @@ var Viewer = exports.Viewer = Widget.extend({
     //
     // Returns a Promise.
     _startHideTimer: function (activity) {
+
         if (typeof activity === 'undefined' || activity === null) {
             activity = false;
         }
@@ -469,6 +480,7 @@ var Viewer = exports.Viewer = Widget.extend({
     //
     // Returns nothing.
     _clearHideTimer: function () {
+	
         clearTimeout(this.hideTimer);
         this.hideTimer = null;
         this.hideTimerDfd.reject();
@@ -477,26 +489,26 @@ var Viewer = exports.Viewer = Widget.extend({
 });
 
 // Classes for toggling annotator state.
-Viewer.classes = {
+mpViewer.classes = {
     showControls: 'annotator-visible'
 };
 
 // HTML templates for this.widget and this.item properties.
-Viewer.template = [
+mpViewer.template = [
     '<div class="annotator-outer annotator-viewer annotator-hide">',
-    '  <ul class="annotator-widgetview annotator-listing"></ul>',
+    '  <ul class="annotator-mpwidgetview annotator-listing"></ul>',
     '</div>'
 ].join('\n');
 
-Viewer.itemTemplate = [
+mpViewer.itemTemplate = [
     '<li class="annotator-annotation annotator-item">',
     '  <span class="annotator-controls">',
     '    <a href="#"',
     '       title="' + _t('View as webpage') + '"',
     '       class="annotator-link">' + _t('View as webpage') + '</a>',
-    '    <button style="display:none" type="button"',
+    '    <button type="button"',
     '            title="' + _t('Edit') + '"',
-    '            class="annotator-edit">' + _t('Edit') + '</button>',
+    '            class="annotator-edit" onclick="showEditor()">' + _t('Edit') + '</button>',
     '    <button type="button"',
     '            title="' + _t('Delete') + '"',
     '            class="annotator-delete">' + _t('Delete') + '</button> &nbsp;&nbsp;',
@@ -508,7 +520,7 @@ Viewer.itemTemplate = [
 ].join('\n');
 
 // Configuration options
-Viewer.options = {
+mpViewer.options = {
     // Add the default field(s) to the viewer.
     defaultFields: true,
 
@@ -568,7 +580,6 @@ exports.standalone = function standalone(options) {
                     app.annotations['delete'](annotation);
                 };
             }
-
             // Set default handlers that determine whether the edit and delete
             // buttons are shown in the viewer:
             if (typeof options.permitEdit === 'undefined') {
@@ -582,7 +593,7 @@ exports.standalone = function standalone(options) {
                 };
             }
 
-            widget = new exports.Viewer(options);
+            widget = new exports.mpViewer(options);
         },
 
         destroy: function () { widget.destroy(); }

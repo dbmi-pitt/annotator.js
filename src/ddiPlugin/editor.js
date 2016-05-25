@@ -3,7 +3,6 @@ var Widget = require('./../ui/widget').Widget;
 var util = require('../util');
 var Editor = require('../drugPlugin/editor').Editor;
 var Template = require('./template').Template;
-
 var $ = util.$;
 var _t = util.gettext;
 var Promise = util.Promise;
@@ -42,8 +41,7 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
         var editorSelf = this;
         this.fields = [];
         this.annotation = {};
-
-        //console.log("[INFO] ddi - editor - constructor");
+        console.log("[INFO] ddi - editor - constructor");
 
         if (this.options.defaultFields) {
 
@@ -66,9 +64,11 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                     $('#Drug1 option').remove();
                     $('#Drug2 option').remove();
                     var flag = 0;
+
                     console.log(annotations.length);
+
                     var anns = annotations.slice();
-                    //console.log("(1):"+anns[0].quote);
+
                     var quoteobject = $('#quotearea');
                     var quotecontent = $('#quotearea').html();
                     //console.log(quotecontent);
@@ -78,13 +78,16 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                     for (var i = 0, len = anns.length; i < len; i++) {
                         if ((anns[i].annotationType == "DrugMention") && (list.indexOf(anns[i].quote) < 0)) {
                             list.push(anns[i].quote);
-                            //console.log(anns[i].quote);
                         }
                     }
+
+                    //console.log(list);
+
                     for (var i = 0, len = list.length; i < len; i++) {
                         if (quotecontent.indexOf(list[i]) >= 0) {
                             index++;
                             //quotecontent.split(list[i]).join("<span class='highlightdrug'>"+list[i]+"<sup>"+index+"</sup></span>");
+
                             //console.log(quotecontent);
                             quotecontent = quotecontent.replace(list[i], "<span class='highlightdrug'>" + list[i] + "</span>");
                             $('#Drug1').append($('<option>', {
@@ -151,7 +154,6 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                      $(field).find('#clinical').on('selected',function() {
                      $('#ddisection').hide();
                      });*/
-                    console.debug("annotation.assertion_type:" + annotation.assertion_type);
                     if (annotation.assertion_type == "DDI clinical trial") {
                         $('#altersection').show();
                         $('.moreinfo').show();
@@ -329,49 +331,60 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                         signal = 1;
                     }
 
-
                     //load all content
                     $("#Drug1 > option").each(function () {
-                        if (this.value === annotation.Drug1) $(this).attr('selected', true);
+                        if (this.value === annotation.Drug1) $(this).prop('selected', true);
                     });
                     $('#Drug2 > option').each(function () {
-                        if (this.value === annotation.Drug2) $(this).attr('selected', true);
+                        if (this.value === annotation.Drug2) $(this).prop('selected', true);
                     });
-                    $('#relationship option').each(function () {
-                        if (this.value === annotation.relationship) {
-                            $(this).attr('selected', true);
+
+                    $('#relationship > option').each(function () {
+                        //$(this).prop("selected", false);
+
+                        if (this.value == annotation.relationship) {
+                            $(this).prop("selected", true);
                             signal = 0;
-                        }
+                        }else
+                            $(this).prop("selected", false);
                     });
+
                     if (signal == 1) {
-                        $('#relationship option')[0].selected = "selected";
+                        $('#relationship option:eq(0)').prop("selected", true);
                     } else {
                         signal = 1;
                     }
 
-                    if(annotation.relationship == "inhibit"||annotation.relationship == "substrate of")
+                    if(1)
                     {
+                        // show enzyme field if relationship is inhibits or substrate of
+                        $(document).ready(function() { showEnzyme(); });
                         $('#enzyme option').each(function () {
                             if (this.value === annotation.enzyme) {
-                                $(this).attr('selected', true);
+                                $(this).prop('selected', true);
                                 signal = 0;
-                            }
+                            }else
+                                $(this).prop('selected', false);
                         });
                         if (signal == 1) {
-                            $('#enzyme option')[0].selected = "selected";
+                            $('#enzyme option:eq(0)').prop("selected",true);
+
                         } else {
                             signal = 1;
                         }
                     }
 
                     $('#assertion_type option').each(function () {
-                        if (this.value === annotation.assertion_type) {
-                            $(this).attr('selected', true);
+                        if (this.value == annotation.assertion_type) {
+                            $(this).prop('selected', true);
                             signal = 0;
+                        }else {
+                            $(this).prop('selected', false);
                         }
                     });
                     if (signal == 1) {
-                        $('#assertion_type option')[0].selected = "selected";
+                        $('#assertion_type option:eq(0)').prop("selected",true);
+                        $("#altersection").hide();$("#forward").hide();
                     } else {
                         signal = 1;
                     }
@@ -382,7 +395,7 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                         if (this.value === annotation.Role1) this.checked = true; else this.checked = false;
                     });
                     $('.Type2').each(function () {
-                        if (this.value === annotation.Type2) this.checked = true; else this.checked = false;
+                        if (this.value === annotation.Type2) $(this).prop('checked',true); else $(this).prop('checked',false);
                     });
                     $('.Role2').each(function () {
                         if (this.value === annotation.Role2) this.checked = true; else this.checked = false;
@@ -432,10 +445,12 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                     annotation.Comment = $('#Comment').val();
                     annotation.annotationType = "DDI";
                     annotation.relationship = $('#relationship option:selected').text();
-                    if(annotation.relationship == "inhibit"||annotation.relationship == "substrate of")
+                    if(annotation.relationship == "inhibits"||annotation.relationship == "substrate of") {
                         annotation.enzyme = $('#enzyme option:selected').text();
-                    else
+                    } else {
                         annotation.enzyme = "";
+                    }
+
                     if(annotation.assertion_type=="DDI clinical trial")
                     {
                         annotation.Number_participants = $('#Number_participants').val();
@@ -549,8 +564,9 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
             alert("[INFO] Exceeding max lengh of text 1600!");
             $('.btn-success').click();
             this.cancel();
-
         }
+        
+
         var annotations;
         if(getURLParameter("sourceURL")==null)
             var sourceURL = getURLParameter("file").trim();
@@ -846,52 +862,9 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
         //this._mover = mover(this.element[0], controls);
     }
 });
-/*
- //handlebars test
- var handlebars = require('handlebars');
- var fs = require('fs');
 
- var fooJson = {
- tags: ['express', 'node', 'javascript']
- }
 
- // get your data into a variable
- //var fooJson = require('path/to/foo.json');
-
- // read the file and use the callback to render
- fs.readFile('handlebars-example.hbs', function(err, data){
- if (!err) {
- // make the buffer into a string
- var source = data.toString();
- // call the render function
- renderToString(source, fooJson);
- //alert(testhandle);
- } else {
- // handle file read error
- }
- });
-
- // this will be called after the file is read
- function renderToString(source, data) {
- var template = handlebars.compile(source);
- var outputString = template(data);
- //alert(outputString);
- return outputString;
- }
- */
-/*$.ajax({
- url: "template.html", dataType: "html"
- }).done(function( responseHtml ) {
- $("#mydiv").html(responseHtml);
- console.log(responseHtml);
- });*/
-
-//var Handlebars = require("handlebars");
-//var source   = $("#entry-template").html();
-//var template = Handlebars.compile(source);
 ddiEditor.template = Template.content;
-
-
 
 
 
