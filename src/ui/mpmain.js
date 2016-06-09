@@ -302,14 +302,25 @@ function main(options) {
                             "Confirm": function() {
                                 $( this ).dialog( "close" );
                                 if (editorType == "participants") {
-                                    ann.argues.supportsBy[0].supportsBy.supportsBy.participants = {};
+                                    ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};
                                 } else if (editorType == "dose1") {
-                                    ann.argues.supportsBy[0].supportsBy.supportsBy.drug1Dose = {};        
+                                    ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};        
                                 } else if (editorType == "dose2") {
-                                    ann.argues.supportsBy[0].supportsBy.supportsBy.drug2Dose = {};         
-                                } else if (editorType == "auc" || editorType == "cmax" || editorType == "cl" || editorType == "halflife") {
-                                    ann.argues.supportsBy[0][editorType] = {}; 
-                                }                                            
+                                    ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};         
+                                } else if (editorType == "auc" || editorType == "cmax" || editorType == "clearance" || editorType == "halflife") {
+                                    ann.argues.supportsBy[currDataNum][editorType] = {}; 
+                                } else {
+                                    alert("[ERROR] editor type is not avaliable!");
+                                }       
+
+                                // after deletion, if this row is empty, then delete
+                                var boo = isDataRowEmpty(ann.argues.supportsBy[currDataNum]);
+                                if (boo) {
+                                    console.log("mpmain - delete empty row!");
+                                    ann.argues.supportsBy.splice(currDataNum, 1);
+                                    totalDataNum = totalDataNum -1;
+                                }
+                                    
                                 if (typeof s.mpeditor.dfd !== 'undefined' && s.mpeditor.dfd !== null) {
                                     s.mpeditor.dfd.resolve();
                                 }        
@@ -340,9 +351,12 @@ function main(options) {
         // select text, then load normed ranges to adder
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
+                console.log("mpmain - textselector - onSelection");
+
                 if (ranges.length > 0) {
                     //var mpAnnotation = makeMPAnnotation(ranges);
                     var hlAnnotation = makeHLAnnotation(ranges);
+                    console.log("mpmain - textselector - hladder and mp adder load");
 
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
@@ -358,24 +372,24 @@ function main(options) {
 
         // mp viewer
         s.mpviewer = new mpviewer.mpViewer({
-            onEdit: function (ann, field) {
+            onEdit: function (ann, field, dataNum) {
                 // Copy the interaction point from the shown viewer:
                 s.interactionPoint = util.$(s.mpviewer.element)
                     .css(['top', 'left']);
+
+                $("#annotator-delete").show();
                 if (ann.annotationType == "MP"){
                     var annotationId = ann.id;
-                    if (document.getElementById(annotationId + field))
-                        document.getElementById(annotationId + field).scrollIntoView(true);
+
                     if (field == "claim") {
                         $('#quote').show();
                         claimEditorLoad();
-                    }
-                    else { 
+                    } else { 
                         $('#quote').hide();
-                        switchDataForm(field);                               
+                        switchDataForm(field);   
+                        currDataNum = dataNum;
                     }
                     app.annotations.update(ann);
-
                 }
             },
             onDelete: function (ann) {
@@ -494,7 +508,7 @@ function main(options) {
                             cachedOATarget = ann.argues.hasTarget;
                             cachedOARanges = ann.argues.ranges;                 
 
-                            addDataCellByEditor("participants");
+                            addDataCellByEditor("participants", 0);
                         }, 
                         "Done": function() {
                             $( this ).dialog( "close" );
@@ -553,6 +567,24 @@ function main(options) {
         }
     };
 }
+
+// called when delete data
+// return false if data row not empty, otherwise, return true
+function isDataRowEmpty(data) {
+
+    console.log("delete data - call isDataRowEmpty");
+    fieldL = ["auc","cmax","clearance","halflife"];
+    
+    for (i = 0; i < fieldL.length; i++) {
+        if (data[fieldL[i]].value != null)
+            return false;
+    }
+    
+    if (data.supportsBy.supportsBy.participants.value != null || data.supportsBy.supportsBy.drug1Dose.value != null || data.supportsBy.supportsBy.drug2Dose.value !=null)
+        return false;
+    return true   
+}
+
 
 
 function getTxtFromNode(node, isSuffix, ignoreSelector, maxLength){

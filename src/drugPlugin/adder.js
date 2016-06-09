@@ -24,17 +24,25 @@ var Adder = Widget.extend({
         var self = this;
         this.element
             .on("click." + NS, 'button', function (e) {
-                $('.mp-main-menu').hide(); 
+                // console.log("hladder - self._onClick(e)");  
+                $('.mp-main-menu').hide();                 
                 self._onClick(e);
             })
             .on("mousedown." + NS, 'button', function (e) {
+                // console.log("hladder - self._onMousedown(e)");
                 self._onMousedown(e);
             });
 
         this.document = this.element[0].ownerDocument;
         $(this.document.body).on("mouseup." + NS, function (e) {
+            // console.log("hladder - self._onMouseup(e)");
             self._onMouseup(e);
         });
+        // this.document = this.element[0].ownerDocument;
+        // $( ".annotator-adderhl" ).on("mouseup." + NS, function (e) {
+        //     console.log("hladder - self._onMouseup(e)");
+        //     self._onMouseup(e);
+        // });
     },
 
     destroy: function () {
@@ -155,7 +163,7 @@ Adder.template = [
 
     '<div class="annotator-adderhl annotator-hide">',
 
-    '  <button type="button" title="Highlight">' + _t('Annotate') + '</button>',
+    '  <button class="hl-adder-btn" type="button" title="Highlight">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 
