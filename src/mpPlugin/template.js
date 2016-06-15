@@ -242,6 +242,21 @@ var context8 = {
     ]
 };
 
+
+// Data - evidence supports or refutes
+var context9 = {
+    questions: [
+        {
+            type:"checkbox",
+            name:"Evidence: ",
+            classname: "evRelationship",
+            id:"evRelationship",
+            options:["supports","refutes"],
+            optionsID:[]
+        }
+    ]
+};
+
 // handlerbar - build form1 function
 // @inputs: JSON config - context1
 // @outputs: form1 in html
@@ -301,7 +316,12 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                     out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
             }
             out = out + "</select>";
+        }
+        else if (items[i].type=="checkbox") {
+            for (var j = 0, sl = items[i].options.length; j < sl; j++)
+                out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";            
         } 
+
     }
     return out;
 });
@@ -347,6 +367,10 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var form8 = template(context8);
 
+// Data - evidence relationship
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var form9 = template(context9);
 
 
 Template.content = [
@@ -365,6 +389,7 @@ Template.content = [
 
     // links 
     '<div id="mp-data-nav" style="display: none;">',
+    '<button type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
@@ -416,6 +441,10 @@ Template.content = [
     form8,
     '</div>',
 
+    // Data & material - evidence relationship
+    '<div id="mp-data-form-evRelationship" style="margin-top:10px;margin-left:5px;display: none;">',
+    form9,
+    '</div>',
     
     '</div>',
     '</div>',

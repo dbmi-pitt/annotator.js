@@ -225,6 +225,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $("#halflifeType")[0].selectedIndex = -1;
                         $("#halflifeDirection")[0].selectedIndex = -1;
 
+                        // clean evidence relationship
+                        $('input[name=evRelationship]').prop('checked', false);
+
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);                                                 
                         $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
@@ -250,6 +253,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         });
 
                         // load mp data fields
+
+                        // evidence relationship
+                        if (loadData.evRelationship == "refutes")
+                            $('input[name=evRelationship][value=refutes]').prop('checked', true);               
+                        else
+                            $('input[name=evRelationship][value=supports]').prop('checked', true);                
+
+
                         // AUC
                         $("#auc").val(loadData.auc.value);
                         $("#aucType > option").each(function () {
@@ -338,6 +349,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         console.log("mpeditor update data & material - num: " + currDataNum);
                         var mpData = annotation.argues.supportsBy[currDataNum];
+                        // Evidence relationship
+                        mpData.evRelationship = $("input[name=evRelationship]:checked").val();
 
                         // MP add data-method-material 
                         var partTmp = mpData.supportsBy.supportsBy.participants;
