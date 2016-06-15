@@ -484,6 +484,9 @@ function main(options) {
                 s.mphighlighter.draw(ann);
                 $("#mp-annotation-work-on").html(ann.id);
                 annotationTable(ann.rawurl, ann.email);
+
+                $( "#dialog-claim-options" ).show();
+                
                 // providing options of add another claim or data on current span
                 $( "#claim-dialog-confirm" ).dialog({
                     resizable: false,
@@ -498,15 +501,14 @@ function main(options) {
                             $("#mp-editor-type").html("claim");
                             var newAnn = (JSON.parse(JSON.stringify(ann)));
                             newAnn.argues.qualifiedBy = {};
-                            app.annotations.create(newAnn);
-                            
+                            app.annotations.create(newAnn);         
                         },
                         "Add data": function() {
                             $( this ).dialog( "close" );        
                             // keep using the same text span
                             isTextSelected = true;
                             cachedOATarget = ann.argues.hasTarget;
-                            cachedOARanges = ann.argues.ranges;                 
+                            cachedOARanges = ann.argues.ranges;    
 
                             addDataCellByEditor("participants", 0);
                         }, 
@@ -520,7 +522,9 @@ function main(options) {
                             cachedOARanges = "";
                         }
                     }
-                });              
+                });   
+
+                $('dialog-claim-options').hide();           
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.draw(ann);
             } else {
