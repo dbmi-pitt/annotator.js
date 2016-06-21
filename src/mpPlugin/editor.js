@@ -55,6 +55,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                     
                     var editorType = $("#mp-editor-type").html();
                     var annotationId = $("#mp-annotation-work-on").html();
+                    var claim = annotation.argues;     
 
                     // load MP Claim
                     if(editorType == "claim"){
@@ -75,7 +76,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();                
 
-                        var claim = annotation.argues;                        
+                   
                         var quoteobject = $("<div id='quotearea'/>");
                         $('#quote').append(quoteobject);
                         $('#quotearea').html(claim.hasTarget.hasSelector.exact || '');
@@ -192,12 +193,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }                         
                         }
                         
-                    } 
+                    } else { // if editing data, then update drug names to data fields nav
+                        $("#drug1-dose-switch-btn").html(claim.qualifiedBy.drug1 + " Dose");
+                        $("#drug2-dose-switch-btn").html(claim.qualifiedBy.drug2 + " Dose");
+                        $("#drug1Dose-label").html(claim.qualifiedBy.drug1 + " Dose");
+                        $("#drug2Dose-label").html(claim.qualifiedBy.drug2 + " Dose");
+                    }
 
                     // load MP list of data 
                     if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                   
-                        console.log("mpeditor - load data - num: " + currDataNum);
-                        
+                        console.log("mpeditor - load data - num: " + currDataNum);   
                         var loadData = annotation.argues.supportsBy[currDataNum];
 
                         // clean material : participants, dose1, dose2
@@ -227,6 +232,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         // clean evidence relationship
                         $('input[name=evRelationship]').prop('checked', false);
+
 
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);                                                 

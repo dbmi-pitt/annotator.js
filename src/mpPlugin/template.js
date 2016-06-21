@@ -302,7 +302,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
 Handlebars.registerHelper('buildFormData', function(items, options) {
     var out = "";
     for(var i=0, l=items.length; i<l; i++) {
-        out += "<strong>" + items[i].name +"</strong>";
+        out += "<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
         if(items[i].type=="text")
             out += "<strong id='"+items[i].id+"'></strong><br>";
         else if(items[i].type=="input")
@@ -391,8 +391,8 @@ Template.content = [
     '<div id="mp-data-nav" style="display: none;">',
     '<button type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
+    '<button id="drug1-dose-switch-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
+    '<button id="drug2-dose-switch-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
     '<button type="button" onclick="switchDataForm(\'auc\')" >Auc</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
