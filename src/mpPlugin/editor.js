@@ -53,12 +53,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 id: 'quote',
                 load: function (field, annotation, annotations) {               
                     
-                    var editorType = $("#mp-editor-type").html();
-                    var annotationId = $("#mp-annotation-work-on").html();
                     var claim = annotation.argues;     
 
                     // load MP Claim
-                    if(editorType == "claim"){
+                    if(currFormType == "claim"){
                         console.log("mpeditor - load - claim");
 
                         // clean claim editor
@@ -193,11 +191,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }                         
                         }
                         
-                    } else { // if editing data, then update drug names to data fields nav
+                    } else { // if editing data, then update claim label and drug names to data fields nav
                         $("#drug1-dose-switch-btn").html(claim.qualifiedBy.drug1 + " Dose");
                         $("#drug2-dose-switch-btn").html(claim.qualifiedBy.drug2 + " Dose");
                         $("#drug1Dose-label").html(claim.qualifiedBy.drug1 + " Dose");
                         $("#drug2Dose-label").html(claim.qualifiedBy.drug2 + " Dose");
+                        $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
+
                     }
 
                     // load MP list of data 
@@ -315,10 +315,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 
                 submit:function (field, annotation) {
 
-                    var editorType = $("#mp-editor-type").html();
-                    var annotationId = $("#mp-annotation-work-on").html();
-
-                    if (editorType == "claim"){
+                    if (currFormType == "claim"){
 
                         // MP Claim
                         if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
@@ -351,7 +348,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.label = claimStatement;
                         annotation.argues.supportsBy = [];                  
 
-                    } else if (editorType != "claim" && annotationId != null && annotation.argues.supportsBy.length > 0) { 
+                    } else if (currFormType != "claim" && currAnnotationId != null && annotation.argues.supportsBy.length > 0) { 
 
                         console.log("mpeditor update data & material - num: " + currDataNum);
                         var mpData = annotation.argues.supportsBy[currDataNum];
@@ -468,7 +465,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.supportsBy[currDataNum] = mpData;
                     }
                     // clean editor status
-                    $("#mp-editor-type").html('');
+                    currFormType = "";
                 }                
             });            
         }
@@ -645,9 +642,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
 
     // Public: Submits the editor and delete specific data field to the annotation.
-    // @input: data field from editorType
+    // @input: data field from currFormType
     // Returns nothing.
-    // deleteDataSubmit: function (editorType) {
+    // deleteDataSubmit: function (currFormType) {
     // },
     
     // Public: Cancels the editing process, discarding any edits made to the
@@ -660,7 +657,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
             this.dfd.reject('editing cancelled');
 
             // clean editor status
-            $("#mp-editor-type").html('');
+            currFormType = "";
         }
         this.hide();
         showAnnTable();

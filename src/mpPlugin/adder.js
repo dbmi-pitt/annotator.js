@@ -163,7 +163,7 @@ var mpAdder = Widget.extend({
         //$('.annotator-adderddi').removeClass().addClass('annotator-adderhl annotator-hide');
 
 
-        var editorType = $("#mp-editor-type").html();
+        var editorType = currFormType;
         if (editorType == null || editorType.trim() == ""){
             editorType = "participants";
         }
@@ -182,9 +182,8 @@ var mpAdder = Widget.extend({
         else if (editorType != "claim" && typeof this.onUpdate === 'function') { 
 
             // query MP annotation
-            var annotationId = $("#mp-annotation-work-on").html();
             var annhost = config.annotator.host;
-            var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + annhost + '/annotatorstore" ,"urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search?_id=' + annotationId +'"}}';
+            var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + annhost + '/annotatorstore" ,"urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search?_id=' + currAnnotationId +'"}}';
             
             var queryOptions = JSON.parse(queryOptStr);
             var storage = new HttpStorage(queryOptions);
@@ -219,7 +218,7 @@ mpAdder.template = [
     // MP: add menu for create claim and add data
     '<button class="mp-menu-btn" type="button">' + _t('Annotate') + '</button>',
     '<ul class="mp-main-menu" style="display: none;">',
-    '<li class="mp-main-menu-1" onclick="showEditor(),claimEditorLoad()">',
+    '<li class="mp-main-menu-1" onclick="showEditor(),claimEditorLoad();">',
     'create claim',
     '</li>',
     '<li class="mp-main-menu-2">',

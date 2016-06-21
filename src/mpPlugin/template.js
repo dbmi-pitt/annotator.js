@@ -382,10 +382,8 @@ Template.content = [
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
-    // Type of editor
-    '<div id="mp-editor-type" style="display: none;"></div>',
-    // The Claim currently working on
-    '<div id="mp-annotation-work-on" style="display: none;"></div>',
+    // current claim label
+    '<div id="claim-label-data-editor" style="display: none;"></div><br>',
 
     // links 
     '<div id="mp-data-nav" style="display: none;">',
