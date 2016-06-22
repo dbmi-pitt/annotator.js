@@ -367,6 +367,8 @@ var mpViewer = exports.mpViewer = Widget.extend({
         if (this.annotations.length > 0) {
             var fieldName = this.annotations[0].fieldName;
             var dataNum = this.annotations[0].dataNum;
+            currFormType = fieldName;
+
             this.hide();
 
             this.options.onEdit(item, fieldName, dataNum);
