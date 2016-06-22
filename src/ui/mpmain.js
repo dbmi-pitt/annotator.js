@@ -265,7 +265,7 @@ function main(options) {
         s.mpeditor = new mpeditor.mpEditor({
             extensions: options.editorExtensions,
             onDelete: function (ann) {
-                var editorType = $("#mp-editor-type").html();
+                var editorType = currFormType;
                 if (editorType == "claim") { 
                     // delete confirmation for claim
                     $( "#dialog-claim-delete-confirm" ).dialog({
@@ -283,8 +283,8 @@ function main(options) {
                                 s.mphighlighter.undraw(ann);  
 
                                 // clean field name and annotation id
-                                $("#mp-editor-type").html('');           
-                                $("#mp-annotation-work-on").html('');         
+                                currFormType = "";
+                                currAnnotationId = "";
                             },
                             "Cancel": function() {
                             $( this ).dialog( "close" );
@@ -385,6 +385,7 @@ function main(options) {
                         $('#quote').show();
                         claimEditorLoad();
                     } else { 
+                        $("#claim-label-data-editor").show();
                         $('#quote').hide();
                         switchDataForm(field);   
                         currDataNum = dataNum;
@@ -482,7 +483,7 @@ function main(options) {
             if (ann.annotationType == "MP"){
                 console.log("mpmain - annotationCreated called");
                 s.mphighlighter.draw(ann);
-                $("#mp-annotation-work-on").html(ann.id);
+                currAnnotationId = ann.id;
                 annotationTable(ann.rawurl, ann.email);
 
                 $( "#dialog-claim-options" ).show();
@@ -498,7 +499,7 @@ function main(options) {
                             $( this ).dialog( "close" ); 
                             showEditor();
                             claimEditorLoad();
-                            $("#mp-editor-type").html("claim");
+                            currFormType = "claim";
                             var newAnn = (JSON.parse(JSON.stringify(ann)));
                             newAnn.argues.qualifiedBy = {};
                             app.annotations.create(newAnn);         
@@ -548,7 +549,7 @@ function main(options) {
             console.log("mpmain - annotationUpdated called");
             if (ann.annotationType == "MP"){
                 s.mphighlighter.redraw(ann);
-                $("#mp-annotation-work-on").html(ann.id);
+                currAnnotationId = ann.id;
                 annotationTable(ann.rawurl, ann.email);
            
             } else if (ann.annotationType == "DrugMention"){

@@ -9,61 +9,61 @@ var $ = require('jquery');
 // Claim form
 var context1 = {
     questions: [
-      {
-        type:"dropdown",
-        name:"Drug1: ",
-        id:"Drug1",
-        options:[],
-        optionsID:[]
-      },
-      {
-          type:"checkbox",
-          name:"Precipitant: ",
-          classname: "precipitant",
-          id:"drug1precipitant",
-          options:["drug1"],
-          optionsID:[]
-      },
-      {
-        type:"dropdown",
-        name:"Relationship: ",
-        id:"relationship",
-        options:["interact with","inhibits","substrate of"],
-        optionsID:["r0","r1","r2"]
-      },
-      {
-        type:"dropdown",
-        name:"Method: ",
-        id:"method",
-        options:["UNK","DDI clinical trial"],
-        optionsID:[]
-      },
-      {
-        type:"dropdown",
-        name:"Drug2: ",
-        id:"Drug2",
-        options:[],
-        optionsID:[]
-      },
-      {
-          type:"checkbox",
-          name:"Precipitant: ",
-          classname: "precipitant",
-          id:"drug2precipitant",
-          options:["drug2"],
-          optionsID:[]
-      },
-      {
-        type:"dropdown",
-        name:"Enzyme: ",
-        id:"enzyme",
-        options:["UNK","cyp1a1","cyp1a2","cyp1b1","cyp2a6","cyp2a13","cyp2b6","cyp2c8","cyp2c9","cyp2c19","cyp2d6","cyp2e1","cyp2j2","cyp3a4","cyp3a5","cyp4a11","cyp2c8","cyp2c9","cyp2c19"],
-        optionsID:[]
-      },
-      {
-        type:"space",
-        name:""
-      }
+        {
+            type:"dropdown",
+            name:"Drug1: ",
+            id:"Drug1",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Precipitant: ",
+            classname: "precipitant",
+            id:"drug1precipitant",
+            options:["drug1"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Relationship: ",
+            id:"relationship",
+            options:["interact with","inhibits","substrate of"],
+            optionsID:["r0","r1","r2"]
+        },
+        {
+            type:"dropdown",
+            name:"Method: ",
+            id:"method",
+            options:["UNK","DDI clinical trial"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Drug2: ",
+            id:"Drug2",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Precipitant: ",
+            classname: "precipitant",
+            id:"drug2precipitant",
+            options:["drug2"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Enzyme: ",
+            id:"enzyme",
+            options:["UNK","cyp1a1","cyp1a2","cyp1b1","cyp2a6","cyp2a13","cyp2b6","cyp2c8","cyp2c9","cyp2c19","cyp2d6","cyp2e1","cyp2j2","cyp3a4","cyp3a5","cyp4a11","cyp2c8","cyp2c9","cyp2c19"],
+            optionsID:[]
+        },
+        {
+            type:"space",
+            name:""
+        }
     ]
 };
 
@@ -160,6 +160,12 @@ var context5 = {
             id:"aucDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"auc-unchanged-checkbox",
+            value: "aucunchanged"
         }
     ]
 };
@@ -247,7 +253,7 @@ var context8 = {
 var context9 = {
     questions: [
         {
-            type:"checkbox",
+            type:"radiobutton",
             name:"Evidence: ",
             classname: "evRelationship",
             id:"evRelationship",
@@ -274,7 +280,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
         else 
             out = out + "<td><strong>" + items[i].name +"</strong></td><td>";
             
-        if (items[i].type=="checkbox") {
+        if (items[i].type=="radiobutton") {
             for (var j = 0, sl = items[i].options.length; j < sl; j++)
                 out = out + "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'></input>";            
         } 
@@ -302,7 +308,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
 Handlebars.registerHelper('buildFormData', function(items, options) {
     var out = "";
     for(var i=0, l=items.length; i<l; i++) {
-        out += "<strong>" + items[i].name +"</strong>";
+        out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
         if(items[i].type=="text")
             out += "<strong id='"+items[i].id+"'></strong><br>";
         else if(items[i].type=="input")
@@ -317,11 +323,13 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             }
             out = out + "</select>";
         }
-        else if (items[i].type=="checkbox") {
+        else if (items[i].type=="radiobutton") {
             for (var j = 0, sl = items[i].options.length; j < sl; j++)
                 out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";            
         } 
-
+        else if (items[i].type=="checkbox") {
+            out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
+        }
     }
     return out;
 });
@@ -382,17 +390,15 @@ Template.content = [
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
-    // Type of editor
-    '<div id="mp-editor-type" style="display: none;"></div>',
-    // The Claim currently working on
-    '<div id="mp-annotation-work-on" style="display: none;"></div>',
+    // current claim label
+    '<div id="claim-label-data-editor" style="display: none;"></div><br>',
 
     // links 
     '<div id="mp-data-nav" style="display: none;">',
     '<button type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
+    '<button id="drug1-dose-switch-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
+    '<button id="drug2-dose-switch-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
     '<button type="button" onclick="switchDataForm(\'auc\')" >Auc</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
