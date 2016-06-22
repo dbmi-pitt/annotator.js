@@ -265,8 +265,8 @@ function main(options) {
         s.mpeditor = new mpeditor.mpEditor({
             extensions: options.editorExtensions,
             onDelete: function (ann) {
-                var editorType = currFormType;
-                if (editorType == "claim") { 
+
+                if (currFormType == "claim") { 
                     // delete confirmation for claim
                     $( "#dialog-claim-delete-confirm" ).dialog({
                         resizable: false,
@@ -301,14 +301,14 @@ function main(options) {
                         buttons: {                        
                             "Confirm": function() {
                                 $( this ).dialog( "close" );
-                                if (editorType == "participants") {
+                                if (currFormType == "participants") {
                                     ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};
-                                } else if (editorType == "dose1") {
+                                } else if (currFormType == "dose1") {
                                     ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};        
-                                } else if (editorType == "dose2") {
+                                } else if (currFormType == "dose2") {
                                     ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};         
-                                } else if (editorType == "auc" || editorType == "cmax" || editorType == "clearance" || editorType == "halflife") {
-                                    ann.argues.supportsBy[currDataNum][editorType] = {}; 
+                                } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
+                                    ann.argues.supportsBy[currDataNum][currFormType] = {}; 
                                 } else {
                                     alert("[ERROR] editor type is not avaliable!");
                                 }       

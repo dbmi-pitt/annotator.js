@@ -2,7 +2,7 @@
 
 var Widget = require('./../ui/widget').Widget,
     util = require('../util');
-
+var Range = require('xpath-range').Range;
 var $ = util.$;
 var _t = util.gettext;
 
@@ -10,6 +10,8 @@ var NS = 'annotator-addermp';
 
 // bring storage in
 var HttpStorage = require('../storage').HttpStorage;
+var mphighlighter = require('./highlighter');
+
 
 // Adder shows and hides an annotation adder button that can be clicked on to
 // create an annotation.
@@ -206,7 +208,19 @@ var mpAdder = Widget.extend({
                     isTextSelected = true;
                     // get selection for data
                     cachedOATarget = temp.annotation.argues.hasTarget;
-                    cachedOARanges = temp.annotation.argues.ranges;                    
+                    cachedOARanges = temp.annotation.argues.ranges;            
+
+                    // console.log("[TEST] highlight text span!");
+                    // for (var i = 0, ilen = cachedOARanges.length; i < ilen; i++) {
+                    //     //var r = reanchorRange(cachedOARanges[i], this.element);  
+                    //     console.log(this.element);
+                    //     console.log(cachedOARanges[i]);
+                    //     var r = Range.sniff(cachedOARanges[i]).normalize(this.element);
+                    //     if (r !==null) {
+                    //         console.log(r);
+                    //     } 
+                    // }
+
                 });                            
         }
     }   
