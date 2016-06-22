@@ -267,16 +267,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             $('input[name=evRelationship][value=supports]').prop('checked', true);                
 
 
-                        // AUC
-                        $("#auc").val(loadData.auc.value);
-                        $("#aucType > option").each(function () {
-                            if (this.value === loadData.auc.type) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        $("#aucDirection > option").each(function () {
-                            if (this.value === loadData.auc.direction) {
-                                $(this).prop('selected', true);                                                  }
-                        });
+                        // AUC: if unchanged then mark on checkbox, else load auc
+                        if (loadData.auc.value == "unchanged") {
+                            $('#auc-unchanged-checkbox').attr('checked','checked');
+                        } else {
+                            $("#auc").val(loadData.auc.value);
+                            $("#aucType > option").each(function () {
+                                if (this.value === loadData.auc.type) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                            $("#aucDirection > option").each(function () {
+                                if (this.value === loadData.auc.direction) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                        }
 
                         // CMAX
                         $("#cmax").val(loadData.cmax.value);
@@ -366,61 +370,74 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 partTmp.hasTarget = cachedOATarget;    
                             }
                             mpData.supportsBy.supportsBy.participants = partTmp;
-                            console.log("mpeditor - submit - update participants");
                         }
 
                         var dose1Tmp = mpData.supportsBy.supportsBy.drug1Dose;
-                        if (($('#drug1Dose').val().trim() != "") && (dose1Tmp.value != $('#drug1Dose').val() || dose1Tmp.formulation != $('#drug1Formulation option:selected').text() || dose1Tmp.duration != $('#drug1Duration').val() || dose1Tmp.regimens != $('#drug1Regimens option:selected').text())) {
+                        var drug1V = $('#drug1Dose').val();
+                        var drug1F = $('#drug1Formulation option:selected').text();
+                        var drug1D = $('#drug1Duration').val();
+                        var drug1R = $('#drug1Regimens option:selected').text();
+                        if ((drug1V != "") && (drug1D != "") && (drug1F != "") && (drug1R != "")) {
                                      
-                            dose1Tmp.value = $('#drug1Dose').val(); 
-                            dose1Tmp.formulation = $('#drug1Formulation option:selected').text();
-                            dose1Tmp.duration = $('#drug1Duration').val();
-                            dose1Tmp.regimens = $('#drug1Regimens option:selected').text();
+                            dose1Tmp.value = drug1V;
+                            dose1Tmp.formulation = drug1F;
+                            dose1Tmp.duration = drug1D;
+                            dose1Tmp.regimens = drug1R;
                             if (dose1Tmp.ranges == null && dose1Tmp.hasTarget == null) {
                                 dose1Tmp.hasTarget = cachedOATarget;
                                 dose1Tmp.ranges = cachedOARanges;
                             }
                             mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;   
-                            console.log("mpeditor - submit - update drug 1 dose");
                         }
 
-
                         var dose2Tmp = mpData.supportsBy.supportsBy.drug2Dose;
-                        if (($('#drug2Dose').val().trim() != "") && (dose2Tmp.value != $('#drug2Dose').val() || dose2Tmp.formulation != $('#drug2Formulation option:selected').text() || dose2Tmp.duration != $('#drug2Duration').val() || dose2Tmp.regimens != $('#drug2Regimens option:selected').text())) {
+                        var drug2V = $('#drug2Dose').val();
+                        var drug2F = $('#drug2Formulation option:selected').text();
+                        var drug2D = $('#drug2Duration').val();
+                        var drug2R = $('#drug2Regimens option:selected').text();
+                        if ((drug2V != "") && (drug2D != "") && (drug2F != "") && (drug2R != "")) {
                                      
-                            dose2Tmp.value = $('#drug2Dose').val(); 
-                            dose2Tmp.formulation = $('#drug2Formulation option:selected').text();
-                            dose2Tmp.duration = $('#drug2Duration').val();
-                            dose2Tmp.regimens = $('#drug2Regimens option:selected').text();
+                            dose2Tmp.value = drug2V;
+                            dose2Tmp.formulation = drug2F;
+                            dose2Tmp.duration = drug2D;
+                            dose2Tmp.regimens = drug2R;
                             if (dose2Tmp.ranges == null && dose2Tmp.hasTarget == null) {
                                 dose2Tmp.hasTarget = cachedOATarget;
                                 dose2Tmp.ranges = cachedOARanges;
                             }
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
-                            console.log("mpeditor - submit - update drug 2 dose");
                         }
 
-                        var auc = mpData.auc;
+
+                        var aucUnchanged = $('#auc-unchanged-checkbox').is(':checked');
                         var aucValue = $('#auc').val().trim();
                         var aucType = $('#aucType option:selected').text();
                         var aucDirection = $('#aucDirection option:selected').text();
-                        
-                        if ((aucValue != "" && mpData.auc.value != aucValue) || (aucType != "" && mpData.auc.type != aucType) || (aucDirection != "" && mpData.auc.direction != aucDirection)) {
-                            mpData.auc.value = aucValue;
-                            mpData.auc.type = aucType
-                            mpData.auc.direction = aucDirection;
+
+                        if (aucUnchanged || (aucValue != "" && aucType != "" && aucDirection != "")) {
+                            if (aucUnchanged) {
+                                mpData.auc.value = "unchanged";            
+                                mpData.auc.type = "";
+                                mpData.auc.direction = "";      
+                            }
+                            else {
+                                mpData.auc.value = aucValue;
+                                mpData.auc.type = aucType;
+                                mpData.auc.direction = aucDirection;      
+                            }
                             if (mpData.auc.ranges == null && mpData.auc.hasTarget == null) {
                                 mpData.auc.hasTarget = cachedOATarget;
                                 mpData.auc.ranges = cachedOARanges;
-                            }
-                            console.log("mpeditor - submit - update auc");
-                        }
+                            }                            
+                        } else {
+                            console.log("[WARNING] auc required fields not filled!");
+                        }                        
 
                         var cmax = mpData.cmax;
                         var cmaxValue = $('#cmax').val().trim();
                         var cmaxType = $('#cmaxType option:selected').text();
                         var cmaxDirection = $('#cmaxDirection option:selected').text();
-                        if ((cmaxValue != "" && mpData.cmax.value != cmaxValue) || (cmaxType != "" && mpData.cmax.type != cmaxType) || (cmaxDirection != "" && mpData.cmax.direction != cmaxDirection)) {
+                        if ((cmaxValue != "" && mpData.cmax.value != cmaxValue) && (cmaxType != "" && mpData.cmax.type != cmaxType) && (cmaxDirection != "" && mpData.cmax.direction != cmaxDirection)) {
                             mpData.cmax.value = cmaxValue;
                             mpData.cmax.type = cmaxType
                             mpData.cmax.direction = cmaxDirection;
@@ -436,7 +453,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var clearanceType = $('#clearanceType option:selected').text();
                         var clearanceDirection = $('#clearanceDirection option:selected').text();
 
-                        if ((clearanceValue != "" && mpData.clearance.value != clearanceValue) || (clearanceType != "" && mpData.clearance.type != clearanceType) || (clearanceDirection != "" && mpData.clearance.direction != clearanceDirection)) {
+                        if ((clearanceValue != "" && mpData.clearance.value != clearanceValue) && (clearanceType != "" && mpData.clearance.type != clearanceType) && (clearanceDirection != "" && mpData.clearance.direction != clearanceDirection)) {
                             mpData.clearance.value = clearanceValue;
                             mpData.clearance.type = clearanceType
                             mpData.clearance.direction = clearanceDirection;
@@ -451,7 +468,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var halflifeValue = $('#halflife').val().trim();
                         var halflifeType = $('#halflifeType option:selected').text();
                         var halflifeDirection = $('#halflifeDirection option:selected').text();
-                        if ((halflifeValue != "" && mpData.halflife.value != halflifeValue) || (halflifeType != "" && mpData.halflife.type != halflifeType) || (halflifeDirection != "" && mpData.halflife.direction != halflifeDirection)) {
+                        if ((halflifeValue != "" && mpData.halflife.value != halflifeValue) && (halflifeType != "" && mpData.halflife.type != halflifeType) && (halflifeDirection != "" && mpData.halflife.direction != halflifeDirection)) {
                             mpData.halflife.value = halflifeValue;
                             mpData.halflife.type = halflifeType
                             mpData.halflife.direction = halflifeDirection;
