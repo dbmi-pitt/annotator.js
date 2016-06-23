@@ -48,9 +48,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
         if (this.options.defaultFields) {
 
             this.addField({
-                type: 'div',
-                label: _t('Comments') + '\u2026',
-                id: 'quote',
+                // type: 'div',
+                // label: _t('Comments') + '\u2026',
+                // id: 'quote',
                 load: function (field, annotation, annotations) {               
                     
                     var claim = annotation.argues;     
@@ -73,7 +73,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();                
-
                    
                         var quoteobject = $("<div id='quotearea'/>");
                         $('#quote').append(quoteobject);
@@ -143,7 +142,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                             
                             $(field).find('#quote').css('background', '#EDEDED');
-
                             
                             //load fields from annotation.claim
                             $("#Drug1 > option").each(function () {
@@ -235,7 +233,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
 
                         // load mp material field  
-                        $("#participants").val(loadData.supportsBy.supportsBy.participants.value);                                                 
+                        $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
+                        if (loadData.supportsBy.supportsBy.participants.hasTarget != null)
+                            $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');                                               
+
                         $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
                         $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
                         $("#drug1Formulation > option").each(function () {
@@ -246,6 +247,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.supportsBy.supportsBy.drug1Dose.regimens) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null)
+                            $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
+
                         
                         $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
                         $("#drug2Duration").val(loadData.supportsBy.supportsBy.drug2Dose.duration);
@@ -257,6 +261,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.supportsBy.supportsBy.drug2Dose.regimens) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null)
+                            $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');       
 
                         // load mp data fields
 
@@ -281,6 +287,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', true);                                                  }
                             });
                         }
+                        if (loadData.auc.hasTarget != null)
+                            $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || '');       
 
                         // CMAX
                         $("#cmax").val(loadData.cmax.value);
@@ -292,6 +300,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.cmax.direction) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.cmax.hasTarget != null)
+                            $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || '');       
 
                         // Clearance
                         $("#clearance").val(loadData.clearance.value);
@@ -303,6 +313,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.clearance.direction) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.clearance.hasTarget != null)
+                            $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || '');       
 
                         // HALFLIFE
                         $("#halflife").val(loadData.halflife.value);
@@ -314,6 +326,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.halflife.direction) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.halflife.hasTarget != null)
+                            $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || '');       
+                        
                     }                     
                 },
                 
@@ -711,7 +726,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
         var input = null,
             element = $('<li class="annotator-item" />');
 
-
+        console.log(field);
         field.element = element[0];
 
         if (field.type === 'textarea') {
@@ -736,7 +751,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
         if (field.type === 'div') {
             input.attr({
-
                 html: field.label
             });
         }
