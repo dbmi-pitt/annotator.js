@@ -10,6 +10,13 @@ var $ = require('jquery');
 var context1 = {
     questions: [
         {
+            type:"quote",
+            name:"Quote: ",
+            id:"quote",
+            options:[],
+            optionsID:[]
+        },
+        {
             type:"dropdown",
             name:"Drug1: ",
             id:"Drug1",
@@ -71,6 +78,13 @@ var context1 = {
 var context2 = {
     questions: [
         {
+            type:"quote",
+            name:"Quote: ",
+            id:"participantsquote",
+            options:[],
+            optionsID:[]
+        },
+        {
             type: "input",
             name: "Number of Participants: ",
             id: "participants"
@@ -81,6 +95,13 @@ var context2 = {
 // Data - Drug 1 dosage form
 var context3 = {
     questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"dose1quote",
+            options:[],
+            optionsID:[]
+        },
         {
             type: "input",
             name: "Dose: ",
@@ -104,13 +125,20 @@ var context3 = {
             id:"drug1Regimens",
             options:["UNK","SD","QD","BID", "TID", "QID", "Q12", "Q8", "Q6", "Daily"],
             optionsID:[]
-      }
+        }
     ]
 };
 
 // Data - Drug 2 dosage form
 var context4 = {
     questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"dose2quote",
+            options:[],
+            optionsID:[]
+        },
         {
             type: "input",
             name: "Dose: ",
@@ -143,6 +171,13 @@ var context4 = {
 var context5 = {
     questions: [
         {
+            type:"quote",
+            name:"Quote: ",
+            id:"aucquote",
+            options:[],
+            optionsID:[]
+        },
+        {
             type: "input",
             name: "AUC: ",
             id: "auc"
@@ -174,6 +209,13 @@ var context5 = {
 var context6 = {
     questions: [
         {
+            type:"quote",
+            name:"Quote: ",
+            id:"cmaxquote",
+            options:[],
+            optionsID:[]
+        },
+        {
             type: "input",
             name: "CMAX: ",
             id: "cmax"
@@ -199,6 +241,13 @@ var context6 = {
 // Data - Clearance form
 var context7 = {
     questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"clearancequote",
+            options:[],
+            optionsID:[]
+        },
         {
             type: "input",
             name: "Clearance: ",
@@ -226,6 +275,13 @@ var context7 = {
 // Data - half life form
 var context8 = {
     questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"halflifequote",
+            options:[],
+            optionsID:[]
+        },
         {
             type: "input",
             name: "Half life: ",
@@ -268,18 +324,22 @@ var context9 = {
 // @outputs: form1 in html
 Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
-    
-    for (var i=0, l=items.length; i<l; i++) {
-        if (((i)%4==0))
+    if (items[0].type == "quote") {
+        out += "<strong>" + items[0].name +"</strong><div id='" + items[0].id + "' ></div>";
+    }
+    out += "<table class='clear-user-agent-styles'>";
+    for (var i = 1, l=items.length; i<l; i++) {
+        
+        if (((i)%5==0))
             out = out + "<tr>";
-
+            
         if (items[i].id == "enzyme") 
             out += "<td><strong id='enzymesection1'>" + items[i].name +"</strong></td><td>";
         else if (items[i].id == "drug1precipitant" || items[i].id == "drug2precipitant") 
             out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>"
         else 
             out = out + "<td><strong>" + items[i].name +"</strong></td><td>";
-            
+        
         if (items[i].type=="radiobutton") {
             for (var j = 0, sl = items[i].options.length; j < sl; j++)
                 out = out + "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'></input>";            
@@ -287,48 +347,56 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
         else if (items[i].type=="dropdown") {
             out = out + "<select id='" + items[i].id + "'>";
             for(var j = 0, sl = items[i].options.length; j<sl; j++) {
-                if(items[i].optionsID.length==0)
+                if (items[i].optionsID.length==0)
                     out = out + "<option value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
                 else
                     out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
             }
             out = out + "</select>";
         } 
-        else if(items[i].type=="textarea") {
+        else if (items[i].type=="textarea") {
             out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
         }
-
+        
         out = out + "</td>";
-        if(((i+1)%4==0))
+
+        if(((i+1)%5==0))
             out = out + "</tr>";
     }
+    out +="</table>";
+    
     return out;
 });
 
 Handlebars.registerHelper('buildFormData', function(items, options) {
     var out = "";
     for(var i=0, l=items.length; i<l; i++) {
-        out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
-        if(items[i].type=="text")
-            out += "<strong id='"+items[i].id+"'></strong><br>";
-        else if(items[i].type=="input")
-            out += "<input style='width:30px;' type='text' id='"+items[i].id+"'>";
-        else if (items[i].type=="dropdown") {
-            out = out + "<select id='" + items[i].id + "'>";
-            for(var j = 0, sl = items[i].options.length; j<sl; j++) {
-                if(items[i].optionsID.length==0)
-                    out = out + "<option value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
-                else
-                    out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
-            }
-            out = out + "</select>";
+        if (items[i].type == "quote") {
+            out += "<strong>" + items[i].name +"</strong><div id='" + items[i].id + "' ></div>";
         }
-        else if (items[i].type=="radiobutton") {
-            for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";            
-        } 
-        else if (items[i].type=="checkbox") {
-            out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
+        else {
+            out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+            if(items[i].type=="text")
+                out += "<strong id='"+items[i].id+"'></strong><br>";
+            else if(items[i].type=="input")
+                out += "<input style='width:30px;' type='text' id='"+items[i].id+"'>";
+            else if (items[i].type=="dropdown") {
+                out = out + "<select id='" + items[i].id + "'>";
+                for(var j = 0, sl = items[i].options.length; j<sl; j++) {
+                    if(items[i].optionsID.length==0)
+                        out = out + "<option value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
+                    else
+                        out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
+                }
+                out = out + "</select>";
+            }
+            else if (items[i].type=="radiobutton") {
+                for (var j = 0, sl = items[i].options.length; j < sl; j++)
+                    out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";            
+            } 
+            else if (items[i].type=="checkbox") {
+                out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
+            }
         }
     }
     return out;
@@ -385,13 +453,16 @@ Template.content = [
 
     '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
     '<form class="annotator-widget">',
-    '<ul class="annotator-listing"></ul>',
+    // '<ul class="annotator-listing"></ul>',
+
     '<div class="annotationbody" style="margin-left:5px;margin-right:0px;height:100%;line-height:200%;margin-top:0px;overflow-y: hidden">',
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
+    // '<div id="quote" class="quoteborder" style="display: none;">',
+
     // current claim label
-    '<div id="claim-label-data-editor" style="display: none;"></div><br>',
+    '<div id="claim-label-data-editor" style="display: none;"></div>',
 
     // links 
     '<div id="mp-data-nav" style="display: none;">',
@@ -407,9 +478,7 @@ Template.content = [
 
     // Claim form
     '<div id="mp-claim-form" style="margin-top:10px;margin-left:5px;display: none;">',
-    '<table class="clear-user-agent-styles">',
     form1,
-    '</table>',
     '</div>',
     
     // Data & material - Num of Participants
