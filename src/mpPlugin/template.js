@@ -325,7 +325,8 @@ var context9 = {
 Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
     if (items[0].type == "quote") {
-        out += "<strong>" + items[0].name +"</strong><div id='" + items[0].id + "' ></div>";
+        // <strong>" + items[0].name +"</strong> 
+        out += "<div id='" + items[0].id + "' class='claimquoteborder' ></div><br><br>";
     }
     out += "<table class='clear-user-agent-styles'>";
     for (var i = 1, l=items.length; i<l; i++) {
@@ -372,7 +373,8 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
     var out = "";
     for(var i=0, l=items.length; i<l; i++) {
         if (items[i].type == "quote") {
-            out += "<strong>" + items[i].name +"</strong><div id='" + items[i].id + "' ></div>";
+            // <strong>" + items[i].name +"</strong>
+            out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br>";
         }
         else {
             out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
