@@ -233,6 +233,12 @@ var context6 = {
             id:"cmaxDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"cmax-unchanged-checkbox",
+            value: "cmaxunchanged"
         }
     ]
 };
@@ -266,6 +272,12 @@ var context7 = {
             id:"clearanceDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"clearance-unchanged-checkbox",
+            value: "clearanceunchanged"
         }
     ]
 };
@@ -300,6 +312,12 @@ var context8 = {
             id:"halflifeDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"halflife-unchanged-checkbox",
+            value: "halflifeunchanged"
         }
     ]
 };
