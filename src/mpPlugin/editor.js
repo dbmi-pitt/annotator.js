@@ -48,9 +48,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
         if (this.options.defaultFields) {
 
             this.addField({
-                type: 'div',
-                label: _t('Comments') + '\u2026',
-                id: 'quote',
+                // type: 'div',
+                // label: _t('Comments') + '\u2026',
+                // id: 'quote',
                 load: function (field, annotation, annotations) {               
                     
                     var claim = annotation.argues;     
@@ -58,7 +58,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                     // load MP Claim
                     if(currFormType == "claim"){
                         console.log("mpeditor - load - claim");
-
+                        
                         // clean claim editor
                         $('#quote').empty();
                         $("#method")[0].selectedIndex = 0;
@@ -73,7 +73,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();                
-
                    
                         var quoteobject = $("<div id='quotearea'/>");
                         $('#quote').append(quoteobject);
@@ -98,7 +97,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (quotecontent.indexOf(list[i]) >= 0 && "<span class='highlightdrug'>".indexOf(list[i]) < 0) {
                                 index++;
                                 quotecontent = quotecontent.replace(list[i], "<span class='highlightdrug'>" + list[i] + "</span>");
-
+                                
                                 // add to dropdown box
                                 $('#Drug1').append($('<option>', {
                                     value: list[i],
@@ -143,7 +142,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                             
                             $(field).find('#quote').css('background', '#EDEDED');
-
                             
                             //load fields from annotation.claim
                             $("#Drug1 > option").each(function () {
@@ -192,10 +190,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
-                        $("#drug1-dose-switch-btn").html(claim.qualifiedBy.drug1 + " Dose");
-                        $("#drug2-dose-switch-btn").html(claim.qualifiedBy.drug2 + " Dose");
-                        $("#drug1Dose-label").html(claim.qualifiedBy.drug1 + " Dose");
-                        $("#drug2Dose-label").html(claim.qualifiedBy.drug2 + " Dose");
+                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose";
+                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose";
+
+                        if (claim.qualifiedBy.relationship == "interact with") {
+                            if (claim.qualifiedBy.precipitant == "drug1")
+                                drug1doseLabel += " (precipitant)";                                
+                            else if (claim.qualifiedBy.precipitant == "drug2")
+                                drug2doseLabel += " (precipitant)";                                
+                            }
+                        
+                        $("#drug1-dose-switch-btn").html(drug1doseLabel);
+                        $("#drug2-dose-switch-btn").html(drug2doseLabel);
+                        $("#drug1Dose-label").html(drug1doseLabel);
+                        $("#drug2Dose-label").html(drug2doseLabel);
                         $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
 
                     }
@@ -235,7 +243,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
 
                         // load mp material field  
-                        $("#participants").val(loadData.supportsBy.supportsBy.participants.value);                                                 
+                        $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
+                        if (loadData.supportsBy.supportsBy.participants.hasTarget != null)
+                            $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');                                               
+
                         $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
                         $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
                         $("#drug1Formulation > option").each(function () {
@@ -246,6 +257,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.supportsBy.supportsBy.drug1Dose.regimens) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null)
+                            $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
+
                         
                         $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
                         $("#drug2Duration").val(loadData.supportsBy.supportsBy.drug2Dose.duration);
@@ -257,13 +271,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.supportsBy.supportsBy.drug2Dose.regimens) {
                                 $(this).prop('selected', true);                                                  }
                         });
+                        if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null)
+                            $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');       
 
                         // load mp data fields
 
                         // evidence relationship
                         if (loadData.evRelationship == "refutes")
                             $('input[name=evRelationship][value=refutes]').prop('checked', true);               
-                        else
+                        else if (loadData.evRelationship == "supports")
                             $('input[name=evRelationship][value=supports]').prop('checked', true);                
 
 
@@ -281,39 +297,61 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', true);                                                  }
                             });
                         }
+                        if (loadData.auc.hasTarget != null)
+                            $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || '');       
 
-                        // CMAX
-                        $("#cmax").val(loadData.cmax.value);
-                        $("#cmaxType > option").each(function () {
-                            if (this.value === loadData.cmax.type) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        $("#cmaxDirection > option").each(function () {
-                            if (this.value === loadData.cmax.direction) {
-                                $(this).prop('selected', true);                                                  }
-                        });
 
-                        // Clearance
-                        $("#clearance").val(loadData.clearance.value);
-                        $("#clearanceType > option").each(function () {
-                            if (this.value === loadData.clearance.type) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        $("#clearanceDirection > option").each(function () {
-                            if (this.value === loadData.clearance.direction) {
-                                $(this).prop('selected', true);                                                  }
-                        });
+                        // CMAX: if unchanged then mark on checkbox, else load cmax
+                        if (loadData.cmax.value == "unchanged") {
+                            $('#cmax-unchanged-checkbox').attr('checked','checked');
+                        } else {
+                            $("#cmax").val(loadData.cmax.value);
+                            $("#cmaxType > option").each(function () {
+                                if (this.value === loadData.cmax.type) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                            $("#cmaxDirection > option").each(function () {
+                                if (this.value === loadData.cmax.direction) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                        }
+                        if (loadData.cmax.hasTarget != null)
+                            $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || '');       
 
-                        // HALFLIFE
-                        $("#halflife").val(loadData.halflife.value);
-                        $("#halflifeType > option").each(function () {
-                            if (this.value === loadData.halflife.type) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        $("#halflifeDirection > option").each(function () {
-                            if (this.value === loadData.halflife.direction) {
-                                $(this).prop('selected', true);                                                  }
-                        });
+                        // CLEARANCE: if unchanged then mark on checkbox, else load clearance
+                        if (loadData.clearance.value == "unchanged") {
+                            $('#clearance-unchanged-checkbox').attr('checked','checked');
+                        } else {
+                            $("#clearance").val(loadData.clearance.value);
+                            $("#clearanceType > option").each(function () {
+                                if (this.value === loadData.clearance.type) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                            $("#clearanceDirection > option").each(function () {
+                                if (this.value === loadData.clearance.direction) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                        }
+                        if (loadData.clearance.hasTarget != null)
+                            $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || '');       
+
+                        // HALFLIFE: if unchanged then mark on checkbox, else load halflife
+                        if (loadData.halflife.value == "unchanged") {
+                            $('#halflife-unchanged-checkbox').attr('checked','checked');
+                        } else {
+                            $("#halflife").val(loadData.halflife.value);
+                            $("#halflifeType > option").each(function () {
+                                if (this.value === loadData.halflife.type) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                            $("#halflifeDirection > option").each(function () {
+                                if (this.value === loadData.halflife.direction) {
+                                    $(this).prop('selected', true);                                                  }
+                            });
+                        }
+                        if (loadData.halflife.hasTarget != null)
+                            $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || '');       
+
                     }                     
                 },
                 
@@ -433,51 +471,79 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             console.log("[WARNING] auc required fields not filled!");
                         }                        
 
-                        var cmax = mpData.cmax;
+                        var cmaxUnchanged = $('#cmax-unchanged-checkbox').is(':checked');
                         var cmaxValue = $('#cmax').val().trim();
                         var cmaxType = $('#cmaxType option:selected').text();
                         var cmaxDirection = $('#cmaxDirection option:selected').text();
-                        if ((cmaxValue != "" && mpData.cmax.value != cmaxValue) && (cmaxType != "" && mpData.cmax.type != cmaxType) && (cmaxDirection != "" && mpData.cmax.direction != cmaxDirection)) {
-                            mpData.cmax.value = cmaxValue;
-                            mpData.cmax.type = cmaxType
-                            mpData.cmax.direction = cmaxDirection;
+
+                        if (cmaxUnchanged || (cmaxValue != "" && cmaxType != "" && cmaxDirection != "")) {
+                            if (cmaxUnchanged) {
+                                mpData.cmax.value = "unchanged";            
+                                mpData.cmax.type = "";
+                                mpData.cmax.direction = "";      
+                            }
+                            else {
+                                mpData.cmax.value = cmaxValue;
+                                mpData.cmax.type = cmaxType;
+                                mpData.cmax.direction = cmaxDirection;      
+                            }
                             if (mpData.cmax.ranges == null && mpData.cmax.hasTarget == null) {
                                 mpData.cmax.hasTarget = cachedOATarget;
                                 mpData.cmax.ranges = cachedOARanges;
-                            }
-                            console.log("mpeditor - submit - update cmax");
-                        }
+                            }                            
+                        } else {
+                            console.log("[WARNING] cmax required fields not filled!");
+                        }                
 
-                        var clearance = mpData.clearance;
+
+                        var clearanceUnchanged = $('#clearance-unchanged-checkbox').is(':checked');
                         var clearanceValue = $('#clearance').val().trim();
                         var clearanceType = $('#clearanceType option:selected').text();
                         var clearanceDirection = $('#clearanceDirection option:selected').text();
 
-                        if ((clearanceValue != "" && mpData.clearance.value != clearanceValue) && (clearanceType != "" && mpData.clearance.type != clearanceType) && (clearanceDirection != "" && mpData.clearance.direction != clearanceDirection)) {
-                            mpData.clearance.value = clearanceValue;
-                            mpData.clearance.type = clearanceType
-                            mpData.clearance.direction = clearanceDirection;
+                        if (clearanceUnchanged || (clearanceValue != "" && clearanceType != "" && clearanceDirection != "")) {
+                            if (clearanceUnchanged) {
+                                mpData.clearance.value = "unchanged";            
+                                mpData.clearance.type = "";
+                                mpData.clearance.direction = "";      
+                            }
+                            else {
+                                mpData.clearance.value = clearanceValue;
+                                mpData.clearance.type = clearanceType;
+                                mpData.clearance.direction = clearanceDirection;      
+                            }
                             if (mpData.clearance.ranges == null && mpData.clearance.hasTarget == null) {
                                 mpData.clearance.hasTarget = cachedOATarget;
                                 mpData.clearance.ranges = cachedOARanges;
-                            }
-                            console.log("mpeditor - submit - update clearance");
-                        }
+                            }                            
+                        } else {
+                            console.log("[WARNING] clearance required fields not filled!");
+                        }                
 
-                        var halflife = mpData.halflife;
+
+                        var halflifeUnchanged = $('#halflife-unchanged-checkbox').is(':checked');
                         var halflifeValue = $('#halflife').val().trim();
                         var halflifeType = $('#halflifeType option:selected').text();
                         var halflifeDirection = $('#halflifeDirection option:selected').text();
-                        if ((halflifeValue != "" && mpData.halflife.value != halflifeValue) && (halflifeType != "" && mpData.halflife.type != halflifeType) && (halflifeDirection != "" && mpData.halflife.direction != halflifeDirection)) {
-                            mpData.halflife.value = halflifeValue;
-                            mpData.halflife.type = halflifeType
-                            mpData.halflife.direction = halflifeDirection;
+
+                        if (halflifeUnchanged || (halflifeValue != "" && halflifeType != "" && halflifeDirection != "")) {
+                            if (halflifeUnchanged) {
+                                mpData.halflife.value = "unchanged";            
+                                mpData.halflife.type = "";
+                                mpData.halflife.direction = "";      
+                            }
+                            else {
+                                mpData.halflife.value = halflifeValue;
+                                mpData.halflife.type = halflifeType;
+                                mpData.halflife.direction = halflifeDirection;      
+                            }
                             if (mpData.halflife.ranges == null && mpData.halflife.hasTarget == null) {
                                 mpData.halflife.hasTarget = cachedOATarget;
                                 mpData.halflife.ranges = cachedOARanges;
-                            }
-                            console.log("mpeditor - submit - update half life");
-                        }
+                            }                            
+                        } else {
+                            console.log("[WARNING] halflife required fields not filled!");
+                        }                
 
                         annotation.argues.supportsBy[currDataNum] = mpData;
                     }
@@ -711,7 +777,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
         var input = null,
             element = $('<li class="annotator-item" />');
 
-
+        console.log(field);
         field.element = element[0];
 
         if (field.type === 'textarea') {
@@ -736,7 +802,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
         if (field.type === 'div') {
             input.attr({
-
                 html: field.label
             });
         }

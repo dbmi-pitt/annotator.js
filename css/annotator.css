@@ -62,11 +62,19 @@
 	margin-top: 25px;
 }
 
-.quoteborder {
+.claimquoteborder {
 	clear: both;
 	position:fixed;
 	margin-top:-30px;
 	max-height: 50px;
+	overflow-y: scroll;
+}
+
+.dataquoteborder {
+	clear: both;
+	position:fixed;
+	margin-top:-30px;
+	max-height: 40px;
 	overflow-y: scroll;
 }
 
