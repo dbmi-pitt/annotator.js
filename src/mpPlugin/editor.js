@@ -58,7 +58,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                     // load MP Claim
                     if(currFormType == "claim"){
                         console.log("mpeditor - load - claim");
-
+                        
                         // clean claim editor
                         $('#quote').empty();
                         $("#method")[0].selectedIndex = 0;
@@ -97,7 +97,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (quotecontent.indexOf(list[i]) >= 0 && "<span class='highlightdrug'>".indexOf(list[i]) < 0) {
                                 index++;
                                 quotecontent = quotecontent.replace(list[i], "<span class='highlightdrug'>" + list[i] + "</span>");
-
+                                
                                 // add to dropdown box
                                 $('#Drug1').append($('<option>', {
                                     value: list[i],
@@ -190,10 +190,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
-                        $("#drug1-dose-switch-btn").html(claim.qualifiedBy.drug1 + " Dose");
-                        $("#drug2-dose-switch-btn").html(claim.qualifiedBy.drug2 + " Dose");
-                        $("#drug1Dose-label").html(claim.qualifiedBy.drug1 + " Dose");
-                        $("#drug2Dose-label").html(claim.qualifiedBy.drug2 + " Dose");
+                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose";
+                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose";
+
+                        if (claim.qualifiedBy.relationship == "interact with") {
+                            if (claim.qualifiedBy.precipitant == "drug1")
+                                drug1doseLabel += " (precipitant)";                                
+                            else if (claim.qualifiedBy.precipitant == "drug2")
+                                drug2doseLabel += " (precipitant)";                                
+                            }
+                        
+                        $("#drug1-dose-switch-btn").html(drug1doseLabel);
+                        $("#drug2-dose-switch-btn").html(drug2doseLabel);
+                        $("#drug1Dose-label").html(drug1doseLabel);
+                        $("#drug2Dose-label").html(drug2doseLabel);
                         $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
 
                     }
