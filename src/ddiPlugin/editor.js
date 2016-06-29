@@ -56,7 +56,8 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
                     //var annList = annotations.slice();
                     //console.log(annList[0].quote);
                     //var now = annList.splice(0, annotations.options.chunkSize);
-
+                    console.log("[editor.js -- annotation object]")
+                    console.log(annotation);
                     $('#quote').empty();
                     var quoteobject = $("<div id='quotearea'/>");
                     $('#quote').append(quoteobject);

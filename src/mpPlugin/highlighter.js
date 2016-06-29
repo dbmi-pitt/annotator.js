@@ -36,6 +36,10 @@ function highlightRange(normedRange, cssClass, dataRange) {
     // but better than breaking table layouts.
     var nodes = normedRange.textNodes(),
         results = [];
+    console.log("[mpPlugin/highlighter.js--nodes array]");
+    console.log(normedRange);
+    console.log("[mpPlugin/highlighter.js--nodes array]");
+    console.log(nodes);
     for (var i = 0, len = nodes.length; i < len; i++) {
         var node = nodes[i];
         if (!white.test(node.nodeValue)) {
