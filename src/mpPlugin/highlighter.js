@@ -108,6 +108,7 @@ mpHighlighter.prototype.destroy = function () {
 // Returns nothing.
 mpHighlighter.prototype.drawAll = function (annotations) {
     var self = this;
+    console.log("[mpPlugin/highlighter.js--annotations]");
 
     var p = new Promise(function (resolve) {
         var highlights = [];
@@ -148,10 +149,11 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 mpHighlighter.prototype.draw = function (annotation) {
 
     console.log('mphighlighter - draw anntype: ' + annotation.annotationType);
-
+    console.log(annotation);
+    if(annotation.annotationType!=undefined) {
     if (annotation.annotationType != "MP")
         return null;
-
+    }
     //var normedRanges = [];
     var dataRangesL = [];
 
@@ -174,6 +176,7 @@ mpHighlighter.prototype.draw = function (annotation) {
             
             // draw MP data
             var dataL = annotation.argues.supportsBy;
+
 
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
