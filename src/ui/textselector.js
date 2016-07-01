@@ -80,7 +80,8 @@ TextSelector.prototype.captureDocumentSelection = function () {
             ranges.push(normedRange);
         }
     }
-
+    console.log("[textSelector--ranges]");
+    //console.log(ranges);
     // BrowserRange#normalize() modifies the DOM structure and deselects the
     // underlying text as a result. So here we remove the selected ranges and
     // reapply the new ones.
@@ -99,7 +100,29 @@ TextSelector.prototype.captureDocumentSelection = function () {
         selection.addRange(drange);
     }
 
+    //childNodes in selected area
+    var numOfStart = drange.startContainer.childNodes.length;
+    var childNodes = [];
+    var numOfEnd = drange.endOffset;
 
+    for(var i=drange.startOffset;i<numOfStart;i++) {
+        childNodes.push(drange.startContainer.childNodes[i]);
+    }
+    for(var i=0;i<numOfEnd;i++) {
+        childNodes.push(drange.endContainer.childNodes[i]);
+    }
+
+    var pstart = parseInt(drange.startContainer.id.replace("__p",""));
+    var pend = parseInt(drange.endContainer.id.replace("__p",""));
+    //console.log(pstart, pend);
+    for(var i=pstart+1;i<pend;i++) {
+        //console.log(drange.commonAncestorContainer.childNodes[i].childNodes);
+        childNodes.push.apply(childNodes,drange.commonAncestorContainer.childNodes[i].childNodes);
+    }
+
+    ranges.childNodes = childNodes;
+    //console.log(drange);
+    //console.log(childNodes);
     return ranges;
 };
 

@@ -75,8 +75,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();
 
-                        //console.log("[mpPlugin/editor.js -- annotation object]")
-                        //console.log(annotation);
+                        console.log("[mpPlugin/editor.js -- annotation object]")
+                        console.log(annotation);
                         //console.log("'#"+annotation.id+"-claim-0[name='annotator-hl']'");
                         //var temp = "#"+annotation.id+"-claim-0[name='annotator-hl']";
                         //console.log($("[name='annotator-hl']").size());
@@ -84,15 +84,32 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         //find drugs which only be highlighted in this claim
                         var list = [];//used to store drugs
                         var drugList = document.getElementsByName('annotator-hl');
-                        for(var i=0;i<drugList.length;i++) {
-                            if ($("[name='annotator-hl']:eq("+i+")").html().indexOf(annotation.id + "-claim-0") != -1) {
-                                var parent = document.getElementsByName('annotator-hl')[i];//$("[name='annotator-hl']:eq(1)");
-                                while (parent.childNodes.length > 0) {
+                        console.log("[mpPlugin/editor.js--drugList]");
+                        console.log(drugList);
+                        console.log(annotation.childNodes);
+                        var selectedList = annotation.childNodes;
+                        if(annotation.id==undefined) {
+                            for(var i=0;i<drugList.length;i++) {
+                                if($.inArray(drugList[i], selectedList)!=-1) {
+                                    var parent = drugList[i];
+                                    while (parent.childNodes.length > 0)
+                                        parent = parent.childNodes[0];
+                                    list.push(parent.textContent);
+                                }
+                            }
+
+                        }else{
+                            for(var i=0;i<drugList.length;i++) {
+                                if ($("[name='annotator-hl']:eq("+i+")").html().indexOf(annotation.id + "-claim-0") != -1) {
+                                    var parent = document.getElementsByName('annotator-hl')[i];//$("[name='annotator-hl']:eq(1)");
+                                    while (parent.childNodes.length > 0) {
                                     parent = parent.childNodes[0];
                                 }
+                                console.log(parent.textContent);
                                 list.push(parent.textContent);
                             }
-                        }
+                        }}
+                        console.log(list);
 
                         //document.getElementById(annotation.id+"-claim-0").style.textDecoration='underline';
                    
@@ -149,14 +166,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             });
                         }
 
-                        //load fields from annotation.claim
-                        $("#Drug1 > option").each(function () {
-                            if (this.value === claim.qualifiedBy.drug1) $(this).prop('selected', true);
-                        });
-                        $('#Drug2 > option').each(function () {
-                            if (this.value === claim.qualifiedBy.drug2) $(this).prop('selected', true);
-                        });
-
+                        if(claim.qualifiedBy!=undefined) {
+                            //load fields from annotation.claim
+                            $("#Drug1 > option").each(function () {
+                                if (this.value === claim.qualifiedBy.drug1) $(this).prop('selected', true);
+                            });
+                            $('#Drug2 > option').each(function () {
+                                if (this.value === claim.qualifiedBy.drug2) $(this).prop('selected', true);
+                            });
+                        }
                         // highlight drug selections on text quote
                         //console.log(claim.qualifiedBy);
                         if (claim.qualifiedBy != null) {
@@ -382,7 +400,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 },
                 
                 submit:function (field, annotation) {
-                    document.getElementById(annotation.id+"-claim-0").style.textDecoration='';
+                    //document.getElementById(annotation.id+"-claim-0").style.textDecoration='';
                     if (currFormType == "claim"){
 
                         // MP Claim
