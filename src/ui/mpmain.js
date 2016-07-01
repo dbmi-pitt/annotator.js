@@ -509,7 +509,7 @@ function main(options) {
                             // keep using the same text span
                             isTextSelected = true;
                             cachedOATarget = ann.argues.hasTarget;
-                            cachedOARanges = ann.argues.ranges;    
+                            cachedOARanges = ann.argues.ranges;
 
                             addDataCellByEditor("participants", 0);
                         }, 

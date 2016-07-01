@@ -3,6 +3,7 @@ var Widget = require('./../ui/widget').Widget;
 var util = require('../util');
 var Template = require('./template').Template;
 var $ = util.$;
+
 var _t = util.gettext;
 var Promise = util.Promise;
 var NS = "annotator-editor";
@@ -72,26 +73,48 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
 
                         $('#Drug1 option').remove();
-                        $('#Drug2 option').remove();                
+                        $('#Drug2 option').remove();
+
+                        //console.log("[mpPlugin/editor.js -- annotation object]")
+                        //console.log(annotation);
+                        //console.log("'#"+annotation.id+"-claim-0[name='annotator-hl']'");
+                        //var temp = "#"+annotation.id+"-claim-0[name='annotator-hl']";
+                        //console.log($("[name='annotator-hl']").size());
+                        //console.log($("[name='annotator-hl']:eq(0)").html());
+                        //find drugs which only be highlighted in this claim
+                        var list = [];//used to store drugs
+                        var drugList = document.getElementsByName('annotator-hl');
+                        for(var i=0;i<drugList.length;i++) {
+                            if ($("[name='annotator-hl']:eq("+i+")").html().indexOf(annotation.id + "-claim-0") != -1) {
+                                var parent = document.getElementsByName('annotator-hl')[i];//$("[name='annotator-hl']:eq(1)");
+                                while (parent.childNodes.length > 0) {
+                                    parent = parent.childNodes[0];
+                                }
+                                list.push(parent.textContent);
+                            }
+                        }
+
+                        //document.getElementById(annotation.id+"-claim-0").style.textDecoration='underline';
                    
                         var quoteobject = $("<div id='quotearea'/>");
                         $('#quote').append(quoteobject);
                         $('#quotearea').html(claim.hasTarget.hasSelector.exact || '');
                         var flag = 0;                        
-                        var anns = annotations.slice();
+
                         
                         var quoteobject = $('#quotearea');
                         var quotecontent = $('#quotearea').html();
 
-                        var index = 0;
-                        var list = [];
+                        //out of date: original annotation list filter out duplicates
                         //filter out duplicates
-                        for (var i = 0, len = anns.length; i < len; i++) {
+                        //var anns = annotations.slice();
+                        /*for (var i = 0, len = anns.length; i < len; i++) {
                             if ((anns[i].annotationType == "DrugMention") && (list.indexOf(anns[i].argues.hasTarget.hasSelector.exact) < 0)) {
                                 list.push(anns[i].argues.hasTarget.hasSelector.exact);
                             }
-                        }
-                        
+                        }*/
+
+                        var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
                             // avoid replacing span itself
                             if (quotecontent.indexOf(list[i]) >= 0 && "<span class='highlightdrug'>".indexOf(list[i]) < 0) {
@@ -124,32 +147,35 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             $("#method > option").each(function () {
                                 if (this.value === claim.method) $(this).prop('selected', true);
                             });
-                        } 
+                        }
+
+                        //load fields from annotation.claim
+                        $("#Drug1 > option").each(function () {
+                            if (this.value === claim.qualifiedBy.drug1) $(this).prop('selected', true);
+                        });
+                        $('#Drug2 > option').each(function () {
+                            if (this.value === claim.qualifiedBy.drug2) $(this).prop('selected', true);
+                        });
 
                         // highlight drug selections on text quote
+                        //console.log(claim.qualifiedBy);
                         if (claim.qualifiedBy != null) {
                             if (claim.qualifiedBy.drug1 != "") {
                                 var quotestring = quoteobject.html();
-                                quotestring = quotestring.replace(claim.qualifiedBy.drug1, "<span class='selecteddrug'>" + claim.qualifiedBy.drug1 + "</span>");
+                                quotestring = quotestring.replace("<span class=\"highlightdrug\">"+claim.qualifiedBy.drug1, "<span class=\"selecteddrug\">" + claim.qualifiedBy.drug1);
                                 quoteobject.html(quotestring);
                                 //console.log(quotestring);
                             }
-                            if (claim.qualifiedBy.Drug2 != "") {
+                            if (claim.qualifiedBy.drug2 != "") {
                                 var quotestring = quoteobject.html();
-                                quotestring = quotestring.replace(claim.qualifiedBy.Drug2, "<span class='selecteddrug'>" + claim.qualifiedBy.Drug2 + "</span>");
+                                quotestring = quotestring.replace("<span class=\"highlightdrug\">"+claim.qualifiedBy.drug2, "<span class=\"selecteddrug\">" + claim.qualifiedBy.drug2);
                                 quoteobject.html(quotestring);
                                 //console.log(quotestring);
                             }
                             
                             $(field).find('#quote').css('background', '#EDEDED');
                             
-                            //load fields from annotation.claim
-                            $("#Drug1 > option").each(function () {
-                                if (this.value === claim.qualifiedBy.drug1) $(this).prop('selected', true);
-                            });
-                            $('#Drug2 > option').each(function () {
-                                if (this.value === claim.qualifiedBy.drug2) $(this).prop('selected', true);
-                            });
+
 
                             $('#relationship > option').each(function () {
                                 if (this.value == claim.qualifiedBy.relationship) {
@@ -356,7 +382,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 },
                 
                 submit:function (field, annotation) {
-
+                    document.getElementById(annotation.id+"-claim-0").style.textDecoration='';
                     if (currFormType == "claim"){
 
                         // MP Claim
