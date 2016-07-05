@@ -402,7 +402,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         annotation.annotationType = "MP";
 
-                        console.log($('#method option:selected').text());
                         // MP method - keep with claim
                         annotation.argues.method = $('#method option:selected').text();
                     
@@ -426,7 +425,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     } else if (currFormType != "claim" && currAnnotationId != null && annotation.argues.supportsBy.length > 0) { 
 
-                        console.log("mpeditor update data & material - num: " + currDataNum);
+                        // console.log("mpeditor update data & material - num: " + currDataNum);
                         var mpData = annotation.argues.supportsBy[currDataNum];
                         // Evidence relationship
                         mpData.evRelationship = $("input[name=evRelationship]:checked").val();
@@ -811,7 +810,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
         var input = null,
             element = $('<li class="annotator-item" />');
 
-        console.log(field);
         field.element = element[0];
 
         if (field.type === 'textarea') {
