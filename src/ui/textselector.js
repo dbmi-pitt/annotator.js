@@ -59,6 +59,7 @@ TextSelector.prototype.destroy = function () {
 TextSelector.prototype.captureDocumentSelection = function () {
     var i,
         len,
+        textnodes = [],
         ranges = [],
         rangesToIgnore = [],
         selection = global.getSelection();
@@ -72,6 +73,23 @@ TextSelector.prototype.captureDocumentSelection = function () {
             browserRange = new Range.BrowserRange(r),
             normedRange = browserRange.normalize().limit(this.element);
 
+        var nodes = normedRange.textNodes();
+        console.log("[textSelector--normedRange]");
+        console.log(nodes);
+        var tempParent;
+        //get drug node list
+        for(var i=0;i<nodes.length;i++) {
+            //filter annotator-mp
+            if(nodes[i].parentNode.className == "annotator-hl") {
+                var tempParent = nodes[i].parentNode;
+                while (tempParent.className == "annotator-hl"&&tempParent.getAttribute("name") != "annotator-hl") {
+                    tempParent = tempParent.parentNode;
+                }
+                if(tempParent.className=="annotator-hl")
+                    textnodes.push(tempParent);
+            }
+        }
+        console.log(textnodes);
         // If the new range falls fully outside our this.element, we should
         // add it back to the document but not return it from this method.
         if (normedRange === null) {
@@ -80,8 +98,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
             ranges.push(normedRange);
         }
     }
-    console.log("[textSelector--ranges]");
-    //console.log(ranges);
+
     // BrowserRange#normalize() modifies the DOM structure and deselects the
     // underlying text as a result. So here we remove the selected ranges and
     // reapply the new ones.
@@ -100,29 +117,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
         selection.addRange(drange);
     }
 
-    //childNodes in selected area
-    var numOfStart = drange.startContainer.childNodes.length;
-    var childNodes = [];
-    var numOfEnd = drange.endOffset;
-
-    for(var i=drange.startOffset;i<numOfStart;i++) {
-        childNodes.push(drange.startContainer.childNodes[i]);
-    }
-    for(var i=0;i<numOfEnd;i++) {
-        childNodes.push(drange.endContainer.childNodes[i]);
-    }
-
-    var pstart = parseInt(drange.startContainer.id.replace("__p",""));
-    var pend = parseInt(drange.endContainer.id.replace("__p",""));
-    //console.log(pstart, pend);
-    for(var i=pstart+1;i<pend;i++) {
-        //console.log(drange.commonAncestorContainer.childNodes[i].childNodes);
-        childNodes.push.apply(childNodes,drange.commonAncestorContainer.childNodes[i].childNodes);
-    }
-
-    ranges.childNodes = childNodes;
-    //console.log(drange);
-    //console.log(childNodes);
+    ranges.childNodes = textnodes;
     return ranges;
 };
 

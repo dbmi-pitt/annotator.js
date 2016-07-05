@@ -3,6 +3,7 @@ var Widget = require('./../ui/widget').Widget;
 var util = require('../util');
 var Template = require('./template').Template;
 var $ = util.$;
+var Range = require('xpath-range').Range;
 
 var _t = util.gettext;
 var Promise = util.Promise;
@@ -54,14 +55,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 // id: 'quote',
                 load: function (field, annotation, annotations) {               
                     
-                    var claim = annotation.argues;     
+                    var claim = annotation.argues;
 
                     // load MP Claim
                     if(currFormType == "claim"){
                         console.log("mpeditor - load - claim");
                         
                         // clean claim editor
-                        $('#quote').empty();
+                        $("#quote").empty();
                         $("#method")[0].selectedIndex = 0;
                         $("#relationship")[0].selectedIndex = 0;
 
@@ -75,40 +76,29 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();
 
-                        console.log("[mpPlugin/editor.js -- annotation object]")
-                        console.log(annotation);
-                        //console.log("'#"+annotation.id+"-claim-0[name='annotator-hl']'");
-                        //var temp = "#"+annotation.id+"-claim-0[name='annotator-hl']";
-                        //console.log($("[name='annotator-hl']").size());
-                        //console.log($("[name='annotator-hl']:eq(0)").html());
+
                         //find drugs which only be highlighted in this claim
                         var list = [];//used to store drugs
                         var drugList = document.getElementsByName('annotator-hl');
-                        console.log("[mpPlugin/editor.js--drugList]");
-                        console.log(drugList);
-                        console.log(annotation.childNodes);
                         var selectedList = annotation.childNodes;
                         if(annotation.id==undefined) {
-                            for(var i=0;i<drugList.length;i++) {
-                                if($.inArray(drugList[i], selectedList)!=-1) {
-                                    var parent = drugList[i];
+                            for(var i=0;i<selectedList.length;i++) {
+                                    var parent = selectedList[i];
                                     while (parent.childNodes.length > 0)
                                         parent = parent.childNodes[0];
                                     list.push(parent.textContent);
-                                }
                             }
-
                         }else{
                             for(var i=0;i<drugList.length;i++) {
                                 if ($("[name='annotator-hl']:eq("+i+")").html().indexOf(annotation.id + "-claim-0") != -1) {
                                     var parent = document.getElementsByName('annotator-hl')[i];//$("[name='annotator-hl']:eq(1)");
                                     while (parent.childNodes.length > 0) {
-                                    parent = parent.childNodes[0];
+                                        parent = parent.childNodes[0];
                                 }
-                                console.log(parent.textContent);
                                 list.push(parent.textContent);
                             }
                         }}
+                        console.log("[mpPlugin/editor.js--drugList]");
                         console.log(list);
 
                         //document.getElementById(annotation.id+"-claim-0").style.textDecoration='underline';
