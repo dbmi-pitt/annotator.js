@@ -141,7 +141,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 //console.log(quotestring);
                             }
                             
-                            $(field).find('#quote').css('background', '#d1d1d1');
+                            //$(field).find('#quote').css('background', '#d1d1d1');
                             
                             //load fields from annotation.claim
                             $("#Drug1 > option").each(function () {
