@@ -734,7 +734,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
         
         if (typeof this.dfd !== 'undefined' && this.dfd !== null) {
             this.dfd.resolve();
-        }        
+        }
+        undrawCurrhighlighter();
         this.hide();
     },
     // Public: Submits the editor and saves any changes made to the annotation.
@@ -753,6 +754,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
         }
 
         showEditor();
+        undrawCurrhighlighter();
         app.annotations.update(this.annotation);
     },
 
@@ -775,6 +777,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
             // clean editor status
             currFormType = "";
         }
+        undrawCurrhighlighter();
         this.hide();
         showAnnTable();
     },
@@ -901,6 +904,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
     _onDeleteClick: function (event) {
         preventEventDefault(event);
         this.options.onDelete(this.annotation);
+        undrawCurrhighlighter();
     },
 
     // Event callback: called when a user clicks the editor's cancel button.
