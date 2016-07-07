@@ -475,7 +475,7 @@ Template.content = [
     '<form class="annotator-widget">',
     // '<ul class="annotator-listing"></ul>',
 
-    '<div class="annotationbody" style="margin-left:5px;margin-right:0px;height:100%;line-height:200%;margin-top:0px;overflow-y: hidden">',
+    '<div class="annotationbody" style="margin-left:35px;margin-right:0px;height:100%;line-height:200%;margin-top:0px;overflow-y: hidden">',
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
@@ -497,47 +497,47 @@ Template.content = [
     '</div>',
 
     // Claim form
-    '<div id="mp-claim-form" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-claim-form" style="margin-top:10px;margin-left:15px;display: none;">',
     form1,
     '</div>',
     
     // Data & material - Num of Participants
-    '<div id="mp-data-form-participants" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-participants" style="margin-top:7px;margin-left:25px;display: none;">',
     form2,
     '</div>',
 
     // Data & material - Drug1 Dosage
-    '<div id="mp-data-form-dose1" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-dose1" style="margin-top:7px;margin-left:25px;display: none;">',
     form3,
     '</div>',
 
     // Data & material - Drug2 Dosage
-    '<div id="mp-data-form-dose2" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-dose2" style="margin-top:7px;margin-left:25px;display: none;">',
     form4,
     '</div>',
 
     // Data & material - AUC
-    '<div id="mp-data-form-auc" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-auc" style="margin-top:7px;margin-left:25px;display: none;">',
     form5,
     '</div>',
 
     // Data & material - CMAX
-    '<div id="mp-data-form-cmax" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-cmax" style="margin-top:7px;margin-left:25px;display: none;">',
     form6,
     '</div>',
 
     // Data & material - Clearance
-    '<div id="mp-data-form-clearance" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-clearance" style="margin-top:7px;margin-left:25px;display: none;">',
     form7,
     '</div>',
 
     // Data & material - half life
-    '<div id="mp-data-form-halflife" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-halflife" style="margin-top:7px;margin-left:25px;display: none;">',
     form8,
     '</div>',
 
     // Data & material - evidence relationship
-    '<div id="mp-data-form-evRelationship" style="margin-top:10px;margin-left:5px;display: none;">',
+    '<div id="mp-data-form-evRelationship" style="margin-top:7px;margin-left:25px;display: none;">',
     form9,
     '</div>',
     
