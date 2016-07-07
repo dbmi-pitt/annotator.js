@@ -181,7 +181,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 //console.log(quotestring);
                             }
                             
-                            $(field).find('#quote').css('background', '#EDEDED');
+                            $(field).find('#quote').css('background', '#d1d1d1');
                             
 
 
