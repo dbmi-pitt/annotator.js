@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 var Widget = require('./../ui/widget').Widget,
     util = require('../util');
@@ -233,7 +233,7 @@ mpAdder.template = [
     '<button class="mp-menu-btn" type="button">' + _t('Annotate') + '</button>',
     '<ul class="mp-main-menu" style="display: none;">',
     '<li class="mp-main-menu-1" onclick="showEditor(),claimEditorLoad();">',
-    'create claim',
+    'create a claim',
     '</li>',
     '<li class="mp-main-menu-2">',
     'add data for',
