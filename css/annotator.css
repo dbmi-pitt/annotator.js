@@ -1133,9 +1133,9 @@ span[name="annotator-mp"] {
 }
 
 
-.annotator-temphl {
-	background: #007CFF;
-	background: rgba(0, 124, 255, 0.3);
+.annotator-currhl {
+	background: #ec1b06;
+	background: rgba(255, 23, 11, 0.3);
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4D007CFF, endColorstr=#4D007CFF)";  /* 0.3 == 4D in MS filters */
 }
 
