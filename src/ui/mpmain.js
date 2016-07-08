@@ -18,7 +18,7 @@ var hlhighlighter = require('./../drugPlugin/highlighter');
 var hlviewer = require('./../drugPlugin/viewer');
 
 var _t = util.gettext;
-
+var rangeChildNodes = [];
 
 // trim strips whitespace from either end of a string.
 //
@@ -278,6 +278,11 @@ function main(options) {
                                 $( this ).dialog( "close" );
                                 console.log("mpmain - confirm deletion");
 
+                                // clean cached text selection
+                                isTextSelected = false;
+                                cachedOATarget = "";
+                                cachedOARanges = "";
+
                                 app.annotations.delete(ann);
                                 showAnnTable();
                                 s.mphighlighter.undraw(ann);  
@@ -320,6 +325,11 @@ function main(options) {
                                     ann.argues.supportsBy.splice(currDataNum, 1);
                                     totalDataNum = totalDataNum -1;
                                 }
+
+                                // clean cached text selection
+                                // isTextSelected = false;
+                                // cachedOATarget = "";
+                                // cachedOARanges = "";
                                     
                                 if (typeof s.mpeditor.dfd !== 'undefined' && s.mpeditor.dfd !== null) {
                                     s.mpeditor.dfd.resolve();
@@ -352,7 +362,8 @@ function main(options) {
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
                 console.log("mpmain - textselector - onSelection");
-
+                //global variable: rangeChildNodes
+                rangeChildNodes = ranges.childNodes;
                 if (ranges.length > 0) {
                     //var mpAnnotation = makeMPAnnotation(ranges);
                     var hlAnnotation = makeHLAnnotation(ranges);
@@ -362,7 +373,7 @@ function main(options) {
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
                     //s.mpadder.load(mpAnnotation, s.interactionPoint);
-
+                    //s.mphighlighter.draw(hlAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
@@ -387,7 +398,7 @@ function main(options) {
                     } else { 
                         $("#claim-label-data-editor").show();
                         $('#quote').hide();
-                        switchDataForm(field);   
+                        switchDataForm(field, true);   
                         currDataNum = dataNum;
                     }
                     app.annotations.update(ann);
@@ -462,10 +473,13 @@ function main(options) {
             // completes, and rejected if editing is cancelled. We return it
             // here to "stall" the annotation process until the editing is
             // done.
+            console.log("[mpmain--beforeAnnotationCreated]")
+            //s.mphighlighter.draw(annotation);//enhancement
 
 		    annotation.rawurl = options.source;
     		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
 		    annotation.email = options.email;
+            annotation.childNodes = rangeChildNodes;
 
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
@@ -509,7 +523,7 @@ function main(options) {
                             // keep using the same text span
                             isTextSelected = true;
                             cachedOATarget = ann.argues.hasTarget;
-                            cachedOARanges = ann.argues.ranges;    
+                            cachedOARanges = ann.argues.ranges;
 
                             addDataCellByEditor("participants", 0);
                         }, 
@@ -535,7 +549,7 @@ function main(options) {
 
         beforeAnnotationUpdated: function (annotation) {
             console.log("mpmain - beforeAnnotationUpdated");
-
+            console.log(annotation);
             if (annotation.annotationType == "MP"){
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
