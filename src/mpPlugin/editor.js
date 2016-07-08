@@ -285,8 +285,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
-                        if (loadData.supportsBy.supportsBy.participants.hasTarget != null)
+                        if (loadData.supportsBy.supportsBy.participants.hasTarget != null) {
                             $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');
+                        } else {
+                            $('#participantsquote').html('');
+                        }
                         // else {
                         //     if (cachedOATarget.hasSelector != null)
                         //         $('#participantsquote').html(cachedOATarget.hasSelector.exact || '');                            
@@ -304,7 +307,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         });
                         if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null) {
                             $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
-                        } // else {
+                        } else {
+                            $('#dose1quote').html('');
+                        } 
+
+                        // else {
                         //     if (cachedOATarget.hasSelector != null)
                         //         $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
                         // }
@@ -322,7 +329,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         });
                         if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null) {
                             $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');     
-                        } // else {
+                        } else {
+                            $('#dose2quote').html('');
+                        } 
+
+                        // else {
                         //     if (cachedOATarget.hasSelector != null)
                         //         $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
                         // }  
