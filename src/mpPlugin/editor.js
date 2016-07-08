@@ -287,13 +287,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
                         if (loadData.supportsBy.supportsBy.participants.hasTarget != null) {
                             $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');
-                        } else {
-                            $('#participantsquote').html('');
+                        } 
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#participantsquote').html(cachedOATarget.hasSelector.exact || '');          
+                            else 
+                                $('#participantsquote').html('');         
                         }
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#participantsquote').html(cachedOATarget.hasSelector.exact || '');                            
-                        // }
 
                         $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
                         $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
@@ -307,14 +307,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         });
                         if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null) {
                             $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
-                        } else {
-                            $('#dose1quote').html('');
                         } 
-
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
-                        // }
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
+                            else
+                                $('#dose1quote').html('');
+                        }
 
                         
                         $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
@@ -329,14 +328,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         });
                         if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null) {
                             $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');     
-                        } else {
-                            $('#dose2quote').html('');
                         } 
-
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
-                        // }  
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
+                            else 
+                                $('#dose2quote').html('');                      
+                        }  
 
                         // load mp data fields
 
@@ -363,13 +361,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         if (loadData.auc.hasTarget != null) {
                             $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || ''); 
-                        } else {
-                            $('#aucquote').html(''); 
                         } 
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#aucquote').html(cachedOATarget.hasSelector.exact || '');       
-                        // }      
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#aucquote').html(cachedOATarget.hasSelector.exact || '');       
+                            else 
+                                $('#aucquote').html('');                             
+                        }      
 
 
                         // CMAX: if unchanged then mark on checkbox, else load cmax
@@ -388,13 +386,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         if (loadData.cmax.hasTarget != null) {
                             $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || ''); 
-                        } else {
-                            $('#cmaxquote').html('');
                         } 
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#cmaxquote').html(cachedOATarget.hasSelector.exact || '');       
-                        // }      
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#cmaxquote').html(cachedOATarget.hasSelector.exact || '');       
+                            else 
+                                $('#cmaxquote').html('');                        
+                        }      
 
                         // CLEARANCE: if unchanged then mark on checkbox, else load clearance
                         if (loadData.clearance.value == "unchanged") {
@@ -412,13 +410,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         if (loadData.clearance.hasTarget != null) {
                             $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || ''); 
-                        } else {
-                            $('#clearancequote').html('');
-                        } 
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#clearancequote').html(cachedOATarget.hasSelector.exact || '');       
-                        // }      
+                        }
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#clearancequote').html(cachedOATarget.hasSelector.exact || '');       
+                            else
+                                $('#clearancequote').html('');            
+                        }      
 
                         // HALFLIFE: if unchanged then mark on checkbox, else load halflife
                         if (loadData.halflife.value == "unchanged") {
@@ -436,13 +434,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         if (loadData.halflife.hasTarget != null) {
                             $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || ''); 
-                        } else {
-                            $('#halflifequote').html('');
-                        } 
-                        // else {
-                        //     if (cachedOATarget.hasSelector != null)
-                        //         $('#halflifequote').html(cachedOATarget.hasSelector.exact || '');       
-                        // }      
+                        }
+                        else {
+                            if (cachedOATarget.hasSelector != null)
+                                $('#halflifequote').html(cachedOATarget.hasSelector.exact || '');       
+                            else
+                                $('#halflifequote').html('');              
+                        }      
 
                     }                     
                 },
