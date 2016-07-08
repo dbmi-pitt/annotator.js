@@ -262,15 +262,22 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $("#auc").empty();
                         $("#aucType")[0].selectedIndex = -1;
                         $("#aucDirection")[0].selectedIndex = -1;
+                        $('#auc-unchanged-checkbox').attr('checked',false);
+
                         $("#cmax").empty();
                         $("#cmaxType")[0].selectedIndex = -1;
                         $("#cmaxDirection")[0].selectedIndex = -1;
+                        $('#cmax-unchanged-checkbox').attr('checked',false);
+
                         $("#clearance").empty();
                         $("#clearanceType")[0].selectedIndex = -1;
                         $("#clearanceDirection")[0].selectedIndex = -1;
+                        $('#clearance-unchanged-checkbox').attr('checked',false);
+
                         $("#halflife").empty();
                         $("#halflifeType")[0].selectedIndex = -1;
                         $("#halflifeDirection")[0].selectedIndex = -1;
+                        $('#halflife-unchanged-checkbox').attr('checked',false);
 
                         // clean evidence relationship
                         $('input[name=evRelationship]').prop('checked', false);
@@ -279,7 +286,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
                         if (loadData.supportsBy.supportsBy.participants.hasTarget != null)
-                            $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');                                               
+                            $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');
+                        // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#participantsquote').html(cachedOATarget.hasSelector.exact || '');                            
+                        // }
 
                         $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
                         $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
@@ -291,8 +302,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.supportsBy.supportsBy.drug1Dose.regimens) {
                                 $(this).prop('selected', true);                                                  }
                         });
-                        if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null)
+                        if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null) {
                             $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
+                        } // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
+                        // }
 
                         
                         $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
@@ -305,8 +320,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (this.value === loadData.supportsBy.supportsBy.drug2Dose.regimens) {
                                 $(this).prop('selected', true);                                                  }
                         });
-                        if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null)
-                            $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');       
+                        if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null) {
+                            $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');     
+                        } // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
+                        // }  
 
                         // load mp data fields
 
@@ -319,7 +338,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         // AUC: if unchanged then mark on checkbox, else load auc
                         if (loadData.auc.value == "unchanged") {
-                            $('#auc-unchanged-checkbox').attr('checked','checked');
+                            $('#auc-unchanged-checkbox').prop("checked", true);
                         } else {
                             $("#auc").val(loadData.auc.value);
                             $("#aucType > option").each(function () {
@@ -331,13 +350,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', true);                                                  }
                             });
                         }
-                        if (loadData.auc.hasTarget != null)
-                            $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || '');       
+                        if (loadData.auc.hasTarget != null) {
+                            $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || ''); 
+                        } else {
+                            $('#aucquote').html(''); 
+                        } 
+                        // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#aucquote').html(cachedOATarget.hasSelector.exact || '');       
+                        // }      
 
 
                         // CMAX: if unchanged then mark on checkbox, else load cmax
                         if (loadData.cmax.value == "unchanged") {
-                            $('#cmax-unchanged-checkbox').attr('checked','checked');
+                            $('#cmax-unchanged-checkbox').prop("checked", true);
                         } else {
                             $("#cmax").val(loadData.cmax.value);
                             $("#cmaxType > option").each(function () {
@@ -349,12 +375,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', true);                                                  }
                             });
                         }
-                        if (loadData.cmax.hasTarget != null)
-                            $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || '');       
+                        if (loadData.cmax.hasTarget != null) {
+                            $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || ''); 
+                        } else {
+                            $('#cmaxquote').html('');
+                        } 
+                        // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#cmaxquote').html(cachedOATarget.hasSelector.exact || '');       
+                        // }      
 
                         // CLEARANCE: if unchanged then mark on checkbox, else load clearance
                         if (loadData.clearance.value == "unchanged") {
-                            $('#clearance-unchanged-checkbox').attr('checked','checked');
+                            $('#clearance-unchanged-checkbox').prop("checked", true);
                         } else {
                             $("#clearance").val(loadData.clearance.value);
                             $("#clearanceType > option").each(function () {
@@ -366,12 +399,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', true);                                                  }
                             });
                         }
-                        if (loadData.clearance.hasTarget != null)
-                            $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || '');       
+                        if (loadData.clearance.hasTarget != null) {
+                            $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || ''); 
+                        } else {
+                            $('#clearancequote').html('');
+                        } 
+                        // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#clearancequote').html(cachedOATarget.hasSelector.exact || '');       
+                        // }      
 
                         // HALFLIFE: if unchanged then mark on checkbox, else load halflife
                         if (loadData.halflife.value == "unchanged") {
-                            $('#halflife-unchanged-checkbox').attr('checked','checked');
+                            $('#halflife-unchanged-checkbox').prop("checked", true);
                         } else {
                             $("#halflife").val(loadData.halflife.value);
                             $("#halflifeType > option").each(function () {
@@ -383,8 +423,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', true);                                                  }
                             });
                         }
-                        if (loadData.halflife.hasTarget != null)
-                            $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || '');       
+                        if (loadData.halflife.hasTarget != null) {
+                            $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || ''); 
+                        } else {
+                            $('#halflifequote').html('');
+                        } 
+                        // else {
+                        //     if (cachedOATarget.hasSelector != null)
+                        //         $('#halflifequote').html(cachedOATarget.hasSelector.exact || '');       
+                        // }      
 
                     }                     
                 },
@@ -726,11 +773,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
             field.submit(field.element, this.annotation);
         }
-
-        // clean cached text selection
-        isTextSelected = false;
-        cachedOATarget = "";
-        cachedOARanges = "";      
         
         if (typeof this.dfd !== 'undefined' && this.dfd !== null) {
             this.dfd.resolve();
@@ -881,9 +923,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
     //
     // Returns nothing
     _onSaveCloseClick: function (event) {
+
         preventEventDefault(event);
         showAnnTable();    
         this.submit();
+
+        // clean cached text selection
+        isTextSelected = false;
+        cachedOATarget = "";
+        cachedOARanges = "";      
     },
     // Event callback: called when a user clicks the editor's save button.
     //
@@ -907,6 +955,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
     //
     // Returns nothing
     _onCancelClick: function (event) {
+
+        // clean cached text selection
+        isTextSelected = false;
+        cachedOATarget = "";
+        cachedOARanges = "";      
+
         preventEventDefault(event);
         this.cancel();
     },

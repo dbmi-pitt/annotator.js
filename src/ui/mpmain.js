@@ -278,6 +278,11 @@ function main(options) {
                                 $( this ).dialog( "close" );
                                 console.log("mpmain - confirm deletion");
 
+                                // clean cached text selection
+                                isTextSelected = false;
+                                cachedOATarget = "";
+                                cachedOARanges = "";
+
                                 app.annotations.delete(ann);
                                 showAnnTable();
                                 s.mphighlighter.undraw(ann);  
@@ -320,6 +325,11 @@ function main(options) {
                                     ann.argues.supportsBy.splice(currDataNum, 1);
                                     totalDataNum = totalDataNum -1;
                                 }
+
+                                // clean cached text selection
+                                // isTextSelected = false;
+                                // cachedOATarget = "";
+                                // cachedOARanges = "";
                                     
                                 if (typeof s.mpeditor.dfd !== 'undefined' && s.mpeditor.dfd !== null) {
                                     s.mpeditor.dfd.resolve();
@@ -388,7 +398,7 @@ function main(options) {
                     } else { 
                         $("#claim-label-data-editor").show();
                         $('#quote').hide();
-                        switchDataForm(field);   
+                        switchDataForm(field, true);   
                         currDataNum = dataNum;
                     }
                     app.annotations.update(ann);
