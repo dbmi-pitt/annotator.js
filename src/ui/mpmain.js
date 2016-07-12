@@ -292,7 +292,7 @@ function main(options) {
                                 currAnnotationId = "";
                             },
                             "Cancel": function() {
-                            $( this ).dialog( "close" );
+                                $( this ).dialog( "close" );
                             }
                         }
                     });
@@ -509,7 +509,6 @@ function main(options) {
                 alert('[WARNING] main.js - annotationCreated - annot type not defined: ' + ann.annotationType);
             }
         },
-
         beforeAnnotationUpdated: function (annotation) {
             console.log("mpmain - beforeAnnotationUpdated");
             console.log(annotation);
@@ -535,7 +534,6 @@ function main(options) {
                 alert('[WARNING] main.js - annotationUpdated - annot type not defined: ' + ann.annotationType);
             }
         },
-
         annotationDeleted: function (ann) {
             console.log("mpmain - annotationDeleted called");
             s.mphighlighter.undraw(ann);

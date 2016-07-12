@@ -929,7 +929,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
         // clean cached text selection
         isTextSelected = false;
         cachedOATarget = "";
-        cachedOARanges = "";      
+        cachedOARanges = ""; 
+
+        // reset unsave status
+        unsaved = false;
     },
     // Event callback: called when a user clicks the editor's save button.
     //
@@ -937,6 +940,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
     _onSaveClick: function (event) {
         preventEventDefault(event);
         this.submitNotClose();
+
+        // reset unsave status
+        unsaved = false;
     },
 
     // Event callback: called when a user clicks the editor's delete button.
