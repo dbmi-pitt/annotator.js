@@ -18,7 +18,7 @@ var hlhighlighter = require('./../drugPlugin/highlighter');
 var hlviewer = require('./../drugPlugin/viewer');
 
 var _t = util.gettext;
-
+var rangeChildNodes = [];
 
 // trim strips whitespace from either end of a string.
 //
@@ -278,6 +278,11 @@ function main(options) {
                                 $( this ).dialog( "close" );
                                 console.log("mpmain - confirm deletion");
 
+                                // clean cached text selection
+                                isTextSelected = false;
+                                cachedOATarget = "";
+                                cachedOARanges = "";
+
                                 app.annotations.delete(ann);
                                 showAnnTable();
                                 s.mphighlighter.undraw(ann);  
@@ -320,6 +325,11 @@ function main(options) {
                                     ann.argues.supportsBy.splice(currDataNum, 1);
                                     totalDataNum = totalDataNum -1;
                                 }
+
+                                // clean cached text selection
+                                // isTextSelected = false;
+                                // cachedOATarget = "";
+                                // cachedOARanges = "";
                                     
                                 if (typeof s.mpeditor.dfd !== 'undefined' && s.mpeditor.dfd !== null) {
                                     s.mpeditor.dfd.resolve();
@@ -352,7 +362,8 @@ function main(options) {
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
                 console.log("mpmain - textselector - onSelection");
-
+                //global variable: rangeChildNodes
+                rangeChildNodes = ranges.childNodes;
                 if (ranges.length > 0) {
                     //var mpAnnotation = makeMPAnnotation(ranges);
                     var hlAnnotation = makeHLAnnotation(ranges);
@@ -362,7 +373,7 @@ function main(options) {
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
                     //s.mpadder.load(mpAnnotation, s.interactionPoint);
-
+                    //s.mphighlighter.draw(hlAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
@@ -387,7 +398,7 @@ function main(options) {
                     } else { 
                         $("#claim-label-data-editor").show();
                         $('#quote').hide();
-                        switchDataForm(field);   
+                        switchDataForm(field, true);   
                         currDataNum = dataNum;
                     }
                     app.annotations.update(ann);
@@ -462,10 +473,13 @@ function main(options) {
             // completes, and rejected if editing is cancelled. We return it
             // here to "stall" the annotation process until the editing is
             // done.
+            console.log("[mpmain--beforeAnnotationCreated]")
+            //s.mphighlighter.draw(annotation);//enhancement
 
 		    annotation.rawurl = options.source;
     		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
 		    annotation.email = options.email;
+            annotation.childNodes = rangeChildNodes;
 
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
@@ -486,46 +500,9 @@ function main(options) {
                 currAnnotationId = ann.id;
                 annotationTable(ann.rawurl, ann.email);
 
-                $( "#dialog-claim-options" ).show();
-                
-                // providing options of add another claim or data on current span
-                $( "#claim-dialog-confirm" ).dialog({
-                    resizable: false,
-                    height: 'auto',
-                    width: '400px',
-                    modal: true,
-                    buttons: {
-                        "Add another claim": function() {
-                            $( this ).dialog( "close" ); 
-                            showEditor();
-                            claimEditorLoad();
-                            currFormType = "claim";
-                            var newAnn = (JSON.parse(JSON.stringify(ann)));
-                            newAnn.argues.qualifiedBy = {};
-                            app.annotations.create(newAnn);         
-                        },
-                        "Add data": function() {
-                            $( this ).dialog( "close" );        
-                            // keep using the same text span
-                            isTextSelected = true;
-                            cachedOATarget = ann.argues.hasTarget;
-                            cachedOARanges = ann.argues.ranges;    
-
-                            addDataCellByEditor("participants", 0);
-                        }, 
-                        "Done": function() {
-                            $( this ).dialog( "close" );
-                            showAnnTable();  
-
-                            // clean cached text selection
-                            isTextSelected = false;
-                            cachedOATarget = "";
-                            cachedOARanges = "";
-                        }
-                    }
-                });   
-
-                $('dialog-claim-options').hide();           
+                // show dialog for adding multiple claim/data on the same span
+                addClaimDataDialog(ann);
+         
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.draw(ann);
             } else {
@@ -535,7 +512,7 @@ function main(options) {
 
         beforeAnnotationUpdated: function (annotation) {
             console.log("mpmain - beforeAnnotationUpdated");
-
+            console.log(annotation);
             if (annotation.annotationType == "MP"){
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
@@ -559,8 +536,6 @@ function main(options) {
             }
         },
 
-        // beforeAnnotationDeleted: function(ann){
-        // },
         annotationDeleted: function (ann) {
             console.log("mpmain - annotationDeleted called");
             s.mphighlighter.undraw(ann);
@@ -591,7 +566,7 @@ function isDataRowEmpty(data) {
 }
 
 
-
+// get text contents from DOM node
 function getTxtFromNode(node, isSuffix, ignoreSelector, maxLength){
 
     var origParent;
@@ -626,6 +601,62 @@ function getTxtFromNode(node, isSuffix, ignoreSelector, maxLength){
     }
 
     return contents;
+}
+
+// call to pop up dialog box for showing options during creating claim/data
+function addClaimDataDialog(ann) {
+
+    // dialog box for creating claim options 
+    var claimDialog = document.getElementById('create-claim-dialog');
+    
+    // Get the button that opens the dialog
+    var addDataBtn = document.getElementById("add-data-same-span-btn");
+    var addClaimBtn = document.getElementById("add-claim-same-span-btn");
+    var finishSameSpanBtn = document.getElementById("finish-same-span-btn");   
+    
+    var span = document.getElementsByClassName("close")[0];
+    
+    claimDialog.style.display = "block";
+                
+    // When the user clicks on <span> (x), close the dialog
+    span.onclick = function() {
+        claimDialog.style.display = "none";
+    }
+    
+    // When the user clicks anywhere outside of the dialog, close it
+    window.onclick = function(event) {
+        if (event.target == claimDialog) {
+            claimDialog.style.display = "none";
+        }
+    }
+    
+    addDataBtn.onclick = function() {
+        claimDialog.style.display = "none";
+        isTextSelected = true;
+        cachedOATarget = ann.argues.hasTarget;
+        cachedOARanges = ann.argues.ranges;                    
+        addDataCellByEditor("participants", 0);                    
+    }
+    
+    addClaimBtn.onclick = function() {
+        claimDialog.style.display = "none";
+        showEditor();
+        claimEditorLoad();
+        currFormType = "claim";
+        var newAnn = (JSON.parse(JSON.stringify(ann)));
+        newAnn.argues.qualifiedBy = {};
+        app.annotations.create(newAnn);                   
+    }
+    
+    finishSameSpanBtn.onclick = function() {
+        claimDialog.style.display = "none";
+        showAnnTable();  
+        
+        // clean cached text selection
+        isTextSelected = false;
+        cachedOATarget = "";
+        cachedOARanges = "";
+    }   
 }
 
 
