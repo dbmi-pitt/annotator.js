@@ -7,7 +7,6 @@ var util = require('../util');
 var $ = util.$;
 var Promise = util.Promise;
 
-
 function DataRange(range, field, dataNum) {
     this.range = range;
     this.field = field;
@@ -36,6 +35,7 @@ function highlightRange(normedRange, cssClass, dataRange) {
     // but better than breaking table layouts.
     var nodes = normedRange.textNodes(),
         results = [];
+    console.log("[mpPlugin/highlighter.js]");
     for (var i = 0, len = nodes.length; i < len; i++) {
         var node = nodes[i];
         if (!white.test(node.nodeValue)) {
@@ -70,7 +70,6 @@ function reanchorRange(range, rootElement) {
     }
 
     console.log("[ERROR] mphighlighter - reanchorRange - return null");
-    console.log(range);
     return null;
 }
 
@@ -143,19 +142,19 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 // Returns an Array of drawn highlight elements.
 mpHighlighter.prototype.draw = function (annotation) {
 
-    console.log('mphighlighter - draw anntype: ' + annotation.annotationType);
-
-    if (annotation.annotationType != "MP")
-        return null;
-
+    if(annotation.annotationType!=undefined) {
+        if (annotation.annotationType != "MP")
+            return null;
+    }
     //var normedRanges = [];
     var dataRangesL = [];
 
     try {
-
         // draw MP claim
+
         for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
             var r = reanchorRange(annotation.argues.ranges[i], this.element);
+
             if (r !== null) {
                 //normedRanges.push(r);
                 dataRangesL.push(new DataRange(r, "claim", 0));
@@ -170,6 +169,7 @@ mpHighlighter.prototype.draw = function (annotation) {
             
             // draw MP data
             var dataL = annotation.argues.supportsBy;
+
 
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
@@ -260,7 +260,6 @@ mpHighlighter.prototype.draw = function (annotation) {
 
     for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
         var dataNormed = dataRangesL[j];
-
         $.merge(
             annotation._local.highlights,
             highlightRange(dataNormed.range, this.options.highlightClass, dataNormed));
@@ -281,8 +280,6 @@ mpHighlighter.prototype.draw = function (annotation) {
         }
     }
 
-    //console.log("annotation._local.highlights:");
-    //console.log(annotation._local.highlights);
     return annotation._local.highlights;
 };
 

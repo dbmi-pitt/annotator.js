@@ -59,6 +59,7 @@ TextSelector.prototype.destroy = function () {
 TextSelector.prototype.captureDocumentSelection = function () {
     var i,
         len,
+        textnodes = [],
         ranges = [],
         rangesToIgnore = [],
         selection = global.getSelection();
@@ -72,6 +73,23 @@ TextSelector.prototype.captureDocumentSelection = function () {
             browserRange = new Range.BrowserRange(r),
             normedRange = browserRange.normalize().limit(this.element);
 
+        var nodes = normedRange.textNodes();
+        console.log("[textSelector--normedRange]");
+        console.log(nodes);
+        var tempParent;
+        //get drug node list
+        for(var i=0;i<nodes.length;i++) {
+            //filter annotator-mp
+            if(nodes[i].parentNode.className == "annotator-hl") {
+                var tempParent = nodes[i].parentNode;
+                while (tempParent.className == "annotator-hl"&&tempParent.getAttribute("name") != "annotator-hl") {
+                    tempParent = tempParent.parentNode;
+                }
+                if(tempParent.className=="annotator-hl")
+                    textnodes.push(tempParent);
+            }
+        }
+        console.log(textnodes);
         // If the new range falls fully outside our this.element, we should
         // add it back to the document but not return it from this method.
         if (normedRange === null) {
@@ -99,7 +117,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
         selection.addRange(drange);
     }
 
-
+    ranges.childNodes = textnodes;
     return ranges;
 };
 
