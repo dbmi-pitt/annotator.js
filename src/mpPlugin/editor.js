@@ -435,7 +435,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 },
                 
                 submit:function (field, annotation) {
-                    //document.getElementById(annotation.id+"-claim-0").style.textDecoration='';
+
                     if (currFormType == "claim"){
 
                         // MP Claim
@@ -448,10 +448,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.annotationType = "MP";
 
                         // MP method - keep with claim
-                        annotation.argues.method = $('#method option:selected').text();
-                    
+                        annotation.argues.method = $('#method option:selected').text();                        
                         // MP argues claim, claim qualified by ?s ?p ?o
-                        var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
+                        if (annotation.argues.qualifiedBy != null)
+                            var qualifiedBy = annotation.argues.qualifiedBy;
+                        else
+                            var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
+
                         qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                         qualifiedBy.drug2 = $('#Drug2 option:selected').text();
                         qualifiedBy.relationship = $('#relationship option:selected').text();
@@ -466,7 +469,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.qualifiedBy = qualifiedBy;
                         annotation.argues.type = "mp:claim";
                         annotation.argues.label = claimStatement;
-                        annotation.argues.supportsBy = [];                  
+                        
+                        if (annotation.argues.supportsBy == null)
+                            annotation.argues.supportsBy = [];                  
 
                     } else if (currFormType != "claim" && currAnnotationId != null && annotation.argues.supportsBy.length > 0) { 
 
