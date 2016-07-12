@@ -1369,12 +1369,15 @@ input[type="radio"] {
 
 .modal-header {
     padding: 2px 16px;
-    font-size: 20px;
-    /* background-color: #5cb85c; */
-    /* color: white; */
+    font-size: 16px;
+    background-color: #3e72a6;
+    color: #fff;
 }
 
-.modal-body {padding: 2px 16px;}
+.modal-body {
+    padding: 2px 16px;
+    font-size: 13px;
+}
 
 /* .modal-footer { */
 /*     padding: 2px 16px; */
