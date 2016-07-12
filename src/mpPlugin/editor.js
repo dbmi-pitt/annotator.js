@@ -70,6 +70,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $("#enzyme").hide();
                         $("#enzymesection1").hide();
 
+                        $('input[type=radio][name=precipitant]').show();
+                        $('.precipitantLabel').show();
                         $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
                         $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
 
@@ -98,11 +100,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 list.push(parent.textContent);
                             }
                         }}
-                        console.log("[mpPlugin/editor.js--drugList]");
-                        console.log(list);
+                        //console.log("[mpPlugin/editor.js--drugList]");
+                        //console.log(list);
 
-                        //document.getElementById(annotation.id+"-claim-0").style.textDecoration='underline';
-                   
                         var quoteobject = $("<div id='quotearea'/>");
                         $('#quote').append(quoteobject);
                         $('#quotearea').html(claim.hasTarget.hasSelector.exact || '');
@@ -111,15 +111,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         var quoteobject = $('#quotearea');
                         var quotecontent = $('#quotearea').html();
-
-                        //out of date: original annotation list filter out duplicates
-                        //filter out duplicates
-                        //var anns = annotations.slice();
-                        /*for (var i = 0, len = anns.length; i < len; i++) {
-                            if ((anns[i].annotationType == "DrugMention") && (list.indexOf(anns[i].argues.hasTarget.hasSelector.exact) < 0)) {
-                                list.push(anns[i].argues.hasTarget.hasSelector.exact);
-                            }
-                        }*/
 
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
@@ -182,8 +173,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                             
                             //$(field).find('#quote').css('background', '#d1d1d1');
-                            
-
 
                             $('#relationship > option').each(function () {
                                 if (this.value == claim.qualifiedBy.relationship) {
@@ -220,12 +209,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $('input[name=precipitant][id=drug2precipitant]').prop('checked', true);      
                                 else 
                                     console.log("precipitant information not avaliable");
-                            }                         
+                            }                      
                         }
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
-                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose";
-                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose";
+                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
+                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
 
                         if (claim.qualifiedBy.relationship == "interact with") {
                             if (claim.qualifiedBy.precipitant == "drug1")
@@ -446,7 +435,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 },
                 
                 submit:function (field, annotation) {
-                    //document.getElementById(annotation.id+"-claim-0").style.textDecoration='';
+
                     if (currFormType == "claim"){
 
                         // MP Claim
@@ -459,10 +448,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.annotationType = "MP";
 
                         // MP method - keep with claim
-                        annotation.argues.method = $('#method option:selected').text();
-                    
+                        annotation.argues.method = $('#method option:selected').text();                        
                         // MP argues claim, claim qualified by ?s ?p ?o
-                        var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
+                        if (annotation.argues.qualifiedBy != null)
+                            var qualifiedBy = annotation.argues.qualifiedBy;
+                        else
+                            var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
+
                         qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                         qualifiedBy.drug2 = $('#Drug2 option:selected').text();
                         qualifiedBy.relationship = $('#relationship option:selected').text();
@@ -477,7 +469,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.qualifiedBy = qualifiedBy;
                         annotation.argues.type = "mp:claim";
                         annotation.argues.label = claimStatement;
-                        annotation.argues.supportsBy = [];                  
+                        
+                        if (annotation.argues.supportsBy == null)
+                            annotation.argues.supportsBy = [];                  
 
                     } else if (currFormType != "claim" && currAnnotationId != null && annotation.argues.supportsBy.length > 0) { 
 
@@ -940,7 +934,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
         // clean cached text selection
         isTextSelected = false;
         cachedOATarget = "";
-        cachedOARanges = "";      
+        cachedOARanges = ""; 
+
+        // reset unsave status
+        unsaved = false;
     },
     // Event callback: called when a user clicks the editor's save button.
     //
@@ -948,6 +945,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
     _onSaveClick: function (event) {
         preventEventDefault(event);
         this.submitNotClose();
+
+        // reset unsave status
+        unsaved = false;
     },
 
     // Event callback: called when a user clicks the editor's delete button.
