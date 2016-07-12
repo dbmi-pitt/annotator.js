@@ -500,63 +500,9 @@ function main(options) {
                 currAnnotationId = ann.id;
                 annotationTable(ann.rawurl, ann.email);
 
-                // dialog box for creating claim options 
-                // Get the modal
-                var claimDialog = document.getElementById('create-claim-dialog');
-
-                // Get the button that opens the modal
-                var addDataBtn = document.getElementById("add-data-same-span-btn");
-                var addClaimBtn = document.getElementById("add-claim-same-span-btn");
-                var finishSameSpanBtn = document.getElementById("finish-same-span-btn");
-
-                $('.claim-dialog-content').show();
-
-                var span = document.getElementsByClassName("close")[0];
-                // $( "#dialog-claim-options" ).show();     
-
-                claimDialog.style.display = "block";
-                
-                // When the user clicks on <span> (x), close the modal
-                span.onclick = function() {
-                    claimDialog.style.display = "none";
-                }
-                
-                // When the user clicks anywhere outside of the modal, close it
-                window.onclick = function(event) {
-                    if (event.target == modal) {
-                        claimDialog.style.display = "none";
-                    }
-                }
-
-                addDataBtn.onclick = function() {
-                    claimDialog.style.display = "none";
-                    isTextSelected = true;
-                    cachedOATarget = ann.argues.hasTarget;
-                    cachedOARanges = ann.argues.ranges;                    
-                    addDataCellByEditor("participants", 0);                    
-                }
-
-                addClaimBtn.onclick = function() {
-                    claimDialog.style.display = "none";
-                    showEditor();
-                    claimEditorLoad();
-                    currFormType = "claim";
-                    var newAnn = (JSON.parse(JSON.stringify(ann)));
-                    newAnn.argues.qualifiedBy = {};
-                    app.annotations.create(newAnn);                   
-                }
-
-                finishSameSpanBtn.onclick = function() {
-                    claimDialog.style.display = "none";
-                    showAnnTable();  
-                    
-                    // clean cached text selection
-                    isTextSelected = false;
-                    cachedOATarget = "";
-                    cachedOARanges = "";
-                }
- 
-                //$('dialog-claim-options').hide();           
+                // show dialog for adding multiple claim/data on the same span
+                addClaimDataDialog(ann);
+         
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.draw(ann);
             } else {
@@ -590,8 +536,6 @@ function main(options) {
             }
         },
 
-        // beforeAnnotationDeleted: function(ann){
-        // },
         annotationDeleted: function (ann) {
             console.log("mpmain - annotationDeleted called");
             s.mphighlighter.undraw(ann);
@@ -622,7 +566,7 @@ function isDataRowEmpty(data) {
 }
 
 
-
+// get text contents from DOM node
 function getTxtFromNode(node, isSuffix, ignoreSelector, maxLength){
 
     var origParent;
@@ -657,6 +601,62 @@ function getTxtFromNode(node, isSuffix, ignoreSelector, maxLength){
     }
 
     return contents;
+}
+
+// call to pop up dialog box for showing options during creating claim/data
+function addClaimDataDialog(ann) {
+
+    // dialog box for creating claim options 
+    var claimDialog = document.getElementById('create-claim-dialog');
+    
+    // Get the button that opens the dialog
+    var addDataBtn = document.getElementById("add-data-same-span-btn");
+    var addClaimBtn = document.getElementById("add-claim-same-span-btn");
+    var finishSameSpanBtn = document.getElementById("finish-same-span-btn");   
+    
+    var span = document.getElementsByClassName("close")[0];
+    
+    claimDialog.style.display = "block";
+                
+    // When the user clicks on <span> (x), close the dialog
+    span.onclick = function() {
+        claimDialog.style.display = "none";
+    }
+    
+    // When the user clicks anywhere outside of the dialog, close it
+    window.onclick = function(event) {
+        if (event.target == claimDialog) {
+            claimDialog.style.display = "none";
+        }
+    }
+    
+    addDataBtn.onclick = function() {
+        claimDialog.style.display = "none";
+        isTextSelected = true;
+        cachedOATarget = ann.argues.hasTarget;
+        cachedOARanges = ann.argues.ranges;                    
+        addDataCellByEditor("participants", 0);                    
+    }
+    
+    addClaimBtn.onclick = function() {
+        claimDialog.style.display = "none";
+        showEditor();
+        claimEditorLoad();
+        currFormType = "claim";
+        var newAnn = (JSON.parse(JSON.stringify(ann)));
+        newAnn.argues.qualifiedBy = {};
+        app.annotations.create(newAnn);                   
+    }
+    
+    finishSameSpanBtn.onclick = function() {
+        claimDialog.style.display = "none";
+        showAnnTable();  
+        
+        // clean cached text selection
+        isTextSelected = false;
+        cachedOATarget = "";
+        cachedOARanges = "";
+    }   
 }
 
 

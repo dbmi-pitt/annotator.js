@@ -70,6 +70,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $("#enzyme").hide();
                         $("#enzymesection1").hide();
 
+                        $('input[type=radio][name=precipitant]').show();
+                        $('.precipitantLabel').show();
                         $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
                         $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
 
@@ -98,11 +100,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 list.push(parent.textContent);
                             }
                         }}
-                        console.log("[mpPlugin/editor.js--drugList]");
-                        console.log(list);
+                        //console.log("[mpPlugin/editor.js--drugList]");
+                        //console.log(list);
 
-                        //document.getElementById(annotation.id+"-claim-0").style.textDecoration='underline';
-                   
                         var quoteobject = $("<div id='quotearea'/>");
                         $('#quote').append(quoteobject);
                         $('#quotearea').html(claim.hasTarget.hasSelector.exact || '');
@@ -111,15 +111,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         var quoteobject = $('#quotearea');
                         var quotecontent = $('#quotearea').html();
-
-                        //out of date: original annotation list filter out duplicates
-                        //filter out duplicates
-                        //var anns = annotations.slice();
-                        /*for (var i = 0, len = anns.length; i < len; i++) {
-                            if ((anns[i].annotationType == "DrugMention") && (list.indexOf(anns[i].argues.hasTarget.hasSelector.exact) < 0)) {
-                                list.push(anns[i].argues.hasTarget.hasSelector.exact);
-                            }
-                        }*/
 
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
@@ -182,8 +173,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                             
                             //$(field).find('#quote').css('background', '#d1d1d1');
-                            
-
 
                             $('#relationship > option').each(function () {
                                 if (this.value == claim.qualifiedBy.relationship) {
@@ -220,12 +209,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $('input[name=precipitant][id=drug2precipitant]').prop('checked', true);      
                                 else 
                                     console.log("precipitant information not avaliable");
-                            }                         
+                            }                      
                         }
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
-                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose";
-                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose";
+                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
+                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
 
                         if (claim.qualifiedBy.relationship == "interact with") {
                             if (claim.qualifiedBy.precipitant == "drug1")
