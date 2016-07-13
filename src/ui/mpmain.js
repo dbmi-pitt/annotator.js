@@ -612,7 +612,7 @@ function addClaimDataDialog(ann) {
     var addClaimBtn = document.getElementById("add-claim-same-span-btn");
     var finishSameSpanBtn = document.getElementById("finish-same-span-btn");   
     
-    var span = document.getElementById("unchanged-dialog-close");
+    var span = document.getElementById("create-claim-close");
     
     claimDialog.style.display = "block";
                 
