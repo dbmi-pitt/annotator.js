@@ -551,7 +551,7 @@ function main(options) {
 function isDataRowEmpty(data) {
 
     console.log("delete data - call isDataRowEmpty");
-    fieldL = ["auc","cmax","clearance","halflife"];
+    var fieldL = ["auc","cmax","clearance","halflife"];
     
     for (i = 0; i < fieldL.length; i++) {
         if (data[fieldL[i]].value != null)
