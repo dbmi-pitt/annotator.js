@@ -93,8 +93,8 @@
 }
 
 .highlightdrug {
-	background-color:#9ebdff;
-	color: #000000;
+	background-color: rgba(255, 23, 11, 0.42);
+	color: rgb(0, 0, 0);
 }
 
 .selecteddrug {

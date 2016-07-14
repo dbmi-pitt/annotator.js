@@ -79,69 +79,189 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //find drugs which only be highlighted in this claim
                         var list = [];//used to store drugs
+                        var listid = [];
                         var drugList = document.getElementsByName('annotator-hl');
-                        var selectedList = annotation.childNodes;
+
+
+                        var nodes = annotation.childNodes;
+                        console.log(nodes);
+                        var selectedList = [];
+                        for(var i=0;i<nodes.length;i++) {
+                            //filter annotator-mp
+                            if(nodes[i].parentNode.parentNode.className == "annotator-hl") {
+                                var tempParent = nodes[i].parentNode.parentNode;
+                                while (tempParent.className == "annotator-hl"&&tempParent.getAttribute("name") != "annotator-hl") {
+                                    tempParent = tempParent.parentNode;
+                                }
+                                if(tempParent.className=="annotator-hl")
+                                    selectedList.push(tempParent);
+                            }
+                        }
+
+                        console.log(selectedList);
                         if(annotation.id==undefined) {
+                            var prev = "";
+                            var parent;
                             for(var i=0;i<selectedList.length;i++) {
-                                    var parent = selectedList[i];
+                                if(prev != selectedList[i].id) {
+                                    prev = selectedList[i].id;
+                                    parent = selectedList[i];
+                                    listid.push(parent.id);
                                     while (parent.childNodes.length > 0)
                                         parent = parent.childNodes[0];
                                     list.push(parent.textContent);
+                                }else {
+                                    parent = selectedList[i];
+                                    while (parent.childNodes.length > 0)
+                                        parent = parent.childNodes[0];
+                                    var temp = list.pop();
+                                    temp += parent.textContent;
+                                    list.push(temp);
+                                }
                             }
+
                         }else{
+                            console.log(annotation.id);
+                            var prev = "";
+                            var temp = "";
                             for(var i=0;i<drugList.length;i++) {
                                 if ($("[name='annotator-hl']:eq("+i+")").html().indexOf(annotation.id + "-claim-0") != -1) {
-                                    var parent = document.getElementsByName('annotator-hl')[i];//$("[name='annotator-hl']:eq(1)");
+                                    var parent = document.getElementsByName('annotator-hl')[i];
+                                    temp = parent.id;
                                     while (parent.childNodes.length > 0) {
                                         parent = parent.childNodes[0];
+                                    }
+                                    if(temp!=prev) {
+                                        list.push(parent.textContent);
+                                        listid.push(temp);
+                                        prev = temp;
+                                    }else{
+                                        var subdrug = list.pop();
+                                        list.push(subdrug+parent.textContent);
+                                    }
                                 }
-                                list.push(parent.textContent);
-                            }
                         }}
                         console.log("[mpPlugin/editor.js--drugList]");
                         console.log(list);
+                        console.log(listid);
 
-                        //document.getElementById(annotation.id+"-claim-0").style.textDecoration='underline';
-                   
+
+                        //--------------generate quote-----------------
+                        $('#quote').empty();
                         var quoteobject = $("<div id='quotearea'/>");
+                        var p = document.createElement("p");
+
+                        //generate quote: add new annotation
+                        if(annotation.id==undefined) {
+                            var childrenInQuote = nodes;
+                            for (var qi = 0; qi < childrenInQuote.length; qi++) {
+                                var tempContent = $(childrenInQuote[qi]).text();
+                                while(childrenInQuote[qi].parentNode.className=="annotator-hl"||
+                                childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+                                    childrenInQuote[qi]= childrenInQuote[qi].parentNode;
+                                }
+                                var goodChild = childrenInQuote[qi].cloneNode(true);
+                                goodChild.innerHTML = tempContent;
+                                p.appendChild(goodChild);
+                                /*draft* if (childrenInQuote[qi].parentNode.parentNode.getAttribute("name") == "annotator-hl") {
+                                    p.appendChild(childrenInQuote[qi].parentNode.parentNode.cloneNode(true));
+                                    console.log(childrenInQuote[qi].parentNode.parentNode);
+                                } else if (childrenInQuote[qi].parentNode.getAttribute("name") == "annotator-currhl") {
+                                    p.appendChild(childrenInQuote[qi].parentNode.cloneNode(true));
+                                    console.log(childrenInQuote[qi].parentNode);
+                                }*/
+                            }
+                            console.log(p);
+                        //generate quote: edit an existed annotation
+                        } else {
+                            var tempChildrenOfClaim = [];
+                            tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
+                            var childrenOfClaim = [];
+                            for(var i=0;i<tempChildrenOfClaim.length;i++) {
+                                var tempContent = $(tempChildrenOfClaim[i]).text();
+                                while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
+                                    tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
+                                }
+                                var goodChild = tempChildrenOfClaim[i].cloneNode(true);
+                                goodChild.innerHTML = tempContent;
+                                p.appendChild(goodChild);
+                            }
+                            /*for(var i=0;i<childrenOfClaim.length;i++) {
+                                p.appendChild(childrenOfClaim[i]);
+                            }*/
+                        }
+
+                        $(quoteobject).append(p);
+                        var quotecontent = $(quoteobject).html();
+                        console.log(quotecontent);
+
+                        while(quotecontent.indexOf("annotator-currhl")!==-1) {
+                            quotecontent = quotecontent.replace("annotator-currhl", "");
+                        }
+                        while(quotecontent.indexOf("annotator-mp")!==-1) {
+                            quotecontent = quotecontent.replace("class=\"annotator-hl\" name=\"annotator-mp\"", "");
+                        }
+                        console.log(quotecontent);
+                        $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
-                        $('#quotearea').html(claim.hasTarget.hasSelector.exact || '');
+
+
                         var flag = 0;                        
 
                         
-                        var quoteobject = $('#quotearea');
-                        var quotecontent = $('#quotearea').html();
+                        //var quoteobject = $('#quotearea');
+                        //var quotecontent = $('#quotearea').html();
 
                         //out of date: original annotation list filter out duplicates
                         //filter out duplicates
-                        //var anns = annotations.slice();
-                        /*for (var i = 0, len = anns.length; i < len; i++) {
-                            if ((anns[i].annotationType == "DrugMention") && (list.indexOf(anns[i].argues.hasTarget.hasSelector.exact) < 0)) {
-                                list.push(anns[i].argues.hasTarget.hasSelector.exact);
+                        //check drug list
+                        var allHighlightedDrug = [];
+                        var anns = annotations.slice();
+                        for (var i = 0, len = anns.length; i < len; i++) {
+                            if (anns[i].annotationType == "DrugMention") {
+                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
                             }
-                        }*/
+                        }
+                        console.log(allHighlightedDrug);
+                        for(var i=0;i<list.length;i++) {
+                            if(allHighlightedDrug.indexOf(list[i])==-1) {
+                                console.log(list);
+                                list.splice(i, 1);
+                                console.log(list);
+                            }
+                        }
+                        console.log(allHighlightedDrug);
+                        console.log(list);
 
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
                             // avoid replacing span itself
-                            if (quotecontent.indexOf(list[i]) >= 0 && "<span class='highlightdrug'>".indexOf(list[i]) < 0) {
-                                index++;
-                                quotecontent = quotecontent.replace(list[i], "<span class='highlightdrug'>" + list[i] + "</span>");
-                                
-                                // add to dropdown box
-                                $('#Drug1').append($('<option>', {
-                                    value: list[i],
-                                    text: list[i]
-                                }));
-                                $('#Drug2').append($('<option>', {
-                                    value: list[i],
-                                    text: list[i]
-                                }));
-                                flag = flag + 1;
-                            }
-                        }
+                            // add to dropdown box
+                            $('#Drug1').append($('<option>', {
+                                value: listid[i],
+                                text: list[i]
+                            }));
+                            $('#Drug2').append($('<option>', {
+                                value: listid[i],
+                                text: list[i]
+                            }));
+                            flag = flag + 1;
 
-                        quoteobject.html(quotecontent);
+                            /*if (quotecontent.indexOf(list[i]) >= 0 && "<span class=\"highlightdrug\">".indexOf(list[i]) < 0) {
+                                index++;
+                                quotecontent = quotecontent.replace(list[i], "<span class=\"highlightdrug\">" + list[i] + "</span>");
+                            }*/
+                        }
+                        var drug1 = $('#Drug1 option:selected').text();
+                        var drug2 = $('#Drug2 option:selected').text();
+                        var drug1ID = $('#Drug1 option:selected').val();
+                        var drug2ID = $('#Drug2 option:selected').val();
+
+                        quotecontent = quotecontent.replace("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+drug1ID+"\"", "class=\"highlightdrug\" id=\""+drug1ID+"\"");
+                        quotecontent = quotecontent.replace("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+drug2ID+"\"", "class=\"highlightdrug\" id=\""+drug2ID+"\"");
+                        console.log(quotecontent);
+                        $(quoteobject).html(quotecontent);
+                        $('#quote').append(quoteobject);
                         
                         if (flag < 2) {
                             alert("please highlight two different drugs in the text span you selected!");
@@ -159,24 +279,24 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         if(claim.qualifiedBy!=undefined) {
                             //load fields from annotation.claim
                             $("#Drug1 > option").each(function () {
-                                if (this.value === claim.qualifiedBy.drug1) $(this).prop('selected', true);
+                                if (this.value === claim.qualifiedBy.drug1ID) $(this).prop('selected', true);
                             });
                             $('#Drug2 > option').each(function () {
-                                if (this.value === claim.qualifiedBy.drug2) $(this).prop('selected', true);
+                                if (this.value === claim.qualifiedBy.drug2ID) $(this).prop('selected', true);
                             });
                         }
                         // highlight drug selections on text quote
                         //console.log(claim.qualifiedBy);
                         if (claim.qualifiedBy != null) {
-                            if (claim.qualifiedBy.drug1 != "") {
+                            if (claim.qualifiedBy.drug1ID != "") {
                                 var quotestring = quoteobject.html();
-                                quotestring = quotestring.replace("<span class=\"highlightdrug\">"+claim.qualifiedBy.drug1, "<span class=\"selecteddrug\">" + claim.qualifiedBy.drug1);
+                                quotestring = quotestring.replace("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+claim.qualifiedBy.drug1ID+"\"", "class=\"highlightdrug\" id=\""+claim.qualifiedBy.drug1ID+"\"");
                                 quoteobject.html(quotestring);
                                 //console.log(quotestring);
                             }
-                            if (claim.qualifiedBy.drug2 != "") {
+                            if (claim.qualifiedBy.drug2ID != "") {
                                 var quotestring = quoteobject.html();
-                                quotestring = quotestring.replace("<span class=\"highlightdrug\">"+claim.qualifiedBy.drug2, "<span class=\"selecteddrug\">" + claim.qualifiedBy.drug2);
+                                quotestring = quotestring.replace("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+claim.qualifiedBy.drug2ID+"\"", "class=\"highlightdrug\" id=\""+claim.qualifiedBy.drug2ID+"\"");
                                 quoteobject.html(quotestring);
                                 //console.log(quotestring);
                             }
@@ -409,6 +529,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
                         qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                         qualifiedBy.drug2 = $('#Drug2 option:selected').text();
+                        qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
+                        qualifiedBy.drug2ID = $('#Drug2 option:selected').val();
                         qualifiedBy.relationship = $('#relationship option:selected').text();
                         var claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;
                         
@@ -754,7 +876,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
         }
 
         showEditor();
-        undrawCurrhighlighter();
         app.annotations.update(this.annotation);
     },
 
