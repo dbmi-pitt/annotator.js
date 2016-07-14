@@ -462,7 +462,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         if(qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") {
                             qualifiedBy.enzyme = $('#enzyme option:selected').text();
-                        }  else if (qualifiedBy.relationship == "interact with") {
+                        }  else if (qualifiedBy.relationship == "interact with") {                           
                             qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
                         }
 
@@ -958,6 +958,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
     _onDeleteClick: function (event) {
         preventEventDefault(event);
         this.options.onDelete(this.annotation);
+
+        // reset unsave status
+        unsaved = false;
     },
 
     // Event callback: called when a user clicks the editor's cancel button.
@@ -969,6 +972,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
         isTextSelected = false;
         cachedOATarget = "";
         cachedOARanges = "";      
+
+        // reset unsave status
+        unsaved = false;
 
         preventEventDefault(event);
         this.cancel();
