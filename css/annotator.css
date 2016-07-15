@@ -73,22 +73,21 @@ f/* Base Reset
 .dataquoteborder {
 	clear: both;
 	position:fixed;
-	margin-top: -13px;
-	margin-left: 10px;
-	margin-right: 10px;
-	max-height: 35px;
-	overflow-y: scroll;
+	margin-right: 120px;
+	margin-top: -20px;
+	margin-left: -70px;
+	max-height: 40px;
+	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
 
 #quotearea {
-	margin-right: 15px;
-	margin-top: 8px;
-	margin-left: 5px;
-	margin-bottom: 8px;
-	color: #303030;
-	overflow: scroll;
-	max-height: 35px;
+	margin-right: 0px;
+	margin-top: 0px;
+	margin-left: -60px;
+	margin-bottom: 0px;
+	overflow-y:scroll;
+	max-height: 40px;
 	background-color: #d1d1d1;
 }
 
@@ -1381,3 +1380,5 @@ input[type="radio"] {
 /*     background-color: #5cb85c; */
 /*     color: white; */
 /* } */
+
+
