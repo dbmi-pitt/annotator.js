@@ -73,22 +73,21 @@
 .dataquoteborder {
 	clear: both;
 	position:fixed;
-	margin-top: -13px;
-	margin-left: 10px;
-	margin-right: 10px;
-	max-height: 35px;
-	overflow-y: scroll;
+	margin-right: 120px;
+	margin-top: -20px;
+	margin-left: -70px;
+	max-height: 40px;
+	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
 
 #quotearea {
-	margin-right: 15px;
-	margin-top: 8px;
-	margin-left: 5px;
-	margin-bottom: 8px;
-	color: #303030;
-	overflow: scroll;
-	max-height: 35px;
+	margin-right: 0px;
+	margin-top: 0px;
+	margin-left: -60px;
+	margin-bottom: 0px;
+	overflow-y:scroll;
+	max-height: 40px;
 	background-color: #d1d1d1;
 }
 
@@ -1143,24 +1142,29 @@ span[name="annotator-mp"] {
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4D007CFF, endColorstr=#4D007CFF)";  /* 0.3 == 4D in MS filters */
 }
 
-html, body
+html
 {
 	height: 100%;
 	width: 100%;
 }
 
-.sidebar.right {
+body.article{
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+/*.sidebar.right {
 	top: 0;
 	right: 0;
 	bottom: 0;
 	width: 270px;
 	background: #448AFF;
-}
+}*/
 
-/* margin for PMC articles */
-article {
-	margin-top: 7px;
-}
+/* margin for PMC articles 
+.article {
+	margin-top: 0px;
+}*/
 
 .viewertable {
 	font-size: small;
@@ -1301,3 +1305,89 @@ input[type="radio"] {
 
 /*table tr:nth-of-type(odd),table tr:nth-of-type(odd){background-color:#EEF9FF}.main-content .content-full table.alt tr:nth-of-type(odd){background-color:#FFF}.main-content .content-full table.alt tr:nth-of-type(even){background-color:#EEF9FF}.main-content .content-full .norows table tr:nth-of-type(odd),.norows table tr:nth-of-type(odd){background-color:#fff}
 /*.viewertable tr:nth-of-type(odd),.viewertable tr:nth-of-type(odd){background-color:#EEF9FF}.main-content .content-full .viewertable.alt tr:nth-of-type(odd){background-color:#FFF}.main-content .content-full .viewertable.alt tr:nth-of-type(even){background-color:#EEF9FF}.main-content .content-full .norows .viewertable tr:nth-of-type(odd),.norows .viewertable tr:nth-of-type(odd){background-color:#fff}*/
+
+/* dialog box styles
+-------------------------------------------------------------------- */
+
+/* Pop up dialog (background) */
+.dialog-background {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 200px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* dialog Content */
+.dialog-content {
+    position: relative;
+    display: block;
+    background-color: #fefefe;
+    margin: auto;
+    width: 45%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+
+    padding-top: 0.077em;
+    padding-right: 0.077em;
+    padding-bottom: 0.077em;
+    padding-left: 0.077em;
+
+    font-size: 13px;
+    border: 3px solid #3e72a6;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    font-size: 16px;
+    background-color: #3e72a6;
+    color: #fff;
+}
+
+.modal-body {
+    padding: 2px 16px;
+    font-size: 13px;
+}
+
+/* .modal-footer { */
+/*     padding: 2px 16px; */
+/*     background-color: #5cb85c; */
+/*     color: white; */
+/* } */
+
+

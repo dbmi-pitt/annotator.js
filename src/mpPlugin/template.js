@@ -104,7 +104,7 @@ var context3 = {
         },
         {
             type: "input",
-            name: "Dose: ",
+            name: "Dose in MG: ",
             id: "drug1Dose"
         },
         {
@@ -116,7 +116,7 @@ var context3 = {
         },
         {
             type: "input",
-            name: "Duration: ",
+            name: "Duration in days: ",
             id: "drug1Duration"
         },
         {
@@ -141,7 +141,7 @@ var context4 = {
         },
         {
             type: "input",
-            name: "Dose: ",
+            name: "Dose in MG: ",
             id: "drug2Dose"
         },
         {
@@ -153,7 +153,7 @@ var context4 = {
         },
         {
             type: "input",
-            name: "Duration: ",
+            name: "Duration in days: ",
             id: "drug2Duration"
         },
         {
@@ -178,6 +178,12 @@ var context5 = {
             optionsID:[]
         },
         {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"auc-unchanged-checkbox",
+            value: "aucunchanged"
+        },
+        {
             type: "input",
             name: "AUC ratio: ",
             id: "auc"
@@ -195,12 +201,6 @@ var context5 = {
             id:"aucDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
-        },
-        {
-            type:"checkbox",
-            name:"unchanged: ",
-            id:"auc-unchanged-checkbox",
-            value: "aucunchanged"
         }
     ]
 };
@@ -545,7 +545,7 @@ Template.content = [
     '</div>',
     '</div>',
     '    <div class="annotator-controls1">',
-    '     <br><a href="#cancel" class="annotator-cancel" onclick="showrightbyvalue()" id="annotator-cancel">Cancel</a>',
+    '     <br><a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
     '     <a href="#delete" class="annotator-delete" id="annotator-delete">Delete</a>',
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
     '     <a href="#save" class="annotator-save annotator-focus">Save</a>',
