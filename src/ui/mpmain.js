@@ -473,20 +473,19 @@ function main(options) {
     		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
 		    annotation.email = options.email;
             annotation.childNodes = rangeChildNodes;
-            undrawCurrhighlighter();
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
-                s.currhighlighter.draw(hlAnnotation, "add");
-                hlAnnotation = undefined; //clean cached textSelected ranges
+                s.currhighlighter.draw(annotation, "add");
+                //hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
                 // return s.hleditor.load(annotation, s.interactionPoint);
                 // not show editor when typed as Drug mention
-                hlAnnotation = undefined; //clean cached textSelected ranges
+                //hlAnnotation = undefined; //clean cached textSelected ranges
                 return null;
             } else {
                 //return s.mpeditor.load(annotation, s.interactionPoint);
-                hlAnnotation = undefined; //clean cached textSelected ranges
+                //hlAnnotation = undefined; //clean cached textSelected ranges
                 return null;
             }
         },

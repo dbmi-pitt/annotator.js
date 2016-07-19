@@ -72,12 +72,12 @@ TextSelector.prototype.captureDocumentSelection = function () {
         var r = selection.getRangeAt(i),
             browserRange = new Range.BrowserRange(r),
             normedRange = browserRange.normalize().limit(this.element);
-        console.log("normedRange: ");
-        console.log(normedRange);
-        console.log(browserRange);
+        //console.log("normedRange: ");
+        //console.log(normedRange);
+        //console.log(browserRange);
         var nodes = normedRange.textNodes();
         console.log("[textSelector--normedRange]");
-        console.log(nodes);
+        //console.log(nodes);
         var tempParent;
         //get drug node list
         for(var i=0;i<nodes.length;i++) {
@@ -91,7 +91,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
                     textnodes.push(tempParent);
             }
         }
-        console.log(textnodes);
+        //console.log(textnodes);
         // If the new range falls fully outside our this.element, we should
         // add it back to the document but not return it from this method.
         if (normedRange === null) {
@@ -121,7 +121,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
 
     ranges.childNodes = nodes;
     console.log("[textselector--ranges.childNodes--highlighted drug list]")
-    console.log(textnodes);
+    //console.log(textnodes);
     return ranges;
 };
 
