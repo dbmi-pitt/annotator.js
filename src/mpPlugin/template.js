@@ -88,8 +88,8 @@ var context1 = {
         {
             type:"radiobutton",
             name:"Is group randomization? ",
-            classname: "group-random",
-            id:"group-random",
+            classname: "grouprandom",
+            id:"grouprandom",
             html: "div",
             options:["yes","no"],
             optionsID:[]
@@ -97,8 +97,8 @@ var context1 = {
         {
             type:"radiobutton",
             name:"Is parallel group design? ",
-            classname: "parallel-group",
-            id:"parallel-group",
+            classname: "parallelgroup",
+            id:"parallelgroup",
             html: "div",
             options:["yes","no"],
             optionsID:[]
@@ -106,8 +106,8 @@ var context1 = {
         {
             type:"radiobutton",
             name:"Focus on pharmacokinetic processes? ",
-            classname: "pk-process",
-            id:"pk-process",
+            classname: "pkprocess",
+            id:"pkprocess",
             html: "div",
             options:["yes","no"],
             optionsID:[]

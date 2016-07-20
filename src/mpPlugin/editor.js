@@ -78,9 +78,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();
 
-                        $('input[name=group-random]').prop('checked', false);
-                        $('input[name=parallel-group]').prop('checked', false);
-                        $('input[name=pk-process]').prop('checked', false);
+                        $('input[name=grouprandom]').prop('checked', false);
+                        $('input[name=parallelgroup]').prop('checked', false);
+                        $('input[name=pkprocess]').prop('checked', false);
 
                         //find drugs which only be highlighted in this claim
                         //--------------- generate list and listid array ----------------
@@ -307,6 +307,23 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 if (this.value === claim.method) $(this).prop('selected', true);
                             });
                         }
+
+                        // questions for dictating method type
+                        if (claim.grouprandom == "yes")
+                            $('input[name=grouprandom][value=yes]').prop('checked', true);  
+                        else if (claim.grouprandom == "no")
+                            $('input[name=grouprandom][value=no]').prop('checked', true);  
+
+                        if (claim.parallelgroup == "yes")
+                            $('input[name=parallelgroup][value=yes]').prop('checked', true);  
+                        else if (claim.parallelgroup == "no")
+                            $('input[name=parallelgroup][value=no]').prop('checked', true); 
+                        
+                        if (claim.pkprocess == "yes")
+                            $('input[name=pkprocess][value=yes]').prop('checked', true);  
+                        else if (claim.pkprocess == "no")
+                            $('input[name=pkprocess][value=no]').prop('checked', true); 
+                        
 
                         if(claim.qualifiedBy!=undefined) {
                             //load fields from annotation.claim
@@ -640,6 +657,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }  else if (qualifiedBy.relationship == "interact with") {                           
                             qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
                         }
+
+
+                        annotation.argues.grouprandom = $("input[name=grouprandom]:checked").val();  
+                        annotation.argues.parallelgroup = $("input[name=parallelgroup]:checked").val();
+                        annotation.argues.pkprocess = $("input[name=pkprocess]:checked").val();
 
                         annotation.argues.qualifiedBy = qualifiedBy;
                         annotation.argues.type = "mp:claim";
