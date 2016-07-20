@@ -604,7 +604,7 @@ Template.content = [
     '    <div class="annotator-controls1">',
     '     <br><a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
     '     <a href="#delete" class="annotator-delete" id="annotator-delete">Delete</a>',
-    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
     '     <a href="#save" class="annotator-save annotator-focus">Save</a>',
     '     <a href="#save-close" class="annotator-save-close" id="annotator-save-close">Save and Close</a>',
   '    </div>',
