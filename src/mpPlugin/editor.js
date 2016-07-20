@@ -78,6 +78,75 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();
 
+                        var nodes = [];
+                        nodes = annotation.childNodes;
+                        console.log(nodes);
+
+                        //--------------generate quote-----------------
+                        $('#quote').empty();
+
+                        var quoteobject = $("<div id='quotearea'/>");
+                        var p = document.createElement("p");
+
+                        //generate quote: add new annotation
+                        if(annotation.id==undefined) {
+                            var childrenInQuote = nodes;
+                            var goodChild;
+                            var prevNode = null;
+                            for (var qi = 0; qi < childrenInQuote.length; qi++) {
+                                var tempContent = $(childrenInQuote[qi]).text();
+                                while(childrenInQuote[qi].parentNode.className=="annotator-hl"||
+                                childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+                                    childrenInQuote[qi]= childrenInQuote[qi].parentNode;
+                                }
+                                if(!childrenInQuote[qi].isEqualNode(prevNode)) {
+                                    prevNode = childrenInQuote[qi];
+                                    goodChild = prevNode.cloneNode(true);
+                                    goodChild.innerHTML = tempContent;
+                                    p.appendChild(goodChild);
+                                }
+                            }
+                            console.log(p);
+                            //generate quote: edit an existed annotation
+                        } else {
+                            var tempChildrenOfClaim = [];
+                            var prevNode = null;
+                            tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
+                            var childrenOfClaim = [];
+                            for(var i=0;i<tempChildrenOfClaim.length;i++) {
+                                var tempContent = $(tempChildrenOfClaim[i]).text();
+                                while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
+                                    tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
+                                }
+                                if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
+                                    var goodChild = tempChildrenOfClaim[i].cloneNode(true);
+                                    goodChild.innerHTML = tempContent;
+                                    p.appendChild(goodChild);
+                                }
+                            }
+                        }
+
+                        $(quoteobject).append(p);
+                        var quotecontent = $(quoteobject).html();
+                        console.log(quotecontent);
+
+                        while(quotecontent.indexOf("annotator-currhl")!=-1) {
+                            quotecontent = quotecontent.split("annotator-currhl").join("");
+                            console.log(quotecontent);
+                        }
+                        while(quotecontent.indexOf("annotator-mp")!=-1) {
+                            quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-mp\"").join("");
+                            quotecontent = quotecontent.split("name=\"annotator-mp\" class=\"annotator-hl\"").join("");
+                            console.log(quotecontent);
+                        }
+
+                        while(quotecontent.indexOf(" name=\"annotator-hl\"")!=-1) {
+                            quotecontent = quotecontent.split(" name=\"annotator-hl\"").join("");
+                            console.log(quotecontent);
+                        }
+                        console.log(quotecontent);
+                        $(quoteobject).html(quotecontent);
+                        $('#quote').append(quoteobject);
 
                         //find drugs which only be highlighted in this claim
                         //--------------- generate list and listid array ----------------
@@ -86,8 +155,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var drugList = document.getElementsByName('annotator-hl');
 
 
-                        var nodes = [];
-                        nodes = annotation.childNodes;
+
                         var selectedNodes = [];
                         //console.log(nodes);
                         var selectedList = [];
@@ -188,63 +256,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         //console.log(listid);
 
 
-                        //--------------generate quote-----------------
-                        $('#quote').empty();
 
-                        var quoteobject = $("<div id='quotearea'/>");
-                        var p = document.createElement("p");
-
-                        //generate quote: add new annotation
-                        if(annotation.id==undefined) {
-                            var childrenInQuote = nodes;
-                            var goodChild;
-                            var prevNode = null;
-                            for (var qi = 0; qi < childrenInQuote.length; qi++) {
-                                var tempContent = $(childrenInQuote[qi]).text();
-                                while(childrenInQuote[qi].parentNode.className=="annotator-hl"||
-                                childrenInQuote[qi].parentNode.className=="annotator-currhl") {
-                                    childrenInQuote[qi]= childrenInQuote[qi].parentNode;
-                                }
-                                if(!childrenInQuote[qi].isEqualNode(prevNode)) {
-                                    prevNode = childrenInQuote[qi];
-                                    goodChild = prevNode.cloneNode(true);
-                                    goodChild.innerHTML = tempContent;
-                                    p.appendChild(goodChild);
-                                }
-                            }
-
-                        //generate quote: edit an existed annotation
-                        } else {
-                            var tempChildrenOfClaim = [];
-                            var prevNode = null;
-                            tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
-                            var childrenOfClaim = [];
-                            for(var i=0;i<tempChildrenOfClaim.length;i++) {
-                                var tempContent = $(tempChildrenOfClaim[i]).text();
-                                while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
-                                    tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
-                                }
-                                if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
-                                    var goodChild = tempChildrenOfClaim[i].cloneNode(true);
-                                    goodChild.innerHTML = tempContent;
-                                    p.appendChild(goodChild);
-                                }
-                            }
-                        }
-
-                        $(quoteobject).append(p);
-                        var quotecontent = $(quoteobject).html();
-                        //console.log(quotecontent);
-
-                        while(quotecontent.indexOf("annotator-currhl")!==-1) {
-                            quotecontent = quotecontent.replace("annotator-currhl", "");
-                        }
-                        while(quotecontent.indexOf("annotator-mp")!==-1) {
-                            quotecontent = quotecontent.replace("class=\"annotator-hl\" name=\"annotator-mp\"", "");
-                        }
-                        //console.log(quotecontent);
-                        $(quoteobject).html(quotecontent);
-                        $('#quote').append(quoteobject);
 
 
                         var flag = 0;                        
@@ -262,7 +274,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                         }
                         for(var i=0;i<list.length;i++) {
-                            if(allHighlightedDrug.indexOf(list[i])==-1) {
+                            if(allHighlightedDrug.indexOf(list[i].trim())==-1) {
                                 list.splice(i, 1);
                                 listid.splice(i,1);
                             }
@@ -319,9 +331,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var drug2 = $('#Drug2 option:selected').text();
                         var drug1ID = $('#Drug1 option:selected').val();
                         var drug2ID = $('#Drug2 option:selected').val();
-                        //console.log(drug1ID + "+" + drug2ID);
-                        quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+drug1ID+"\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
-                        quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+drug2ID+"\"").join("class=\"highlightdrug\" id=\""+drug2ID+"\"");
+                        console.log("id=\""+drug2ID+"\" class=\"annotator-hl\" name=\"annotator-hl\"");
+                        quotecontent = quotecontent.split("class=\"annotator-hl\" id=\""+drug1ID+"\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
+                        quotecontent = quotecontent.split("class=\"annotator-hl\" id=\""+drug2ID+"\"").join("class=\"highlightdrug\" id=\""+drug2ID+"\"");
+                        quotecontent = quotecontent.split("id=\""+drug1ID+"\" class=\"annotator-hl\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
+                        quotecontent = quotecontent.split("id=\""+drug2ID+"\" class=\"annotator-hl\"").join("class=\"highlightdrug\" id=\""+drug2ID+"\"");
                         //console.log(quotecontent);
                         $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
