@@ -90,14 +90,14 @@ var mpViewer = exports.mpViewer = Widget.extend({
 	        if (claim.label) {
                 
 		        var returnText =
-                    "<div  class='annotator-mp'> By " + annotation.email + " on " + annotation.updated + "</div>" + "<table class='viewertable' style='float:left;'>";
+                    "<div> <div class='annotator-mp'> By " + annotation.email + " on " + annotation.updated + "</div>" + "<table class='viewertable'>";
 
                 returnText += "<tr><td>Claim: " + claim.label + "</td></tr>";
 
                 if (fieldName !== "claim" && dataNum != null) {
                     returnText += "<tr><td>Data: " + (parseInt(dataNum)+1) + " Field: " + fieldName + "</td></tr>";
                 }                    
-                returnText += "</table><br>";
+                returnText += "</table></div>";
 		        
  		        return returnText;
             } else {
