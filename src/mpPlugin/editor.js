@@ -78,6 +78,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#Drug1 option').remove();
                         $('#Drug2 option').remove();
 
+                        $('input[name=group-random]').prop('checked', false);
+                        $('input[name=parallel-group]').prop('checked', false);
+                        $('input[name=pk-process]').prop('checked', false);
 
                         //find drugs which only be highlighted in this claim
                         //--------------- generate list and listid array ----------------
