@@ -8,6 +8,8 @@ var textselector = require('./textselector');
 // mp
 var mpadder = require('./../mpPlugin/adder');
 var mphighlighter = require('./../mpPlugin/highlighter');
+var currhighlighter = require('./temphighlighter');
+
 var mpeditor = require('./../mpPlugin/editor');
 var mpviewer = require('./../mpPlugin/viewer');
 
@@ -19,6 +21,7 @@ var hlviewer = require('./../drugPlugin/viewer');
 
 var _t = util.gettext;
 var rangeChildNodes = [];
+var hlAnnotation;
 
 // trim strips whitespace from either end of a string.
 //
@@ -37,7 +40,7 @@ function annotationFactory(contextEl, ignoreSelector) {
     return function (ranges) {
         var text = [],
             serializedRanges = [];
-
+            console.log(ranges);
         for (var i = 0, len = ranges.length; i < len; i++) {
             var r = ranges[i];
             text.push(trim(r.text()));
@@ -58,7 +61,7 @@ function annotationFactory(contextEl, ignoreSelector) {
                         "@type": "TextQuoteSelector",
                         "exact": text.join(' / '),
                         "prefix": prefix, 
-                        "suffix": suffix 
+                        "suffix": suffix
                     }
                 },
                 supportsBy : []
@@ -357,6 +360,7 @@ function main(options) {
         //highlighter
         s.hlhighlighter = new hlhighlighter.Highlighter(options.element);
         s.mphighlighter = new mphighlighter.mpHighlighter(options.element);
+        s.currhighlighter = new currhighlighter.currHighlighter(options.element);
 
         // select text, then load normed ranges to adder
         s.textselector = new textselector.TextSelector(options.element, {
@@ -366,14 +370,12 @@ function main(options) {
                 rangeChildNodes = ranges.childNodes;
                 if (ranges.length > 0) {
                     //var mpAnnotation = makeMPAnnotation(ranges);
-                    var hlAnnotation = makeHLAnnotation(ranges);
-                    console.log("mpmain - textselector - hladder and mp adder load");
-
+                    hlAnnotation = makeHLAnnotation(ranges);
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
                     //s.mpadder.load(mpAnnotation, s.interactionPoint);
-                    //s.mphighlighter.draw(hlAnnotation);
+
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
@@ -460,6 +462,7 @@ function main(options) {
             s.mpeditor.destroy();
             s.mphighlighter.destroy();
             s.mpviewer.destroy();
+            s.currhighlighter.destroy();
             removeDynamicStyle();
         },
 
@@ -480,16 +483,19 @@ function main(options) {
     		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
 		    annotation.email = options.email;
             annotation.childNodes = rangeChildNodes;
-
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
+                s.currhighlighter.draw(annotation, "add");
+                //hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
                 // return s.hleditor.load(annotation, s.interactionPoint);
                 // not show editor when typed as Drug mention
+                //hlAnnotation = undefined; //clean cached textSelected ranges
                 return null;
             } else {
                 //return s.mpeditor.load(annotation, s.interactionPoint);
+                //hlAnnotation = undefined; //clean cached textSelected ranges
                 return null;
             }
         },
@@ -511,8 +517,17 @@ function main(options) {
         },
         beforeAnnotationUpdated: function (annotation) {
             console.log("mpmain - beforeAnnotationUpdated");
-            console.log(annotation);
             if (annotation.annotationType == "MP"){
+
+                console.log("[mpmain--beforeAnnotationUpdated]")
+                if(hlAnnotation==undefined) {
+                    s.currhighlighter.draw(annotation, "edit");
+                    console.log("[currhighlighter draw annotation]");
+                } else {
+                    s.currhighlighter.draw(hlAnnotation, "add");
+                    console.log("[currhighlighter draw hlAnnotation]");
+                }
+                hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
                 // return s.hleditor.load(annotation, s.interactionPoint);
@@ -524,6 +539,7 @@ function main(options) {
         annotationUpdated: function (ann) {
             console.log("mpmain - annotationUpdated called");
             if (ann.annotationType == "MP"){
+                hlAnnotation = undefined;
                 s.mphighlighter.redraw(ann);
                 currAnnotationId = ann.id;
                 annotationTable(ann.rawurl, ann.email);

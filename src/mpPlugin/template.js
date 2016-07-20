@@ -13,6 +13,7 @@ var context1 = {
             type:"quote",
             name:"Quote: ",
             id:"quote",
+            html: "table",
             options:[],
             optionsID:[]
         },
@@ -20,6 +21,7 @@ var context1 = {
             type:"dropdown",
             name:"Drug1: ",
             id:"Drug1",
+            html: "table",
             options:[],
             optionsID:[]
         },
@@ -28,6 +30,7 @@ var context1 = {
             name:"Precipitant: ",
             classname: "precipitant",
             id:"drug1precipitant",
+            html: "table",
             options:["drug1"],
             optionsID:[]
         },
@@ -35,6 +38,7 @@ var context1 = {
             type:"dropdown",
             name:"Relationship: ",
             id:"relationship",
+            html: "table",
             options:["interact with","inhibits","substrate of"],
             optionsID:["r0","r1","r2"]
         },
@@ -42,6 +46,7 @@ var context1 = {
             type:"dropdown",
             name:"Method: ",
             id:"method",
+            html: "table",
             options:["UNK","DDI clinical trial"],
             optionsID:[]
         },
@@ -49,6 +54,7 @@ var context1 = {
             type:"dropdown",
             name:"Drug2: ",
             id:"Drug2",
+            html: "table",
             options:[],
             optionsID:[]
         },
@@ -57,6 +63,7 @@ var context1 = {
             name:"Precipitant: ",
             classname: "precipitant",
             id:"drug2precipitant",
+            html: "table",
             options:["drug2"],
             optionsID:[]
         },
@@ -64,12 +71,46 @@ var context1 = {
             type:"dropdown",
             name:"Enzyme: ",
             id:"enzyme",
+            html: "table",
             options:["UNK","cyp1a1","cyp1a2","cyp1b1","cyp2a6","cyp2a13","cyp2b6","cyp2c8","cyp2c9","cyp2c19","cyp2d6","cyp2e1","cyp2j2","cyp3a4","cyp3a5","cyp4a11","cyp2c8","cyp2c9","cyp2c19"],
             optionsID:[]
         },
         {
             type:"space",
+            html: "table",
             name:""
+        },
+        {
+            type:"space",
+            html: "table",
+            name:""
+        },
+        {
+            type:"radiobutton",
+            name:"Is group randomization? ",
+            classname: "grouprandom",
+            id:"grouprandom",
+            html: "div",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Is parallel group design? ",
+            classname: "parallelgroup",
+            id:"parallelgroup",
+            html: "div",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Focus on pharmacokinetic processes? ",
+            classname: "pkprocess",
+            id:"pkprocess",
+            html: "div",
+            options:["yes","no"],
+            optionsID:[]
         }
     ]
 };
@@ -342,47 +383,63 @@ var context9 = {
 // @outputs: form1 in html
 Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
+    var divHtml = "";
     if (items[0].type == "quote") {
-        // <strong>" + items[0].name +"</strong> 
         out += "<div id='" + items[0].id + "' class='claimquoteborder' ></div><br><br>";
     }
     out += "<table class='clear-user-agent-styles'>";
     for (var i = 1, l=items.length; i<l; i++) {
         
-        if (((i)%5==0))
-            out = out + "<tr>";
-            
-        if (items[i].id == "enzyme") 
-            out += "<td><strong id='enzymesection1'>" + items[i].name +"</strong></td><td>";
-        else if (items[i].id == "drug1precipitant" || items[i].id == "drug2precipitant") 
-            out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>"
-        else 
-            out = out + "<td><strong>" + items[i].name +"</strong></td><td>";
-        
-        if (items[i].type=="radiobutton") {
-            for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                out = out + "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'></input>";            
-        } 
-        else if (items[i].type=="dropdown") {
-            out = out + "<select id='" + items[i].id + "'>";
-            for(var j = 0, sl = items[i].options.length; j<sl; j++) {
-                if (items[i].optionsID.length==0)
-                    out = out + "<option value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
-                else
-                    out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
-            }
-            out = out + "</select>";
-        } 
-        else if (items[i].type=="textarea") {
+        if (items[i].html == "table") {
+            if (((i)%5==0))
+                out = out + "<tr>";
+            // add label 
+            if (items[i].id == "enzyme") 
+                out += "<td><strong id='enzymesection1'>" + items[i].name +"</strong></td><td>";
+            else if (items[i].id == "drug1precipitant" || items[i].id == "drug2precipitant") 
+                out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>"
+            else 
+                out = out + "<td><strong>" + items[i].name +"</strong></td><td>";
+            // add field element
+            if (items[i].type=="radiobutton") {
+                if (items[i].classname == "precipitant") { // precipitant radio button (in different row)
+                    for (var j = 0, sl = items[i].options.length; j < sl; j++)
+                        out = out + "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'></input>";            
+                } else { // normal radio button
+                    for (var j = 0, sl = items[i].options.length; j < sl; j++)
+                        out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
+                }
+            } 
+            else if (items[i].type=="dropdown") {
+                out = out + "<select id='" + items[i].id + "'>";
+                for(var j = 0, sl = items[i].options.length; j<sl; j++) {
+                    if (items[i].optionsID.length==0)
+                        out = out + "<option value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
+                    else
+                        out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
+                }
+                out = out + "</select>";
+            } 
+            else if (items[i].type=="textarea") {
             out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
-        }
-        
-        out = out + "</td>";
+            }
+            
+            out = out + "</td>";
 
-        if(((i+1)%5==0))
-            out = out + "</tr>";
+            if(((i+1)%5==0))
+                out = out + "</tr>";
+        } 
+        else if (items[i].html == "div") {
+            if (items[i].type=="radiobutton") {
+                divHtml += "<div style='display: inline'><strong>" + items[i].name +"</strong>";
+                for (var j = 0, sl = items[i].options.length; j < sl; j++)
+                    divHtml += "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
+                divHtml += "</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+        }
     }
     out +="</table>";
+    out += divHtml;
     
     return out;
 });
@@ -547,7 +604,7 @@ Template.content = [
     '    <div class="annotator-controls1">',
     '     <br><a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
     '     <a href="#delete" class="annotator-delete" id="annotator-delete">Delete</a>',
-    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
     '     <a href="#save" class="annotator-save annotator-focus">Save</a>',
     '     <a href="#save-close" class="annotator-save-close" id="annotator-save-close">Save and Close</a>',
   '    </div>',
