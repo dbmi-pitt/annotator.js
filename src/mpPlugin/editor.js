@@ -130,10 +130,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var quotecontent = $(quoteobject).html();
                         console.log(quotecontent);
 
-                        $('input[name=grouprandom]').prop('checked', false);
-                        $('input[name=parallelgroup]').prop('checked', false);
-                        $('input[name=pkprocess]').prop('checked', false);
-
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
                             quotecontent = quotecontent.split("annotator-currhl").join("");
                             console.log(quotecontent);
@@ -255,16 +251,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
                         }
-                        //console.log("[mpPlugin/editor.js--drugList]");
-                        //console.log(list);
-                        //console.log(listid);
-
-
-
-
 
                         var flag = 0;                        
-
 
                         //var quoteobject = $('#quotearea');
                         //var quotecontent = $('#quotearea').html();
@@ -320,24 +308,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 if (this.value === claim.method) $(this).prop('selected', true);
                             });
                         }
-
-                        // questions for dictating method type
-                        if (claim.grouprandom == "yes")
-                            $('input[name=grouprandom][value=yes]').prop('checked', true);  
-                        else if (claim.grouprandom == "no")
-                            $('input[name=grouprandom][value=no]').prop('checked', true);  
-
-                        if (claim.parallelgroup == "yes")
-                            $('input[name=parallelgroup][value=yes]').prop('checked', true);  
-                        else if (claim.parallelgroup == "no")
-                            $('input[name=parallelgroup][value=no]').prop('checked', true); 
-                        
-                        if (claim.pkprocess == "yes")
-                            $('input[name=pkprocess][value=yes]').prop('checked', true);  
-                        else if (claim.pkprocess == "no")
-                            $('input[name=pkprocess][value=no]').prop('checked', true); 
-                        
-
+                       
                         if(claim.qualifiedBy!=undefined) {
                             //load fields from annotation.claim
                             $("#Drug1 > option").each(function () {
@@ -476,6 +447,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // clean evidence relationship
                         $('input[name=evRelationship]').prop('checked', false);
 
+                        // study type questions
+                        $('input[name=grouprandom]').prop('checked', false);
+                        $('input[name=parallelgroup]').prop('checked', false);
+                        $('input[name=pkprocess]').prop('checked', false);
+
 
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
@@ -537,6 +513,21 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             $('input[name=evRelationship][value=refutes]').prop('checked', true);               
                         else if (loadData.evRelationship == "supports")
                             $('input[name=evRelationship][value=supports]').prop('checked', true);                
+
+
+                        // questions for dictating method type
+                        if (loadData.grouprandom == "yes")
+                            $('input[name=grouprandom][value=yes]').prop('checked', true);  
+                        else if (loadData.grouprandom == "no")
+                            $('input[name=grouprandom][value=no]').prop('checked', true);  
+                        if (loadData.parallelgroup == "yes")
+                            $('input[name=parallelgroup][value=yes]').prop('checked', true);  
+                        else if (loadData.parallelgroup == "no")
+                            $('input[name=parallelgroup][value=no]').prop('checked', true);                         
+                        if (loadData.pkprocess == "yes")
+                            $('input[name=pkprocess][value=yes]').prop('checked', true);  
+                        else if (loadData.pkprocess == "no")
+                            $('input[name=pkprocess][value=no]').prop('checked', true); 
 
 
                         // AUC: if unchanged then mark on checkbox, else load auc
@@ -673,11 +664,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
                         }
 
-
-                        annotation.argues.grouprandom = $("input[name=grouprandom]:checked").val();  
-                        annotation.argues.parallelgroup = $("input[name=parallelgroup]:checked").val();
-                        annotation.argues.pkprocess = $("input[name=pkprocess]:checked").val();
-
                         annotation.argues.qualifiedBy = qualifiedBy;
                         annotation.argues.type = "mp:claim";
                         annotation.argues.label = claimStatement;
@@ -741,6 +727,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
                         }
 
+
+                        mpData.grouprandom = $("input[name=grouprandom]:checked").val();  
+                        mpData.parallelgroup = $("input[name=parallelgroup]:checked").val();
+                        mpData.pkprocess = $("input[name=pkprocess]:checked").val();
 
                         var aucUnchanged = $('#auc-unchanged-checkbox').is(':checked');
                         var aucValue = $('#auc').val().trim();
