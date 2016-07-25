@@ -356,30 +356,34 @@ var context10 = {
     questions: [
         {
             type:"radiobutton",
-            name:"Is group randomization? ",
+            name:"Is there group randomization?",
             classname: "grouprandom",
             id:"grouprandom",
-            html: "div",
+            newline: "no",
             options:["yes","no"],
             optionsID:[]
         },
         {
             type:"radiobutton",
-            name:"Is parallel group design? ",
+            name:"Is there parallel group design? ",
             classname: "parallelgroup",
             id:"parallelgroup",
-            html: "div",
+            newline: "yes",
             options:["yes","no"],
-            optionsID:[]
         },
         {
             type:"radiobutton",
-            name:"Focus on pharmacokinetic processes? ",
+            name:"Did the study focus on pharmacokinetic processes?",
             classname: "pkprocess",
             id:"pkprocess",
-            html: "div",
+            newline: "no",
             options:["yes","no"],
-            optionsID:[]
+        },
+        {
+            type:"button",
+            name:"clear",
+            classname: "",
+            id:"study-type-qs-clear",
         }
     ]
 };
@@ -458,7 +462,9 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br>";
         }
         else {
-            out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+            if (items[i].type != "button")
+                out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+
             if(items[i].type=="text")
                 out += "<strong id='"+items[i].id+"'></strong><br>";
             else if(items[i].type=="input")
@@ -474,11 +480,20 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 out = out + "</select>";
             }
             else if (items[i].type=="radiobutton") {
-                for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                    out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";            
+                for (var j = 0, sl = items[i].options.length; j < sl; j++) {
+                    out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";
+                }
+                if (items[i].newline == "yes")
+                    out += "<br>";
+                else if (items[i].newline == "no")
+                    out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             } 
             else if (items[i].type=="checkbox") {
                 out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
+            }
+            else if (items[i].type=="button") {
+                if (items[i].id == "study-type-qs-clear")
+                    out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";                
             }
         }
     }
