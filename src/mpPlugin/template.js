@@ -84,33 +84,6 @@ var context1 = {
             type:"space",
             html: "table",
             name:""
-        },
-        {
-            type:"radiobutton",
-            name:"Is group randomization? ",
-            classname: "grouprandom",
-            id:"grouprandom",
-            html: "div",
-            options:["yes","no"],
-            optionsID:[]
-        },
-        {
-            type:"radiobutton",
-            name:"Is parallel group design? ",
-            classname: "parallelgroup",
-            id:"parallelgroup",
-            html: "div",
-            options:["yes","no"],
-            optionsID:[]
-        },
-        {
-            type:"radiobutton",
-            name:"Focus on pharmacokinetic processes? ",
-            classname: "pkprocess",
-            id:"pkprocess",
-            html: "div",
-            options:["yes","no"],
-            optionsID:[]
         }
     ]
 };
@@ -378,12 +351,45 @@ var context9 = {
     ]
 };
 
+// Data - questions about study type
+var context10 = {
+    questions: [
+        {
+            type:"radiobutton",
+            name:"Is group randomization? ",
+            classname: "grouprandom",
+            id:"grouprandom",
+            html: "div",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Is parallel group design? ",
+            classname: "parallelgroup",
+            id:"parallelgroup",
+            html: "div",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Focus on pharmacokinetic processes? ",
+            classname: "pkprocess",
+            id:"pkprocess",
+            html: "div",
+            options:["yes","no"],
+            optionsID:[]
+        }
+    ]
+};
+
 // handlerbar - build form1 function
 // @inputs: JSON config - context1
 // @outputs: form1 in html
 Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
-    var divHtml = "";
+    //var divHtml = "";
     if (items[0].type == "quote") {
         out += "<div id='" + items[0].id + "' class='claimquoteborder' ></div><br><br>";
     }
@@ -429,17 +435,17 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             if(((i+1)%5==0))
                 out = out + "</tr>";
         } 
-        else if (items[i].html == "div") {
-            if (items[i].type=="radiobutton") {
-                divHtml += "<div style='display: inline'><strong>" + items[i].name +"</strong>";
-                for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                    divHtml += "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
-                divHtml += "</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-        }
+        // else if (items[i].html == "div") {
+        //     if (items[i].type=="radiobutton") {
+        //         divHtml += "<div style='display: inline'><strong>" + items[i].name +"</strong>";
+        //         for (var j = 0, sl = items[i].options.length; j < sl; j++)
+        //             divHtml += "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
+        //         divHtml += "</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        //     }
+        // }
     }
     out +="</table>";
-    out += divHtml;
+    //out += divHtml;
     
     return out;
 });
@@ -525,6 +531,11 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var form9 = template(context9);
 
+// Data - study type questions
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var form10 = template(context10);
+
 
 Template.content = [
 
@@ -550,7 +561,8 @@ Template.content = [
     '<button type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>',
+    '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
+    '<button type="button" onclick="switchDataForm(\'question\')" >questions</button>',
     '</div>',
 
     // Claim form
@@ -596,6 +608,11 @@ Template.content = [
     // Data & material - evidence relationship
     '<div id="mp-data-form-evRelationship" style="margin-top:7px;margin-left:25px;display: none;">',
     form9,
+    '</div>',
+
+    // Data & material - questions about study type
+    '<div id="mp-data-form-question" style="margin-top:7px;margin-left:25px;display: none;">',
+    form10,
     '</div>',
     
     '</div>',
