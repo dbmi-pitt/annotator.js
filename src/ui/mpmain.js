@@ -271,79 +271,74 @@ function main(options) {
 
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
-                    $( "#dialog-claim-delete-confirm" ).dialog({
-                        resizable: false,
-                        height: 'auto',
-                        width: '400px',
-                        modal: true,
-                        buttons: {
-                            "Confirm": function() {
-                                $( this ).dialog( "close" );
-                                console.log("mpmain - confirm deletion");
+                    console.log("delete");
+                    $( "#dialog-claim-delete-confirm" ).show();
+                    $( "#claim-delete-confirm-btn" ).click(function() {
+                        $( "#dialog-claim-delete-confirm" ).hide();
+                        console.log("mpmain - confirm deletion");
 
-                                // clean cached text selection
-                                isTextSelected = false;
-                                cachedOATarget = "";
-                                cachedOARanges = "";
+                        // clean cached text selection
+                        isTextSelected = false;
+                        cachedOATarget = "";
+                        cachedOARanges = "";
 
-                                app.annotations.delete(ann);
-                                showAnnTable();
-                                s.mphighlighter.undraw(ann);  
+                        app.annotations.delete(ann);
+                        showAnnTable();
+                        s.mphighlighter.undraw(ann);
 
-                                // clean field name and annotation id
-                                currFormType = "";
-                                currAnnotationId = "";
-                            },
-                            "Cancel": function() {
-                                $( this ).dialog( "close" );
-                            }
-                        }
+                        // clean field name and annotation id
+                        currFormType = "";
+                        currAnnotationId = "";
                     });
+                    $( "#claim-delete-cancel-btn" ).click(function() {
+                        $( "#dialog-claim-delete-confirm" ).hide();
+                    });
+                    $( "#claim-delete-dialog-close" ).click(function() {
+                        $( "#dialog-claim-delete-confirm" ).hide();
+                    });
+
                 } else {
                     // delete confirmation for data & material
-                    $( "#dialog-data-delete-confirm" ).dialog({
-                        resizable: false,
-                        height: 'auto',
-                        width: '400px',
-                        modal: true,
-                        buttons: {                        
-                            "Confirm": function() {
-                                $( this ).dialog( "close" );
-                                if (currFormType == "participants") {
-                                    ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};
-                                } else if (currFormType == "dose1") {
-                                    ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};        
-                                } else if (currFormType == "dose2") {
-                                    ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};         
-                                } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
-                                    ann.argues.supportsBy[currDataNum][currFormType] = {}; 
-                                } else {
-                                    alert("[ERROR] editor type is not avaliable!");
-                                }       
-
-                                // after deletion, if this row is empty, then delete
-                                var boo = isDataRowEmpty(ann.argues.supportsBy[currDataNum]);
-                                if (boo) {
-                                    console.log("mpmain - delete empty row!");
-                                    ann.argues.supportsBy.splice(currDataNum, 1);
-                                    totalDataNum = totalDataNum -1;
-                                }
-
-                                // clean cached text selection
-                                // isTextSelected = false;
-                                // cachedOATarget = "";
-                                // cachedOARanges = "";
-                                    
-                                if (typeof s.mpeditor.dfd !== 'undefined' && s.mpeditor.dfd !== null) {
-                                    s.mpeditor.dfd.resolve();
-                                }        
-                                showAnnTable();                                   
-                            },
-                            "Cancel": function() {
-                                $( this ).dialog( "close" );
-                            }
+                    $( "#dialog-data-delete-confirm" ).show();
+                    $( "#data-delete-confirm-btn" ).click(function() {
+                        $("#dialog-data-delete-confirm").hide();
+                        if (currFormType == "participants") {
+                            ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};
+                        } else if (currFormType == "dose1") {
+                            ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
+                        } else if (currFormType == "dose2") {
+                            ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
+                        } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
+                            ann.argues.supportsBy[currDataNum][currFormType] = {};
+                        } else {
+                            alert("[ERROR] editor type is not avaliable!");
                         }
-                    });                    
+
+                        // after deletion, if this row is empty, then delete
+                        var boo = isDataRowEmpty(ann.argues.supportsBy[currDataNum]);
+                        if (boo) {
+                            console.log("mpmain - delete empty row!");
+                            ann.argues.supportsBy.splice(currDataNum, 1);
+                            totalDataNum = totalDataNum -1;
+                        }
+
+                        // clean cached text selection
+                        // isTextSelected = false;
+                        // cachedOATarget = "";
+                        // cachedOARanges = "";
+
+                        if (typeof s.mpeditor.dfd !== 'undefined' && s.mpeditor.dfd !== null) {
+                            s.mpeditor.dfd.resolve();
+                        }
+                        showAnnTable();
+                    });
+
+                    $( "#data-delete-cancel-btn" ).click(function() {
+                        $( "#dialog-data-delete-confirm" ).hide();
+                    });
+                    $( "#data-delete-dialog-close" ).click(function() {
+                        $( "#dialog-data-delete-confirm" ).hide();
+                    });
                 }                
             }
         });
