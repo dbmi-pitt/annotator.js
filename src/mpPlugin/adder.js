@@ -231,13 +231,14 @@ mpAdder.template = [
     '<div class="annotator-addermp annotator-hide">',
     // MP: add menu for create claim and add data
     '<button class="mp-menu-btn" type="button">' + _t('Annotate') + '</button>',
-    '<ul class="mp-main-menu" style="display: none;">',
+    '<ul class="mp-main-menu">',
     '<li class="mp-main-menu-1" onclick="showEditor(),claimEditorLoad();">',
     'create a claim',
     '</li>',
     '<li class="mp-main-menu-2">',
     'add data for',
-    '<ul class="mp-sub-menu-2" style="display: none;"><ul>',
+    '<ul class="mp-sub-menu-2">',
+    '</ul>',
     '</li>',
     '</ul>',
     '</div>'
