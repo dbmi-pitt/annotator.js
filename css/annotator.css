@@ -338,6 +338,7 @@ span[name="annotator-mp"] {
 	/*clear: both;
 	position:fixed;*/
 	margin-bottom:40px;
+	margin-left: 22%;
 }
 
 .annotator-widget {
@@ -1251,8 +1252,10 @@ th, td {
 	text-align: right;
 	white-space:nowrap;
 	font-size: small;
-	font-family: Arial;
+	font-family: Arial; 
+	list-style-type: none;
 }
+
 .clear-user-agent-styles td:nth-of-type(even) {
 	text-align: left;
 	padding-left: 5px;
@@ -1390,3 +1393,4 @@ input[type="radio"] {
 	border: none;
 	font-family:  "Myriad Web",Verdana,Helvetica,Arial,sans-serif;
 }
+
