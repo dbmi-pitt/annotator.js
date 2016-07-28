@@ -258,7 +258,12 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
         highlightRange(dataNormed.range, this.options.highlightClass, dataNormed);
     }
 
-
+    //deselect browser's highlight
+    if ( document.selection ) {
+        document.selection.empty();
+    } else if ( window.getSelection ) {
+        window.getSelection().removeAllRanges();
+    }
 
     //console.log("annotation._local.highlights:");
     //console.log(annotation._local.highlights);
