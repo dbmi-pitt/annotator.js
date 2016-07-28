@@ -63,33 +63,38 @@ f/* Base Reset
 	margin-top: 25px;
 }
 */
-.claimquoteborder {
+#quotearea.claimquoteborder {
 	clear: both;
 	position:fixed;
-	margin-top:-20px;
+	margin-right: 110px;
+	margin-top: -20px;
+	margin-left: -70px;
 	max-height: 40px;
+	margin-bottom: 10px;
+	overflow-y:scroll;
+	background-color: #d1d1d1;
 }
 
-.dataquoteborder {
+#quotearea.dataquoteborder {
 	clear: both;
 	position:fixed;
 	margin-right: 120px;
 	margin-top: -20px;
 	margin-left: -70px;
 	max-height: 40px;
+	margin-bottom: 10px;
 	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
 
-#quotearea {
-	margin-right: 0px;
-	margin-top: 0px;
+ /* quotearea
+	/*margin-right: 0px;
 	margin-left: -60px;
-	margin-bottom: 0px;
+	margin-bottom: 5px;
 	overflow-y:scroll;
 	max-height: 40px;
-	background-color: #d1d1d1;
-}
+	background-color: #d1d1d1;*/
+
 
 .highlightdrug {
 	background-color:#9ebdff;
@@ -1297,7 +1302,7 @@ table, tr, td {
 	color:#000000;
 	font-size:12px;
 	font-weight:670;
-	line-height:155%;
+	/*line-height:155%;*/
 }
 
 input[type="radio"] {
