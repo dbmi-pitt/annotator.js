@@ -84,33 +84,6 @@ var context1 = {
             type:"space",
             html: "table",
             name:""
-        },
-        {
-            type:"radiobutton",
-            name:"Is group randomization? ",
-            classname: "grouprandom",
-            id:"grouprandom",
-            html: "div",
-            options:["yes","no"],
-            optionsID:[]
-        },
-        {
-            type:"radiobutton",
-            name:"Is parallel group design? ",
-            classname: "parallelgroup",
-            id:"parallelgroup",
-            html: "div",
-            options:["yes","no"],
-            optionsID:[]
-        },
-        {
-            type:"radiobutton",
-            name:"Focus on pharmacokinetic processes? ",
-            classname: "pkprocess",
-            id:"pkprocess",
-            html: "div",
-            options:["yes","no"],
-            optionsID:[]
         }
     ]
 };
@@ -257,6 +230,12 @@ var context6 = {
             optionsID:[]
         },
         {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"cmax-unchanged-checkbox",
+            value: "cmaxunchanged"
+        },
+        {
             type: "input",
             name: "CMAX: ",
             id: "cmax"
@@ -274,12 +253,6 @@ var context6 = {
             id:"cmaxDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
-        },
-        {
-            type:"checkbox",
-            name:"unchanged: ",
-            id:"cmax-unchanged-checkbox",
-            value: "cmaxunchanged"
         }
     ]
 };
@@ -294,6 +267,12 @@ var context7 = {
             id:"clearancequote",
             options:[],
             optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"clearance-unchanged-checkbox",
+            value: "clearanceunchanged"
         },
         {
             type: "input",
@@ -313,12 +292,6 @@ var context7 = {
             id:"clearanceDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
-        },
-        {
-            type:"checkbox",
-            name:"unchanged: ",
-            id:"clearance-unchanged-checkbox",
-            value: "clearanceunchanged"
         }
     ]
 };
@@ -334,6 +307,12 @@ var context8 = {
             id:"halflifequote",
             options:[],
             optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"halflife-unchanged-checkbox",
+            value: "halflifeunchanged"
         },
         {
             type: "input",
@@ -353,12 +332,6 @@ var context8 = {
             id:"halflifeDirection",
             options:["UNK","increase","decrease"],
             optionsID:[]
-        },
-        {
-            type:"checkbox",
-            name:"unchanged: ",
-            id:"halflife-unchanged-checkbox",
-            value: "halflifeunchanged"
         }
     ]
 };
@@ -378,12 +351,49 @@ var context9 = {
     ]
 };
 
+// Data - questions about study type
+var context10 = {
+    questions: [
+        {
+            type:"radiobutton",
+            name:"Is there group randomization?",
+            classname: "grouprandom",
+            id:"grouprandom",
+            newline: "no",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Is there parallel group design? ",
+            classname: "parallelgroup",
+            id:"parallelgroup",
+            newline: "yes",
+            options:["yes","no"],
+        },
+        {
+            type:"radiobutton",
+            name:"Did the study focus on pharmacokinetic processes?",
+            classname: "pkprocess",
+            id:"pkprocess",
+            newline: "no",
+            options:["yes","no"],
+        },
+        {
+            type:"button",
+            name:"clear",
+            classname: "",
+            id:"study-type-qs-clear",
+        }
+    ]
+};
+
 // handlerbar - build form1 function
 // @inputs: JSON config - context1
 // @outputs: form1 in html
 Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
-    var divHtml = "";
+    //var divHtml = "";
     if (items[0].type == "quote") {
         out += "<div id='" + items[0].id + "' class='claimquoteborder' ></div><br><br>";
     }
@@ -429,17 +439,17 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             if(((i+1)%5==0))
                 out = out + "</tr>";
         } 
-        else if (items[i].html == "div") {
-            if (items[i].type=="radiobutton") {
-                divHtml += "<div style='display: inline'><strong>" + items[i].name +"</strong>";
-                for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                    divHtml += "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
-                divHtml += "</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-        }
+        // else if (items[i].html == "div") {
+        //     if (items[i].type=="radiobutton") {
+        //         divHtml += "<div style='display: inline'><strong>" + items[i].name +"</strong>";
+        //         for (var j = 0, sl = items[i].options.length; j < sl; j++)
+        //             divHtml += "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
+        //         divHtml += "</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        //     }
+        // }
     }
     out +="</table>";
-    out += divHtml;
+    //out += divHtml;
     
     return out;
 });
@@ -452,7 +462,9 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br>";
         }
         else {
-            out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+            if (items[i].type != "button")
+                out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+
             if(items[i].type=="text")
                 out += "<strong id='"+items[i].id+"'></strong><br>";
             else if(items[i].type=="input")
@@ -468,11 +480,20 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 out = out + "</select>";
             }
             else if (items[i].type=="radiobutton") {
-                for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                    out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";            
+                for (var j = 0, sl = items[i].options.length; j < sl; j++) {
+                    out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";
+                }
+                if (items[i].newline == "yes")
+                    out += "<br>";
+                else if (items[i].newline == "no")
+                    out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             } 
             else if (items[i].type=="checkbox") {
                 out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
+            }
+            else if (items[i].type=="button") {
+                if (items[i].id == "study-type-qs-clear")
+                    out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";                
             }
         }
     }
@@ -525,6 +546,11 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var form9 = template(context9);
 
+// Data - study type questions
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var form10 = template(context10);
+
 
 Template.content = [
 
@@ -550,7 +576,8 @@ Template.content = [
     '<button type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>',
+    '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
+    '<button type="button" onclick="switchDataForm(\'question\')" >questions</button>',
     '</div>',
 
     // Claim form
@@ -596,6 +623,11 @@ Template.content = [
     // Data & material - evidence relationship
     '<div id="mp-data-form-evRelationship" style="margin-top:7px;margin-left:25px;display: none;">',
     form9,
+    '</div>',
+
+    // Data & material - questions about study type
+    '<div id="mp-data-form-question" style="margin-top:7px;margin-left:25px;display: none;">',
+    form10,
     '</div>',
     
     '</div>',
