@@ -63,7 +63,7 @@
 	margin-top: 25px;
 }
 */
-#quotearea.claimquoteborder {
+.claimquoteborder {
 	clear: both;
 	position:fixed;
 	margin-right: 110px;
@@ -75,7 +75,7 @@
 	background-color: #d1d1d1;
 }
 
-#quotearea.dataquoteborder {
+.dataquoteborder {
 	clear: both;
 	position:fixed;
 	margin-right: 120px;
@@ -87,7 +87,9 @@
 	background-color: #d1d1d1;
 }
 
- /* quotearea
+ #quotearea{
+ 	background-color: #d1d1d1;
+ }
 	/*margin-right: 0px;
 	margin-left: -60px;
 	margin-bottom: 5px;
