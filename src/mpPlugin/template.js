@@ -581,52 +581,52 @@ Template.content = [
     '</div>',
 
     // Claim form
-    '<div id="mp-claim-form" style="margin-top:10px;margin-left:15px;display: none;">',
+    '<div id="mp-claim-form" style="display: none;">',
     form1,
     '</div>',
     
     // Data & material - Num of Participants
-    '<div id="mp-data-form-participants" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-participants" style="display: none;">',
     form2,
     '</div>',
 
     // Data & material - Drug1 Dosage
-    '<div id="mp-data-form-dose1" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-dose1" style="display: none;">',
     form3,
     '</div>',
 
     // Data & material - Drug2 Dosage
-    '<div id="mp-data-form-dose2" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-dose2" style="display: none;">',
     form4,
     '</div>',
 
     // Data & material - AUC
-    '<div id="mp-data-form-auc" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-auc" style="display: none;">',
     form5,
     '</div>',
 
     // Data & material - CMAX
-    '<div id="mp-data-form-cmax" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-cmax" style="display: none;">',
     form6,
     '</div>',
 
     // Data & material - Clearance
-    '<div id="mp-data-form-clearance" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-clearance" style="display: none;">',
     form7,
     '</div>',
 
     // Data & material - half life
-    '<div id="mp-data-form-halflife" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-halflife" style="display: none;">',
     form8,
     '</div>',
 
     // Data & material - evidence relationship
-    '<div id="mp-data-form-evRelationship" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-evRelationship" style="display: none;">',
     form9,
     '</div>',
 
     // Data & material - questions about study type
-    '<div id="mp-data-form-question" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-question" style="display: none;">',
     form10,
     '</div>',
     
