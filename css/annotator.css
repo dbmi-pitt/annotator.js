@@ -74,6 +74,7 @@
 	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
+
 .dataquoteborder {
 	clear: both;
 	position:fixed;
@@ -1292,6 +1293,7 @@ table, tr, td {
 	color:#000000;
 	font-size:12px;
 	font-weight:670;
+	padding-top: 0px;
 	/*line-height:155%;*/
 }
 
