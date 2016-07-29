@@ -63,7 +63,7 @@ f/* Base Reset
 	margin-top: 25px;
 }
 */
-/*.claimquoteborder {
+.claimquoteborder {
 	clear: both;
 	position:fixed;
 	margin-right: 110px;
@@ -74,7 +74,7 @@ f/* Base Reset
 	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
-*/
+
 .dataquoteborder {
 	clear: both;
 	position:fixed;
@@ -87,11 +87,11 @@ f/* Base Reset
 	background-color: #d1d1d1;
 }
 
-#quotearea{
+/*#quotearea{
  	clear: both;
 	position:fixed;
 	background-color: #d1d1d1;
- }
+ }*/
 
 
 .highlightdrug {
@@ -1300,6 +1300,7 @@ table, tr, td {
 	color:#000000;
 	font-size:12px;
 	font-weight:670;
+	padding-top: 0px;
 	/*line-height:155%;*/
 }
 
