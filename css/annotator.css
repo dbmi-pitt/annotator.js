@@ -63,7 +63,7 @@ f/* Base Reset
 	margin-top: 25px;
 }
 */
-.claimquoteborder {
+/*.claimquoteborder {
 	clear: both;
 	position:fixed;
 	margin-right: 110px;
@@ -74,7 +74,7 @@ f/* Base Reset
 	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
-
+*/
 .dataquoteborder {
 	clear: both;
 	position:fixed;
@@ -87,15 +87,11 @@ f/* Base Reset
 	background-color: #d1d1d1;
 }
 
- #quotearea{
- 	background-color: #d1d1d1;
+#quotearea{
+ 	clear: both;
+	position:fixed;
+	background-color: #d1d1d1;
  }
-	/*margin-right: 0px;
-	margin-left: -60px;
-	margin-bottom: 5px;
-	overflow-y:scroll;
-	max-height: 40px;
-	background-color: #d1d1d1;*/
 
 
 .highlightdrug {
