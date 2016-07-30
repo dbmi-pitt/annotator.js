@@ -87,17 +87,6 @@
 	background-color: #d1d1d1;
 }
 
- #quotearea{
- 	background-color: #d1d1d1;
- }
-	/*margin-right: 0px;
-	margin-left: -60px;
-	margin-bottom: 5px;
-	overflow-y:scroll;
-	max-height: 40px;
-	background-color: #d1d1d1;*/
-
-
 .highlightdrug {
 	background-color: rgba(255, 23, 11, 0.42);
 	color: rgb(0, 0, 0);
@@ -1304,6 +1293,7 @@ table, tr, td {
 	color:#000000;
 	font-size:12px;
 	font-weight:670;
+	padding-top: 0px;
 	/*line-height:155%;*/
 }
 
