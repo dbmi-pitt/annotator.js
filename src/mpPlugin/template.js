@@ -368,17 +368,17 @@ var context10 = {
             name:"Is there parallel group design? ",
             classname: "parallelgroup",
             id:"parallelgroup",
-            newline: "yes",
-            options:["yes","no"],
-        },
-        {
-            type:"radiobutton",
-            name:"Did the study focus on pharmacokinetic processes?",
-            classname: "pkprocess",
-            id:"pkprocess",
             newline: "no",
             options:["yes","no"],
         },
+        // {
+        //     type:"radiobutton",
+        //     name:"Did the study focus on pharmacokinetic processes?",
+        //     classname: "pkprocess",
+        //     id:"pkprocess",
+        //     newline: "no",
+        //     options:["yes","no"],
+        // },
         {
             type:"button",
             name:"clear",
@@ -395,7 +395,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
     //var divHtml = "";
     if (items[0].type == "quote") {
-        out += "<div id='" + items[0].id + "' class='claimquoteborder' ></div><br><br>";
+        out += "<div id='" + items[0].id + "' class='claimquoteborder'></div><br><br><br>";
     }
     out += "<table class='clear-user-agent-styles'>";
     for (var i = 1, l=items.length; i<l; i++) {
@@ -459,7 +459,7 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
     for(var i=0, l=items.length; i<l; i++) {
         if (items[i].type == "quote") {
             // <strong>" + items[i].name +"</strong>
-            out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br>";
+            out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br><br>";
         }
         else {
             if (items[i].type != "button")
@@ -562,8 +562,6 @@ Template.content = [
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
-    // '<div id="quote" class="quoteborder" style="display: none;">',
-
     // current claim label
     '<div id="claim-label-data-editor" style="display: none;"></div>',
 
@@ -578,55 +576,55 @@ Template.content = [
     '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'question\')" >questions</button>',
-    '</div>',
+    '</div><br>',
 
     // Claim form
-    '<div id="mp-claim-form" style="margin-top:10px;margin-left:15px;display: none;">',
+    '<div id="mp-claim-form" style="display: none;">',
     form1,
     '</div>',
     
     // Data & material - Num of Participants
-    '<div id="mp-data-form-participants" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-participants" style="display: none;">',
     form2,
     '</div>',
 
     // Data & material - Drug1 Dosage
-    '<div id="mp-data-form-dose1" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-dose1" style="display: none;">',
     form3,
     '</div>',
 
     // Data & material - Drug2 Dosage
-    '<div id="mp-data-form-dose2" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-dose2" style="display: none;">',
     form4,
     '</div>',
 
     // Data & material - AUC
-    '<div id="mp-data-form-auc" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-auc" style="display: none;">',
     form5,
     '</div>',
 
     // Data & material - CMAX
-    '<div id="mp-data-form-cmax" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-cmax" style="display: none;">',
     form6,
     '</div>',
 
     // Data & material - Clearance
-    '<div id="mp-data-form-clearance" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-clearance" style="display: none;">',
     form7,
     '</div>',
 
     // Data & material - half life
-    '<div id="mp-data-form-halflife" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-halflife" style="display: none;">',
     form8,
     '</div>',
 
     // Data & material - evidence relationship
-    '<div id="mp-data-form-evRelationship" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-evRelationship" style="display: none;">',
     form9,
     '</div>',
 
     // Data & material - questions about study type
-    '<div id="mp-data-form-question" style="margin-top:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-question" style="display: none;">',
     form10,
     '</div>',
     
@@ -634,7 +632,7 @@ Template.content = [
     '</div>',
     '</div>',
     '    <div class="annotator-controls1">',
-    '     <br><a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
+    '     <a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
     '     <a href="#delete" class="annotator-delete" id="annotator-delete">Delete</a>',
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
     '     <a href="#save" class="annotator-save annotator-focus">Save</a>',

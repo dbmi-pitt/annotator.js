@@ -450,8 +450,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // study type questions
                         $('input[name=grouprandom]').prop('checked', false);
                         $('input[name=parallelgroup]').prop('checked', false);
-                        $('input[name=pkprocess]').prop('checked', false);
-
 
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
@@ -524,10 +522,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             $('input[name=parallelgroup][value=yes]').prop('checked', true);  
                         else if (loadData.parallelgroup == "no")
                             $('input[name=parallelgroup][value=no]').prop('checked', true);                         
-                        if (loadData.pkprocess == "yes")
-                            $('input[name=pkprocess][value=yes]').prop('checked', true);  
-                        else if (loadData.pkprocess == "no")
-                            $('input[name=pkprocess][value=no]').prop('checked', true); 
 
 
                         // AUC: if unchanged then mark on checkbox, else load auc
@@ -730,7 +724,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         mpData.grouprandom = $("input[name=grouprandom]:checked").val();  
                         mpData.parallelgroup = $("input[name=parallelgroup]:checked").val();
-                        mpData.pkprocess = $("input[name=pkprocess]:checked").val();
 
                         var aucUnchanged = $('#auc-unchanged-checkbox').is(':checked');
                         var aucValue = $('#auc').val().trim();
