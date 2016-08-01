@@ -310,6 +310,8 @@ function main(options) {
                             ann.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
                         } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
                             ann.argues.supportsBy[currDataNum][currFormType] = {};
+                        } else if (currFormType == "evRelationship") {
+                            ann.argues.supportsBy[currDataNum].evRelationship = '';
                         } else {
                             alert("[ERROR] editor type is not avaliable!");
                         }
