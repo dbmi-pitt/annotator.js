@@ -347,7 +347,7 @@ span[name="annotator-mp"] {
 	bottom: -30px;
 	right: 0px;
 	width: 800px;
-	height:180px;
+	/* height:180px; */
 	overflow-y: hidden;
 	background-color: #FFFFFF;
 	border: 0px solid #7A7A7A;
