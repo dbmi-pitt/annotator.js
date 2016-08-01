@@ -368,17 +368,17 @@ var context10 = {
             name:"Is there parallel group design? ",
             classname: "parallelgroup",
             id:"parallelgroup",
-            newline: "yes",
-            options:["yes","no"],
-        },
-        {
-            type:"radiobutton",
-            name:"Did the study focus on pharmacokinetic processes?",
-            classname: "pkprocess",
-            id:"pkprocess",
             newline: "no",
             options:["yes","no"],
         },
+        // {
+        //     type:"radiobutton",
+        //     name:"Did the study focus on pharmacokinetic processes?",
+        //     classname: "pkprocess",
+        //     id:"pkprocess",
+        //     newline: "no",
+        //     options:["yes","no"],
+        // },
         {
             type:"button",
             name:"clear",
@@ -395,7 +395,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
     //var divHtml = "";
     if (items[0].type == "quote") {
-        out += "<div id='" + items[0].id + "' class='claimquoteborder' ></div><br><br>";
+        out += "<div id='" + items[0].id + "' class='claimquoteborder'></div><br><br><br>";
     }
     out += "<table class='clear-user-agent-styles'>";
     for (var i = 1, l=items.length; i<l; i++) {
@@ -459,7 +459,7 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
     for(var i=0, l=items.length; i<l; i++) {
         if (items[i].type == "quote") {
             // <strong>" + items[i].name +"</strong>
-            out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br>";
+            out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br><br>";
         }
         else {
             if (items[i].type != "button")
@@ -562,8 +562,6 @@ Template.content = [
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
-    // '<div id="quote" class="quoteborder" style="display: none;">',
-
     // current claim label
     '<div id="claim-label-data-editor" style="display: none;"></div>',
 
@@ -578,7 +576,7 @@ Template.content = [
     '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
     '<button type="button" onclick="switchDataForm(\'question\')" >questions</button>',
-    '</div>',
+    '</div><br>',
 
     // Claim form
     '<div id="mp-claim-form" style="display: none;">',
@@ -634,7 +632,7 @@ Template.content = [
     '</div>',
     '</div>',
     '    <div class="annotator-controls1">',
-    '     <br><a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
+    '     <a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
     '     <a href="#delete" class="annotator-delete" id="annotator-delete">Delete</a>',
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
     '     <a href="#save" class="annotator-save annotator-focus">Save</a>',
