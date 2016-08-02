@@ -281,8 +281,7 @@ function main(options) {
                 } else {
 
                     // delete confirmation for data & material
-                    $( "#dialog-data-delete-confirm" ).show();
-
+                    $("#dialog-data-delete-confirm").show();
                 }
             }
         });
@@ -538,6 +537,8 @@ $( "#data-delete-confirm-btn" ).click(function() {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
     } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
         currAnnotation.argues.supportsBy[currDataNum][currFormType] = {};
+    } else if (currFormType == "evRelationship") {
+        currAnnotation.argues.supportsBy[currDataNum].evRelationship = '';
     } else {
         alert("[ERROR] editor type is not avaliable!");
     }
