@@ -567,15 +567,24 @@ Template.content = [
 
     // links 
     '<div id="mp-data-nav" style="display: none;">',
-    '<button type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
+    // '<button type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
+    // '<button type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
+    '<button id="evRelationship-btn" type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
+    '<button id="participants-btn" type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
+
     '<button id="drug1-dose-switch-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
     '<button id="drug2-dose-switch-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
-    '<button type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
-    '<button type="button" onclick="switchDataForm(\'question\')" >questions</button>',
+    // '<button type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
+    // '<button type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
+    // '<button type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
+    // '<button type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
+    // '<button type="button" onclick="switchDataForm(\'question\')" >questions</button>',
+    '<button id="auc-btn" type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
+    '<button id="cmax-btn" type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
+    '<button id="clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
+    '<button id="halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
+    '<button id="question-btn" type="button" onclick="switchDataForm(\'question\')" >questions</button>',
+
     '</div><br>',
 
     // Claim form
@@ -584,47 +593,47 @@ Template.content = [
     '</div>',
     
     // Data & material - Num of Participants
-    '<div id="mp-data-form-participants" style="display: none;">',
+    '<div id="mp-data-form-participants" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form2,
     '</div>',
 
     // Data & material - Drug1 Dosage
-    '<div id="mp-data-form-dose1" style="display: none;">',
+    '<div id="mp-data-form-dose1" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form3,
     '</div>',
 
     // Data & material - Drug2 Dosage
-    '<div id="mp-data-form-dose2" style="display: none;">',
+    '<div id="mp-data-form-dose2" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form4,
     '</div>',
 
     // Data & material - AUC
-    '<div id="mp-data-form-auc" style="display: none;">',
+    '<div id="mp-data-form-auc" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form5,
     '</div>',
 
     // Data & material - CMAX
-    '<div id="mp-data-form-cmax" style="display: none;">',
+    '<div id="mp-data-form-cmax" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form6,
     '</div>',
 
     // Data & material - Clearance
-    '<div id="mp-data-form-clearance" style="display: none;">',
+    '<div id="mp-data-form-clearance" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form7,
     '</div>',
 
     // Data & material - half life
-    '<div id="mp-data-form-halflife" style="display: none;">',
+    '<div id="mp-data-form-halflife" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form8,
     '</div>',
 
     // Data & material - evidence relationship
-    '<div id="mp-data-form-evRelationship" style="display: none;">',
+    '<div id="mp-data-form-evRelationship" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form9,
     '</div>',
 
     // Data & material - questions about study type
-    '<div id="mp-data-form-question" style="display: none;">',
+    '<div id="mp-data-form-question" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form10,
     '</div>',
     
