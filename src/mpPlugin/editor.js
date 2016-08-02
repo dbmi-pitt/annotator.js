@@ -80,7 +80,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         var nodes = [];
                         nodes = annotation.childNodes;
-                        console.log(nodes);
 
                         //--------------generate quote-----------------
                         $('#quote').empty();
@@ -106,7 +105,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     p.appendChild(goodChild);
                                 }
                             }
-                            console.log(p);
+                            //console.log(p);
                             //generate quote: edit an existed annotation
                         } else {
                             var tempChildrenOfClaim = [];
@@ -128,23 +127,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
-                        console.log(quotecontent);
+                        //console.log(quotecontent);
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
                             quotecontent = quotecontent.split("annotator-currhl").join("");
-                            console.log(quotecontent);
                         }
                         while(quotecontent.indexOf("annotator-mp")!=-1) {
                             quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-mp\"").join("");
                             quotecontent = quotecontent.split("name=\"annotator-mp\" class=\"annotator-hl\"").join("");
-                            console.log(quotecontent);
                         }
 
                         while(quotecontent.indexOf(" name=\"annotator-hl\"")!=-1) {
                             quotecontent = quotecontent.split(" name=\"annotator-hl\"").join("");
-                            console.log(quotecontent);
                         }
-                        console.log(quotecontent);
+                        //console.log(quotecontent);
                         $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
 
@@ -193,7 +189,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     list.push(parent.textContent);
                                     listid.push(selectedList[i].id);
                                 }else {
-                                    //console.log(selectedList[i].isEqualNode(prevNode));
+
                                     if(!selectedList[i].isEqualNode(prevNode)) {
                                         parent = selectedList[i];
                                         while (parent.childNodes.length > 0)
@@ -235,7 +231,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     list.push(parent.textContent);
                                     listid.push(drugNodes[i].id);
                                 }else {
-                                    //console.log(drugNodes[i].isEqualNode(prevNode));
+
                                     if(!drugNodes[i].isEqualNode(prevNode)) {
                                         parent = drugNodes[i];
                                         while (parent.childNodes.length > 0)
@@ -252,10 +248,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                         }
 
-                        var flag = 0;                        
-
-                        //var quoteobject = $('#quotearea');
-                        //var quotecontent = $('#quotearea').html();
+                        var flag = 0;
 
                         //check drug list
                         var allHighlightedDrug = [];
@@ -323,7 +316,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var drug2 = $('#Drug2 option:selected').text();
                         var drug1ID = $('#Drug1 option:selected').val();
                         var drug2ID = $('#Drug2 option:selected').val();
-                        console.log("id=\""+drug2ID+"\" class=\"annotator-hl\" name=\"annotator-hl\"");
+
                         quotecontent = quotecontent.split("class=\"annotator-hl\" id=\""+drug1ID+"\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
                         quotecontent = quotecontent.split("class=\"annotator-hl\" id=\""+drug2ID+"\"").join("class=\"highlightdrug\" id=\""+drug2ID+"\"");
                         quotecontent = quotecontent.split("id=\""+drug1ID+"\" class=\"annotator-hl\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
@@ -333,22 +326,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $('#quote').append(quoteobject);
 
                         // highlight drug selections on text quote
-                        //console.log(claim.qualifiedBy);
                         if (claim.qualifiedBy != null) {
-                            /*if (claim.qualifiedBy.drug1ID != "") {
-                                var quotestring = quoteobject.html();
-                                quotestring = quotestring.replace("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+claim.qualifiedBy.drug1ID+"\"", "class=\"highlightdrug\" id=\""+claim.qualifiedBy.drug1ID+"\"");
-                                quoteobject.html(quotestring);
-                                //console.log(quotestring);
-                            }
-                            if (claim.qualifiedBy.drug2ID != "") {
-                                var quotestring = quoteobject.html();
-                                quotestring = quotestring.replace("class=\"annotator-hl\" name=\"annotator-hl\" id=\""+claim.qualifiedBy.drug2ID+"\"", "class=\"highlightdrug\" id=\""+claim.qualifiedBy.drug2ID+"\"");
-                                quoteobject.html(quotestring);
-                                //console.log(quotestring);
-                            }
-                            */
-                            //$(field).find('#quote').css('background', '#d1d1d1');
 
                             $('#relationship > option').each(function () {
                                 if (this.value == claim.qualifiedBy.relationship) {

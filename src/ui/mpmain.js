@@ -41,7 +41,7 @@ function annotationFactory(contextEl, ignoreSelector) {
     return function (ranges) {
         var text = [],
             serializedRanges = [];
-            console.log(ranges);
+            //console.log(ranges);
         for (var i = 0, len = ranges.length; i < len; i++) {
             var r = ranges[i];
             text.push(trim(r.text()));
@@ -270,11 +270,9 @@ function main(options) {
             extensions: options.editorExtensions,
             onDelete: function (ann) {
 
-                console.log("delete");
                 currAnnotation = ann;
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
-                    console.log(currAnnotation.id);
 
                     $( "#dialog-claim-delete-confirm" ).show();
 
@@ -414,7 +412,7 @@ function main(options) {
             // completes, and rejected if editing is cancelled. We return it
             // here to "stall" the annotation process until the editing is
             // done.
-            console.log("[mpmain--beforeAnnotationCreated]")
+            //console.log("[mpmain--beforeAnnotationCreated]")
             //s.mphighlighter.draw(annotation);//enhancement
 
 		    annotation.rawurl = options.source;
@@ -454,16 +452,16 @@ function main(options) {
             }
         },
         beforeAnnotationUpdated: function (annotation) {
-            console.log("mpmain - beforeAnnotationUpdated");
+
             if (annotation.annotationType == "MP"){
 
-                console.log("[mpmain--beforeAnnotationUpdated]")
+                console.log("mpmain - beforeAnnotationUpdated")
                 if(hlAnnotation==undefined) {
                     s.currhighlighter.draw(annotation, "edit");
-                    console.log("[currhighlighter draw annotation]");
+
                 } else {
                     s.currhighlighter.draw(hlAnnotation, "add");
-                    console.log("[currhighlighter draw hlAnnotation]");
+
                 }
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
@@ -527,7 +525,7 @@ $( "#claim-delete-dialog-close" ).click(function() {
 
 //delete data confirmation
 $( "#data-delete-confirm-btn" ).click(function() {
-    console.log("delete data: id = "+currAnnotation.id);
+    //console.log("delete data: id = "+currAnnotation.id);
     $("#dialog-data-delete-confirm").hide();
     if (currFormType == "participants") {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};
@@ -546,7 +544,7 @@ $( "#data-delete-confirm-btn" ).click(function() {
     // after deletion, if this row is empty, then delete
     var boo = isDataRowEmpty(currAnnotation.argues.supportsBy[currDataNum]);
     if (boo) {
-        console.log("delete data empty row!");
+        //console.log("delete data empty row!");
         currAnnotation.argues.supportsBy.splice(currDataNum, 1);
         totalDataNum = totalDataNum -1;
     }
@@ -574,7 +572,7 @@ $( "#data-delete-dialog-close" ).click(function() {
 // return false if data row not empty, otherwise, return true
 function isDataRowEmpty(data) {
 
-    console.log("delete data - call isDataRowEmpty");
+    //console.log("delete data - call isDataRowEmpty");
     var fieldL = ["auc","cmax","clearance","halflife"];
     
     for (i = 0; i < fieldL.length; i++) {

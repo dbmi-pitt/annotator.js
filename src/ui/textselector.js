@@ -72,12 +72,10 @@ TextSelector.prototype.captureDocumentSelection = function () {
         var r = selection.getRangeAt(i),
             browserRange = new Range.BrowserRange(r),
             normedRange = browserRange.normalize().limit(this.element);
-        //console.log("normedRange: ");
-        //console.log(normedRange);
-        //console.log(browserRange);
+
         var nodes = normedRange.textNodes();
-        console.log("[textSelector--normedRange]");
-        //console.log(nodes);
+        //console.log("[textSelector--normedRange]");
+
         var tempParent;
         //get drug node list
         for(var i=0;i<nodes.length;i++) {
@@ -120,7 +118,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
     }
 
     ranges.childNodes = nodes;
-    console.log("[textselector--ranges.childNodes--highlighted drug list]")
+    console.log("textselector - ranges")
     //console.log(textnodes);
     return ranges;
 };

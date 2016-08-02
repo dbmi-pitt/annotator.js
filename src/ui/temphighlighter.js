@@ -35,11 +35,11 @@ function highlightRange(normedRange, cssClass, dataRange) {
     // but better than breaking table layouts.
     var nodes = normedRange.textNodes(),
         results = [];
-    console.log("[currFormType]"+currFormType);
-    console.log("[mpPlugin/highlighter.js--nodes array]");
-    console.log(normedRange);
-    console.log("[mpPlugin/highlighter.js--nodes array]");
-    console.log(nodes);
+    //console.log("[currFormType]"+currFormType);
+    //console.log("[mpPlugin/highlighter.js--nodes array]");
+    //console.log(normedRange);
+    //console.log("[mpPlugin/highlighter.js--nodes array]");
+    //console.log(nodes);
     for (var i = 0, len = nodes.length; i < len; i++) {
         var node = nodes[i];
         if (!white.test(node.nodeValue)) {
@@ -74,7 +74,7 @@ function reanchorRange(range, rootElement) {
     }
 
     console.log("[ERROR] mphighlighter - reanchorRange - return null");
-    console.log(range);
+    //console.log(range);
     return null;
 }
 
@@ -108,7 +108,7 @@ currHighlighter.prototype.destroy = function () {
 // Returns nothing.
 currHighlighter.prototype.drawAll = function (annotations) {
     var self = this;
-    console.log("[mpPlugin/highlighter.js--annotations]");
+    console.log("temphighlighter - annotations]");
 
     var p = new Promise(function (resolve) {
         var highlights = [];
@@ -148,8 +148,8 @@ currHighlighter.prototype.drawAll = function (annotations) {
 // Returns an Array of drawn highlight elements.
 currHighlighter.prototype.draw = function (annotation, inputType) {
 
-    console.log('currhighlighter - draw anntype');
-    console.log(annotation);
+    //console.log('currhighlighter - draw anntype');
+    //console.log(annotation);
     if(annotation.annotationType!=undefined) {
         if (annotation.annotationType != "MP")
             return null;
@@ -265,8 +265,6 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
         window.getSelection().removeAllRanges();
     }
 
-    //console.log("annotation._local.highlights:");
-    //console.log(annotation._local.highlights);
     //return annotation._local.highlights;
 };
 
