@@ -62,28 +62,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         console.log("mpeditor - load - claim");
                         
                         // clean claim editor
-                        $("#quote").empty();
-                        $("#method")[0].selectedIndex = 0;
-                        $("#relationship")[0].selectedIndex = 0;
+                        cleanClaimForm();
 
-                        $("#enzyme")[0].selectedIndex = 0;
-                        $("#enzyme").hide();
-                        $("#enzymesection1").hide();
-
-                        $('input[type=radio][name=precipitant]').show();
-                        $('.precipitantLabel').show();
-                        $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
-                        $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
-
-                        $('#Drug1 option').remove();
-                        $('#Drug2 option').remove();
-                        
                         var nodes = [];
                         nodes = annotation.childNodes;
 
                         //--------------generate quote-----------------
-                        $('#quote').empty();
-
                         var quoteobject = $("<div id='quotearea'/>");
                         var p = document.createElement("p");
 
@@ -149,8 +133,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var list = [];//used to store drugs
                         var listid = [];
                         var drugList = document.getElementsByName('annotator-hl');
-
-
 
                         var selectedNodes = [];
                         //console.log(nodes);
@@ -391,43 +373,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var loadData = annotation.argues.supportsBy[currDataNum];
 
                         // clean material : participants, dose1, dose2
-                        $("#participants").empty();
-                        $("#drug1Dose").empty();
-                        $("#drug1Duration").empty();
-                        $("#drug1Formulation")[0].selectedIndex = -1;
-                        $("#drug1Regimens")[0].selectedIndex = -1;
-                        $("#drug2Dose").empty();
-                        $("#drug2Duration").empty();
-                        $("#drug2Formulation")[0].selectedIndex = -1;
-                        $("#drug2Regimens")[0].selectedIndex = -1;   
-
-                        // clean data : auc, cmax, cl, half life
-                        $("#auc").empty();
-                        $("#aucType")[0].selectedIndex = -1;
-                        $("#aucDirection")[0].selectedIndex = -1;
-                        $('#auc-unchanged-checkbox').attr('checked',false);
-
-                        $("#cmax").empty();
-                        $("#cmaxType")[0].selectedIndex = -1;
-                        $("#cmaxDirection")[0].selectedIndex = -1;
-                        $('#cmax-unchanged-checkbox').attr('checked',false);
-
-                        $("#clearance").empty();
-                        $("#clearanceType")[0].selectedIndex = -1;
-                        $("#clearanceDirection")[0].selectedIndex = -1;
-                        $('#clearance-unchanged-checkbox').attr('checked',false);
-
-                        $("#halflife").empty();
-                        $("#halflifeType")[0].selectedIndex = -1;
-                        $("#halflifeDirection")[0].selectedIndex = -1;
-                        $('#halflife-unchanged-checkbox').attr('checked',false);
-
-                        // clean evidence relationship
-                        $('input[name=evRelationship]').prop('checked', false);
-
-                        // study type questions
-                        $('input[name=grouprandom]').prop('checked', false);
-                        $('input[name=parallelgroup]').prop('checked', false);
+                        cleanDataForm();
 
                         // load mp material field  
                         $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
@@ -488,8 +434,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         if (loadData.evRelationship == "refutes")
                             $('input[name=evRelationship][value=refutes]').prop('checked', true);               
                         else if (loadData.evRelationship == "supports")
-                            $('input[name=evRelationship][value=supports]').prop('checked', true);                
-
+                            $('input[name=evRelationship][value=supports]').prop('checked', true);                  
 
                         // questions for dictating method type
                         if (loadData.grouprandom == "yes")
@@ -599,6 +544,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 $('#halflifequote').html('');              
                         }      
 
+                        
+                        postDataForm(currFormType);
                     }                     
                 },
                 
@@ -1424,3 +1371,108 @@ var mover = exports.mover = function mover(element, handle) {
     // We return the dragTracker object in order to expose its methods.
     return dragTracker(handle, move);
 };
+
+
+function postDataForm(targetField) {
+
+    // field actual div id mapping
+    var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "question":"question"};
+
+    var showDeleteBtn = false;
+
+    for (var field in fieldM) {       
+        var dataid = "mp-data-form-"+field;
+        var fieldVal = "";
+
+        if (field === targetField) {
+            $("#"+dataid).show();  // show specific data form 
+            // inspect that is target form has value filled 
+
+            if (field == "evRelationship" || field =="question") { // when field is radio button
+                fieldVal = $("input[name="+field+"]:checked").val();
+            } else if (field == "auc" || field == "cmax" || field == "clearance" || field == "halflife") { // when field is checkbox
+                $("#mp-data-nav").show();
+                if ($('#' + field + '-unchanged-checkbox').is(':checked')) 
+                    showDeleteBtn = true;                    
+                fieldVal = $("#" + fieldM[field]).val();
+            } else { // when field is text input
+                $("#mp-data-nav").show();
+                fieldVal = $("#" + fieldM[field]).val();
+            }
+
+            console.log(fieldVal);
+                
+            if (fieldVal !=null && fieldVal != "")
+                $("#annotator-delete").show();
+            else if (showDeleteBtn)
+                $("#annotator-delete").show();
+            else 
+                $("#annotator-delete").hide();
+        }                        
+        else {
+            $("#"+dataid).hide();
+        }                           
+    }
+}
+
+
+function cleanClaimForm() {
+
+    $("#quote").empty();
+    $("#method")[0].selectedIndex = 0;
+    $("#relationship")[0].selectedIndex = 0;
+    
+    $("#enzyme")[0].selectedIndex = 0;
+    $("#enzyme").hide();
+    $("#enzymesection1").hide();
+    
+    $('input[type=radio][name=precipitant]').show();
+    $('.precipitantLabel').show();
+    $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
+    $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
+    
+    $('#Drug1 option').remove();
+    $('#Drug2 option').remove();
+
+}
+
+
+function cleanDataForm() {
+    $("#participants").empty();
+    $("#drug1Dose").empty();
+    $("#drug1Duration").empty();
+    $("#drug1Formulation")[0].selectedIndex = -1;
+    $("#drug1Regimens")[0].selectedIndex = -1;
+    $("#drug2Dose").empty();
+    $("#drug2Duration").empty();
+    $("#drug2Formulation")[0].selectedIndex = -1;
+    $("#drug2Regimens")[0].selectedIndex = -1;   
+    
+    // clean data : auc, cmax, cl, half life
+    $("#auc").empty();
+    $("#aucType")[0].selectedIndex = -1;
+    $("#aucDirection")[0].selectedIndex = -1;
+    $('#auc-unchanged-checkbox').attr('checked',false);
+
+    $("#cmax").empty();
+    $("#cmaxType")[0].selectedIndex = -1;
+    $("#cmaxDirection")[0].selectedIndex = -1;
+    $('#cmax-unchanged-checkbox').attr('checked',false);
+    
+    $("#clearance").empty();
+    $("#clearanceType")[0].selectedIndex = -1;
+    $("#clearanceDirection")[0].selectedIndex = -1;
+    $('#clearance-unchanged-checkbox').attr('checked',false);
+    
+    $("#halflife").empty();
+    $("#halflifeType")[0].selectedIndex = -1;
+    $("#halflifeDirection")[0].selectedIndex = -1;
+    $('#halflife-unchanged-checkbox').attr('checked',false);
+    
+    // clean evidence relationship
+    $('input[name=evRelationship]').prop('checked', false);
+    
+    // study type questions
+    $('input[name=grouprandom]').prop('checked', false);
+    $('input[name=parallelgroup]').prop('checked', false);    
+}
