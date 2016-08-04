@@ -106,40 +106,40 @@ currHighlighter.prototype.destroy = function () {
 // annotations - An Array of annotation Objects for which to draw highlights.
 //
 // Returns nothing.
-currHighlighter.prototype.drawAll = function (annotations) {
-    var self = this;
-    console.log("temphighlighter - annotations]");
+// currHighlighter.prototype.drawAll = function (annotations) {
+//     var self = this;
+//     console.log("temphighlighter - annotations]");
 
-    var p = new Promise(function (resolve) {
-        var highlights = [];
+//     var p = new Promise(function (resolve) {
+//         var highlights = [];
 
-        function loader(annList) {
-            if (typeof annList === 'undefined' || annList === null) {
-                annList = [];
-            }
+//         function loader(annList) {
+//             if (typeof annList === 'undefined' || annList === null) {
+//                 annList = [];
+//             }
 
-            var now = annList.splice(0, self.options.chunkSize);
-            for (var i = 0, len = now.length; i < len; i++) {
-                if (now[i].annotationType == "MP")
-                    highlights = highlights.concat(self.draw(now[i]));
-            }
+//             var now = annList.splice(0, self.options.chunkSize);
+//             for (var i = 0, len = now.length; i < len; i++) {
+//                 if (now[i].annotationType == "MP")
+//                     highlights = highlights.concat(self.draw(now[i]));
+//             }
 
-            // If there are more to do, do them after a delay
-            if (annList.length > 0) {
-                setTimeout(function () {
-                    loader(annList);
-                }, self.options.chunkDelay);
-            } else {
-                resolve(highlights);
-            }
-        }
+//             // If there are more to do, do them after a delay
+//             if (annList.length > 0) {
+//                 setTimeout(function () {
+//                     loader(annList);
+//                 }, self.options.chunkDelay);
+//             } else {
+//                 resolve(highlights);
+//             }
+//         }
 
-        var clone = annotations.slice();
-        loader(clone);
-    });
+//         var clone = annotations.slice();
+//         loader(clone);
+//     });
 
-    return p;
-};
+//     return p;
+// };
 
 // Public: Draw highlights for the MP annotation.
 // Including: claim, [{data, method, material}, {..}]

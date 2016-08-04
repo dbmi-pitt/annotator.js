@@ -50,16 +50,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
         if (this.options.defaultFields) {
 
             this.addField({
-                // type: 'div',
-                // label: _t('Comments') + '\u2026',
-                // id: 'quote',
                 load: function (field, annotation, annotations) {               
                     
+                    console.log("mpeditor - load - " + field);
                     var claim = annotation.argues;
 
                     // load MP Claim
                     if(currFormType == "claim"){
-                        console.log("mpeditor - load - claim");
                         
                         // clean claim editor
                         cleanClaimForm();
@@ -351,13 +348,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                     } else { // if editing data, then update claim label and drug names to data fields nav
                         var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
                         var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
-
+                        
                         if (claim.qualifiedBy.relationship == "interact with") {
                             if (claim.qualifiedBy.precipitant == "drug1")
                                 drug1doseLabel += " (precipitant)";                                
                             else if (claim.qualifiedBy.precipitant == "drug2")
                                 drug2doseLabel += " (precipitant)";                                
-                            }
+                        }
                         
                         $("#drug1-dose-switch-btn").html(drug1doseLabel);
                         $("#drug2-dose-switch-btn").html(drug2doseLabel);
@@ -365,11 +362,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $("#drug2Dose-label").html(drug2doseLabel);
                         $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
 
+                        postDataForm(currFormType);
                     }
 
                     // load MP list of data 
-                    if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                   
-                        console.log("mpeditor - load data - num: " + currDataNum);   
+                    if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                     
                         var loadData = annotation.argues.supportsBy[currDataNum];
 
                         // clean material : participants, dose1, dose2
@@ -542,10 +539,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 $('#halflifequote').html(cachedOATarget.hasSelector.exact || '');       
                             else
                                 $('#halflifequote').html('');              
-                        }      
-
-                        
-                        postDataForm(currFormType);
+                        }                            
                     }                     
                 },
                 
@@ -750,8 +744,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         annotation.argues.supportsBy[currDataNum] = mpData;
                     }
-                    // clean editor status
-                    currFormType = "";
                 }                
             });            
         }
@@ -764,6 +756,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
             })
             .on("click." + NS, '.annotator-save', function (e) {
                 self._onSaveClick(e);
+
             })
             .on("click." + NS, '.annotator-save-close', function (e) {
                 self._onSaveCloseClick(e);
@@ -1067,6 +1060,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
         // reset unsave status
         unsaved = false;
+
+        // clean editor status
+        currFormType = "";
     },
     // Event callback: called when a user clicks the editor's save button.
     //
@@ -1375,8 +1371,11 @@ var mover = exports.mover = function mover(element, handle) {
 
 function postDataForm(targetField) {
 
+    console.log(targetField);
+    $("#mp-claim-form").hide();
+
     // field actual div id mapping
-    var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "question":"question"};
+    var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype"};
 
     var showDeleteBtn = false;
 
@@ -1388,7 +1387,7 @@ function postDataForm(targetField) {
             $("#"+dataid).show();  // show specific data form 
             // inspect that is target form has value filled 
 
-            if (field == "evRelationship" || field =="question") { // when field is radio button
+            if (field == "evRelationship" || field =="studytype") { // when field is radio button
                 fieldVal = $("input[name="+field+"]:checked").val();
             } else if (field == "auc" || field == "cmax" || field == "clearance" || field == "halflife") { // when field is checkbox
                 $("#mp-data-nav").show();
@@ -1411,7 +1410,7 @@ function postDataForm(targetField) {
         }                        
         else {
             $("#"+dataid).hide();
-        }                           
+        }
     }
 }
 
