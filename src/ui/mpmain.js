@@ -486,14 +486,13 @@ function main(options) {
             }
         },
         beforeAnnotationDeleted: function (ann) {
-            console.log(ann);
+            s.mphighlighter.undraw(ann);
+            s.hlhighlighter.undraw(ann);            
         }
         ,
         annotationDeleted: function (ann) {
             console.log("mpmain - annotationDeleted called");
             console.log(ann);
-            s.mphighlighter.undraw(ann);
-            s.hlhighlighter.undraw(ann);
             showAnnTable();
             setTimeout(function(){
                 annotationTable(options.source, options.email);
