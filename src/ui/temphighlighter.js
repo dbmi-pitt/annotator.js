@@ -1,7 +1,6 @@
 "use strict";
 
 var Range = require('xpath-range').Range;
-
 var util = require('../util');
 
 var $ = util.$;
@@ -35,11 +34,7 @@ function highlightRange(normedRange, cssClass, dataRange) {
     // but better than breaking table layouts.
     var nodes = normedRange.textNodes(),
         results = [];
-    //console.log("[currFormType]"+currFormType);
-    //console.log("[mpPlugin/highlighter.js--nodes array]");
-    //console.log(normedRange);
-    //console.log("[mpPlugin/highlighter.js--nodes array]");
-    //console.log(nodes);
+
     for (var i = 0, len = nodes.length; i < len; i++) {
         var node = nodes[i];
         if (!white.test(node.nodeValue)) {
@@ -74,7 +69,6 @@ function reanchorRange(range, rootElement) {
     }
 
     console.log("[ERROR] mphighlighter - reanchorRange - return null");
-    //console.log(range);
     return null;
 }
 
@@ -101,46 +95,6 @@ currHighlighter.prototype.destroy = function () {
         });
 };
 
-// Public: Draw highlights for all the given annotations
-//
-// annotations - An Array of annotation Objects for which to draw highlights.
-//
-// Returns nothing.
-currHighlighter.prototype.drawAll = function (annotations) {
-    var self = this;
-    console.log("temphighlighter - annotations]");
-
-    var p = new Promise(function (resolve) {
-        var highlights = [];
-
-        function loader(annList) {
-            if (typeof annList === 'undefined' || annList === null) {
-                annList = [];
-            }
-
-            var now = annList.splice(0, self.options.chunkSize);
-            for (var i = 0, len = now.length; i < len; i++) {
-                if (now[i].annotationType == "MP")
-                    highlights = highlights.concat(self.draw(now[i]));
-            }
-
-            // If there are more to do, do them after a delay
-            if (annList.length > 0) {
-                setTimeout(function () {
-                    loader(annList);
-                }, self.options.chunkDelay);
-            } else {
-                resolve(highlights);
-            }
-        }
-
-        var clone = annotations.slice();
-        loader(clone);
-    });
-
-    return p;
-};
-
 // Public: Draw highlights for the MP annotation.
 // Including: claim, [{data, method, material}, {..}]
 // annotation - An annotation Object for which to draw highlights.
@@ -149,12 +103,10 @@ currHighlighter.prototype.drawAll = function (annotations) {
 currHighlighter.prototype.draw = function (annotation, inputType) {
 
     //console.log('currhighlighter - draw anntype');
-    //console.log(annotation);
     if(annotation.annotationType!=undefined) {
         if (annotation.annotationType != "MP")
             return null;
     }
-    //var normedRanges = [];
     var dataRangesL = [];
 
     try {
@@ -163,7 +115,6 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
             for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
                 var r = reanchorRange(annotation.argues.ranges[i], this.element);
                 if (r !== null) {
-                    //normedRanges.push(r);
                     dataRangesL.push(new DataRange(r, "claim", 0));
                 } else {
                     console.log("[ERROR] range failed to reanchor");
@@ -174,38 +125,34 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
             // draw MP data
             if (annotation.argues.supportsBy.length != 0) {
 
-                // draw MP data
-                var dataL = annotation.argues.supportsBy;
-
-
-                for (var idx = 0; idx < dataL.length; idx++) {
-                    var data = dataL[idx];
+                    var dataL = annotation.argues.supportsBy;
+                    var data = dataL[currDataNum];
 
                     if (currFormType == "auc") {
                         for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
                             var r = reanchorRange(data.auc.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
+                            if (r !== null) dataRangesL.push(new DataRange(r, "auc", currDataNum));
                         }
                     }
 
                     if (currFormType == "cmax") {
                         for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
                             var r = reanchorRange(data.cmax.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
+                            if (r !== null) dataRangesL.push(new DataRange(r, "cmax", currDataNum));
                         }
                     }
 
                     if (currFormType == "clearance") {
                         for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
                             var r = reanchorRange(data.clearance.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
+                            if (r !== null) dataRangesL.push(new DataRange(r, "clearance", currDataNum));
                         }
                     }
 
                     if (currFormType == "halflife") {
                         for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
                             var r = reanchorRange(data.halflife.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
+                            if (r !== null) dataRangesL.push(new DataRange(r, "halflife", currDataNum));
                         }
                     }
 
@@ -217,40 +164,31 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                             for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
                                 var r = reanchorRange(material.participants.ranges[i], this.element);
                                 //if (r !== null) normedRanges.push(r);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));
+                                if (r !== null) dataRangesL.push(new DataRange(r, "participants", currDataNum));
                             }
                         }
 
                         if (currFormType == "dose1") {
                             for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
                                 var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
+                                if (r !== null) dataRangesL.push(new DataRange(r, "dose1", currDataNum));
                             }
                         }
                         if (currFormType == "dose2") {
                             for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
                                 var r = reanchorRange(material.drug2Dose.ranges[i], this.element);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
+                                if (r !== null) dataRangesL.push(new DataRange(r, "dose2", currDataNum));
                             }
                         }
 
                     }
-                }
+
             }
         }
-        //console.log(dataRangesL);
     } catch (err) {
         console.log(err);
     }
 
-
-    // for (var j = 0, jlen = normedRanges.length; j < jlen; j++) {
-    //     var normed = normedRanges[j];
-    //     $.merge(
-    //         annotation._local.highlights,
-    //         highlightRange(normed, this.options.highlightClass)
-    //     );
-    // }
 
     for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
         var dataNormed = dataRangesL[j];
@@ -265,7 +203,6 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
         window.getSelection().removeAllRanges();
     }
 
-    //return annotation._local.highlights;
 };
 
 // Public: Remove the drawn highlights for the given MP annotation.
@@ -286,7 +223,6 @@ currHighlighter.prototype.undraw = function (annotation) {
                 $(mpSpan).replaceWith(mpSpan.childNodes);
         }
     } else {
-        //console.log(annotation._local.highlights);
         for (var i = 0, len = annotation._local.highlights.length; i < len; i++)
         {
             var h = annotation._local.highlights[i];
@@ -295,18 +231,6 @@ currHighlighter.prototype.undraw = function (annotation) {
             }
         }
         delete annotation._local.highlights;
-    }
-};
-
-// Public: Redraw the highlights for the given annotation.
-//
-// annotation - An annotation Object for which to redraw highlights.
-//
-// Returns the list of newly-drawn highlights.
-currHighlighter.prototype.redraw = function (annotation) {
-    if (annotation.annotationType == "MP"){
-        this.undraw(annotation);
-        return this.draw(annotation);
     }
 };
 
@@ -327,10 +251,8 @@ exports.standalone = function standalone(element, options) {
 
     return {
         destroy: function () { widget.destroy(); },
-        annotationsLoaded: function (anns) { widget.drawAll(anns); },
         annotationCreated: function (ann) { widget.draw(ann); },
-        annotationDeleted: function (ann) { widget.undraw(ann); },
-        annotationUpdated: function (ann) { widget.redraw(ann); }
+        annotationDeleted: function (ann) { widget.undraw(ann); }
     };
 
 };

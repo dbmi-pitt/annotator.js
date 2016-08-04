@@ -575,7 +575,7 @@ Template.content = [
     '<button id="cmax-btn" type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button id="clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
     '<button id="halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
-    '<button id="question-btn" type="button" onclick="switchDataForm(\'question\')" >questions</button>',
+    '<button id="studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
 
     '</div><br>',
 
@@ -625,7 +625,7 @@ Template.content = [
     '</div>',
 
     // Data & material - questions about study type
-    '<div id="mp-data-form-question" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    '<div id="mp-data-form-studytype" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form10,
     '</div>',
     

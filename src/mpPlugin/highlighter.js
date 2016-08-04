@@ -294,14 +294,16 @@ mpHighlighter.prototype.undraw = function (annotation) {
     // when add mp data, annotation._local.highlights is null
     // find highlights of MP annotation, clean span 
     if (!hasHighlights) {
+
         var localhighlights = $('span[id^="'+annotation.id+'"]');
+        console.log(localhighlights);
         for (i = 0; i < localhighlights.length; i++){
             var mpSpan = localhighlights[i];
             if (mpSpan.parentNode !== null) 
                 $(mpSpan).replaceWith(mpSpan.childNodes);
         }
     } else {        
-        //console.log(annotation._local.highlights);
+        console.log(annotation._local.highlights);
         for (var i = 0, len = annotation._local.highlights.length; i < len; i++) 
         {
             var h = annotation._local.highlights[i];
