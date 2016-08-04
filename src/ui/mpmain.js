@@ -273,7 +273,6 @@ function main(options) {
                 currAnnotation = ann;
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
-
                     $( "#dialog-claim-delete-confirm" ).show();
 
                 } else {
@@ -486,8 +485,13 @@ function main(options) {
                 alert('[WARNING] main.js - annotationUpdated - annot type not defined: ' + ann.annotationType);
             }
         },
+        beforeAnnotationDeleted: function (ann) {
+            console.log(ann);
+        }
+        ,
         annotationDeleted: function (ann) {
             console.log("mpmain - annotationDeleted called");
+            console.log(ann);
             s.mphighlighter.undraw(ann);
             s.hlhighlighter.undraw(ann);
             showAnnTable();

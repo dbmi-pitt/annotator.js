@@ -1081,6 +1081,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
     // if it's data form, delete current data
     // if claim form, delete claim and data
     _onDeleteClick: function (event) {
+
+        console.log("mpeditor - _onDeleteClick:")
+        console.log(this.annotation);
+
         preventEventDefault(event);
         this.options.onDelete(this.annotation);
         undrawCurrhighlighter();
