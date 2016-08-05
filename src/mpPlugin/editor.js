@@ -269,6 +269,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         
                         if (flag < 2) {
+                            unsaved = false;
                             alert("please highlight two different drugs in the text span you selected!");
                             editorSelf.cancel();
                             $('.btn-success').click();
@@ -549,8 +550,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         // MP Claim
                         if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
+                            unsaved = false;
                             alert("Should highlight two different drugs.");
-                            editorSelf.cancel();
+                            editorSelf.cancel();                            
                             $('.btn-success').click();
                         }
                         
