@@ -47,7 +47,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["UNK","DDI clinical trial"],
+            options:["DDI clinical trial"],
             optionsID:[]
         },
         {
@@ -567,15 +567,15 @@ Template.content = [
 
     // links 
     '<div id="mp-data-nav" style="display: none;">',
-    '<button id="evRelationship-btn" type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
-    '<button id="participants-btn" type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
-    '<button id="drug1-dose-switch-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
-    '<button id="drug2-dose-switch-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
-    '<button id="auc-btn" type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
-    '<button id="cmax-btn" type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
-    '<button id="clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
-    '<button id="halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
-    '<button id="studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
+    '<button id="nav-evRelationship-btn" type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
+    '<button id="nav-participants-btn" type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
+    '<button id="nav-dose1-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
+    '<button id="nav-dose2-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
+    '<button id="nav-auc-btn" type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
+    '<button id="nav-cmax-btn" type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
+    '<button id="nav-clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
+    '<button id="nav-halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
+    '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
 
     '</div><br>',
 

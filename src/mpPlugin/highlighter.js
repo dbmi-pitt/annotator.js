@@ -35,7 +35,7 @@ function highlightRange(normedRange, cssClass, dataRange) {
     // but better than breaking table layouts.
     var nodes = normedRange.textNodes(),
         results = [];
-    console.log("[mpPlugin/highlighter.js]");
+
     for (var i = 0, len = nodes.length; i < len; i++) {
         var node = nodes[i];
         if (!white.test(node.nodeValue)) {
@@ -296,14 +296,14 @@ mpHighlighter.prototype.undraw = function (annotation) {
     if (!hasHighlights) {
 
         var localhighlights = $('span[id^="'+annotation.id+'"]');
-        console.log(localhighlights);
+
         for (i = 0; i < localhighlights.length; i++){
             var mpSpan = localhighlights[i];
             if (mpSpan.parentNode !== null) 
                 $(mpSpan).replaceWith(mpSpan.childNodes);
         }
     } else {        
-        console.log(annotation._local.highlights);
+
         for (var i = 0, len = annotation._local.highlights.length; i < len; i++) 
         {
             var h = annotation._local.highlights[i];
