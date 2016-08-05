@@ -1413,6 +1413,7 @@ function postDataForm(targetField) {
                 $("#annotator-delete").hide();
         }                        
         else {
+            cleanFocusOnDataField(field);
             $("#"+dataid).hide();
         }
     }
