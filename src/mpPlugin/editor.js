@@ -63,6 +63,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         var nodes = [];
                         nodes = annotation.childNodes;
+                        // console.log("claim - annotation.childNodes: ");
+                        // console.log(nodes);
 
                         //--------------generate quote-----------------
                         var quoteobject = $("<div id='quotearea'/>");
