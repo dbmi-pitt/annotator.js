@@ -52,7 +52,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
             this.addField({
                 load: function (field, annotation, annotations) {               
                     
-                    console.log("mpeditor - load - " + field);
                     var claim = annotation.argues;
 
                     // load MP Claim
@@ -268,7 +267,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 quotecontent = quotecontent.replace(list[i], "<span class=\"highlightdrug\">" + list[i] + "</span>");
                             }*/
                         }
-
                         
                         if (flag < 2) {
                             unsaved = false;
@@ -349,200 +347,33 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
-                        var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
-                        var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
+
+                        // load MP list of data 
+                        if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                     
+                            var loadData = annotation.argues.supportsBy[currDataNum];
+                            
+                            // clean material : participants, dose1, dose2
+                            cleanDataForm();
+                            loadDataItemFromAnnotation(loadData);
+                            
+                            var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
+                            var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
+                            
+                            if (claim.qualifiedBy.relationship == "interact with") {
+                                if (claim.qualifiedBy.precipitant == "drug1")
+                                    drug1doseLabel += " (precipitant)";                                
+                                else if (claim.qualifiedBy.precipitant == "drug2")
+                                    drug2doseLabel += " (precipitant)";                                
+                            }
                         
-                        if (claim.qualifiedBy.relationship == "interact with") {
-                            if (claim.qualifiedBy.precipitant == "drug1")
-                                drug1doseLabel += " (precipitant)";                                
-                            else if (claim.qualifiedBy.precipitant == "drug2")
-                                drug2doseLabel += " (precipitant)";                                
+                            $("#drug1-dose-switch-btn").html(drug1doseLabel);
+                            $("#drug2-dose-switch-btn").html(drug2doseLabel);
+                            $("#drug1Dose-label").html(drug1doseLabel);
+                            $("#drug2Dose-label").html(drug2doseLabel);
+                            $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
+                            
+                            postDataForm(currFormType);
                         }
-                        
-                        $("#drug1-dose-switch-btn").html(drug1doseLabel);
-                        $("#drug2-dose-switch-btn").html(drug2doseLabel);
-                        $("#drug1Dose-label").html(drug1doseLabel);
-                        $("#drug2Dose-label").html(drug2doseLabel);
-                        $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
-
-                        postDataForm(currFormType);
-                    }
-
-                    // load MP list of data 
-                    if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                     
-                        var loadData = annotation.argues.supportsBy[currDataNum];
-
-                        // clean material : participants, dose1, dose2
-                        cleanDataForm();
-
-                        // load mp material field  
-                        $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
-                        if (loadData.supportsBy.supportsBy.participants.hasTarget != null) {
-                            $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');
-                        } 
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#participantsquote').html(cachedOATarget.hasSelector.exact || '');          
-                            else 
-                                $('#participantsquote').html('');         
-                        }
-
-                        $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
-                        $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
-                        $("#drug1Formulation > option").each(function () {
-                            if (this.value === loadData.supportsBy.supportsBy.drug1Dose.formulation) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        $("#drug1Regimens > option").each(function () {
-                            if (this.value === loadData.supportsBy.supportsBy.drug1Dose.regimens) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null) {
-                            $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
-                        } 
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
-                            else
-                                $('#dose1quote').html('');
-                        }
-
-                        
-                        $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
-                        $("#drug2Duration").val(loadData.supportsBy.supportsBy.drug2Dose.duration);
-                        $("#drug2Formulation > option").each(function () {
-                            if (this.value === loadData.supportsBy.supportsBy.drug2Dose.formulation) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        $("#drug2Regimens > option").each(function () {
-                            if (this.value === loadData.supportsBy.supportsBy.drug2Dose.regimens) {
-                                $(this).prop('selected', true);                                                  }
-                        });
-                        if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null) {
-                            $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');     
-                        } 
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
-                            else 
-                                $('#dose2quote').html('');                      
-                        }  
-
-                        // load mp data fields
-
-                        // evidence relationship
-                        if (loadData.evRelationship == "refutes")
-                            $('input[name=evRelationship][value=refutes]').prop('checked', true);               
-                        else if (loadData.evRelationship == "supports")
-                            $('input[name=evRelationship][value=supports]').prop('checked', true);                  
-
-                        // questions for dictating method type
-                        if (loadData.grouprandom == "yes")
-                            $('input[name=grouprandom][value=yes]').prop('checked', true);  
-                        else if (loadData.grouprandom == "no")
-                            $('input[name=grouprandom][value=no]').prop('checked', true);  
-                        if (loadData.parallelgroup == "yes")
-                            $('input[name=parallelgroup][value=yes]').prop('checked', true);  
-                        else if (loadData.parallelgroup == "no")
-                            $('input[name=parallelgroup][value=no]').prop('checked', true);                         
-
-
-                        // AUC: if unchanged then mark on checkbox, else load auc
-                        if (loadData.auc.value == "unchanged") {
-                            $('#auc-unchanged-checkbox').prop("checked", true);
-                        } else {
-                            $("#auc").val(loadData.auc.value);
-                            $("#aucType > option").each(function () {
-                                if (this.value === loadData.auc.type) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                            $("#aucDirection > option").each(function () {
-                                if (this.value === loadData.auc.direction) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                        }
-                        if (loadData.auc.hasTarget != null) {
-                            $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || ''); 
-                        } 
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#aucquote').html(cachedOATarget.hasSelector.exact || '');       
-                            else 
-                                $('#aucquote').html('');                             
-                        }      
-
-
-                        // CMAX: if unchanged then mark on checkbox, else load cmax
-                        if (loadData.cmax.value == "unchanged") {
-                            $('#cmax-unchanged-checkbox').prop("checked", true);
-                        } else {
-                            $("#cmax").val(loadData.cmax.value);
-                            $("#cmaxType > option").each(function () {
-                                if (this.value === loadData.cmax.type) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                            $("#cmaxDirection > option").each(function () {
-                                if (this.value === loadData.cmax.direction) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                        }
-                        if (loadData.cmax.hasTarget != null) {
-                            $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || ''); 
-                        } 
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#cmaxquote').html(cachedOATarget.hasSelector.exact || '');       
-                            else 
-                                $('#cmaxquote').html('');                        
-                        }      
-
-                        // CLEARANCE: if unchanged then mark on checkbox, else load clearance
-                        if (loadData.clearance.value == "unchanged") {
-                            $('#clearance-unchanged-checkbox').prop("checked", true);
-                        } else {
-                            $("#clearance").val(loadData.clearance.value);
-                            $("#clearanceType > option").each(function () {
-                                if (this.value === loadData.clearance.type) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                            $("#clearanceDirection > option").each(function () {
-                                if (this.value === loadData.clearance.direction) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                        }
-                        if (loadData.clearance.hasTarget != null) {
-                            $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || ''); 
-                        }
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#clearancequote').html(cachedOATarget.hasSelector.exact || '');       
-                            else
-                                $('#clearancequote').html('');            
-                        }      
-
-                        // HALFLIFE: if unchanged then mark on checkbox, else load halflife
-                        if (loadData.halflife.value == "unchanged") {
-                            $('#halflife-unchanged-checkbox').prop("checked", true);
-                        } else {
-                            $("#halflife").val(loadData.halflife.value);
-                            $("#halflifeType > option").each(function () {
-                                if (this.value === loadData.halflife.type) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                            $("#halflifeDirection > option").each(function () {
-                                if (this.value === loadData.halflife.direction) {
-                                    $(this).prop('selected', true);                                                  }
-                            });
-                        }
-                        if (loadData.halflife.hasTarget != null) {
-                            $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || ''); 
-                        }
-                        else {
-                            if (cachedOATarget.hasSelector != null)
-                                $('#halflifequote').html(cachedOATarget.hasSelector.exact || '');       
-                            else
-                                $('#halflifequote').html('');              
-                        }                            
                     }                     
                 },
                 
@@ -1377,12 +1208,199 @@ var mover = exports.mover = function mover(element, handle) {
 };
 
 
+// load one data item from mp annotation
+function loadDataItemFromAnnotation(loadData) {
+
+    // load mp material field  
+    $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
+    if (loadData.supportsBy.supportsBy.participants.hasTarget != null) {
+        $('#participantsquote').html(loadData.supportsBy.supportsBy.participants.hasTarget.hasSelector.exact || '');
+    } 
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#participantsquote').html(cachedOATarget.hasSelector.exact || '');          
+        else 
+            $('#participantsquote').html('');         
+    }
+
+    $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
+    $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
+    $("#drug1Formulation > option").each(function () {
+        if (this.value === loadData.supportsBy.supportsBy.drug1Dose.formulation) {
+            $(this).prop('selected', true);                                                  
+        }
+    });
+    $("#drug1Regimens > option").each(function () {
+        if (this.value === loadData.supportsBy.supportsBy.drug1Dose.regimens) {
+            $(this).prop('selected', true);                                                  
+        }
+    });
+    if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null) {
+        $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
+    } 
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
+        else
+            $('#dose1quote').html('');
+    }
+    
+    $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
+    $("#drug2Duration").val(loadData.supportsBy.supportsBy.drug2Dose.duration);
+    $("#drug2Formulation > option").each(function () {
+        if (this.value === loadData.supportsBy.supportsBy.drug2Dose.formulation) {
+            $(this).prop('selected', true);                                                  
+        }
+    });
+    $("#drug2Regimens > option").each(function () {
+        if (this.value === loadData.supportsBy.supportsBy.drug2Dose.regimens) {
+            $(this).prop('selected', true);                                                  
+        }
+    });
+    if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null) {
+        $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');     
+    } 
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
+        else 
+            $('#dose2quote').html('');                      
+    }  
+
+    // load mp data fields
+
+    // evidence relationship
+    if (loadData.evRelationship == "refutes")
+        $('input[name=evRelationship][value=refutes]').prop('checked', true);               
+    else if (loadData.evRelationship == "supports")
+        $('input[name=evRelationship][value=supports]').prop('checked', true);                  
+
+    // questions for dictating method type
+    if (loadData.grouprandom == "yes")
+        $('input[name=grouprandom][value=yes]').prop('checked', true);  
+    else if (loadData.grouprandom == "no")
+        $('input[name=grouprandom][value=no]').prop('checked', true);  
+    if (loadData.parallelgroup == "yes")
+        $('input[name=parallelgroup][value=yes]').prop('checked', true);  
+    else if (loadData.parallelgroup == "no")
+        $('input[name=parallelgroup][value=no]').prop('checked', true);                         
+
+
+    // AUC: if unchanged then mark on checkbox, else load auc
+    if (loadData.auc.value == "unchanged") {
+        $('#auc-unchanged-checkbox').prop("checked", true);
+    } else {
+        $("#auc").val(loadData.auc.value);
+        $("#aucType > option").each(function () {
+            if (this.value === loadData.auc.type) {
+                $(this).prop('selected', true);                                                  
+            }            
+        });
+        $("#aucDirection > option").each(function () {
+            if (this.value === loadData.auc.direction) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+    }
+    if (loadData.auc.hasTarget != null) {
+        $('#aucquote').html(loadData.auc.hasTarget.hasSelector.exact || ''); 
+    } 
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#aucquote').html(cachedOATarget.hasSelector.exact || '');       
+        else 
+            $('#aucquote').html('');                             
+    }      
+
+
+    // CMAX: if unchanged then mark on checkbox, else load cmax
+    if (loadData.cmax.value == "unchanged") {
+        $('#cmax-unchanged-checkbox').prop("checked", true);
+    } else {
+        $("#cmax").val(loadData.cmax.value);
+        $("#cmaxType > option").each(function () {
+            if (this.value === loadData.cmax.type) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+        $("#cmaxDirection > option").each(function () {
+            if (this.value === loadData.cmax.direction) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+    }
+    if (loadData.cmax.hasTarget != null) {
+        $('#cmaxquote').html(loadData.cmax.hasTarget.hasSelector.exact || ''); 
+    } 
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#cmaxquote').html(cachedOATarget.hasSelector.exact || '');       
+        else 
+            $('#cmaxquote').html('');                        
+    }      
+
+    // CLEARANCE: if unchanged then mark on checkbox, else load clearance
+    if (loadData.clearance.value == "unchanged") {
+        $('#clearance-unchanged-checkbox').prop("checked", true);
+    } else {
+        $("#clearance").val(loadData.clearance.value);
+        $("#clearanceType > option").each(function () {
+            if (this.value === loadData.clearance.type) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+        $("#clearanceDirection > option").each(function () {
+            if (this.value === loadData.clearance.direction) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+    }
+    if (loadData.clearance.hasTarget != null) {
+        $('#clearancequote').html(loadData.clearance.hasTarget.hasSelector.exact || ''); 
+    }
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#clearancequote').html(cachedOATarget.hasSelector.exact || '');       
+        else
+            $('#clearancequote').html('');            
+    }      
+
+    // HALFLIFE: if unchanged then mark on checkbox, else load halflife
+    if (loadData.halflife.value == "unchanged") {
+        $('#halflife-unchanged-checkbox').prop("checked", true);
+    } else {
+        $("#halflife").val(loadData.halflife.value);
+        $("#halflifeType > option").each(function () {
+            if (this.value === loadData.halflife.type) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+        $("#halflifeDirection > option").each(function () {
+            if (this.value === loadData.halflife.direction) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+    }
+    if (loadData.halflife.hasTarget != null) {
+        $('#halflifequote').html(loadData.halflife.hasTarget.hasSelector.exact || ''); 
+    }
+    else {
+        if (cachedOATarget.hasSelector != null)
+            $('#halflifequote').html(cachedOATarget.hasSelector.exact || '');       
+        else
+            $('#halflifequote').html('');              
+    }                            
+}
+
+
+
+
 function postDataForm(targetField) {
 
-    console.log(targetField);
+    console.log("mpeditor - postDataForm: " + targetField);
     $("#mp-claim-form").hide();
 
-    // field actual div id mapping
+    // field name and actual div id mapping
     var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype"};
 
     var showDeleteBtn = false;
@@ -1404,6 +1422,8 @@ function postDataForm(targetField) {
                 fieldVal = $("#" + fieldM[field]).val();
             } else { // when field is text input
                 $("#mp-data-nav").show();
+                console.log("TESTING DOSE:");
+                console.log(fieldM[field]);
                 fieldVal = $("#" + fieldM[field]).val();
             }
 
