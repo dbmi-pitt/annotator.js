@@ -386,7 +386,6 @@ span[name="annotator-mp"] {
 }
 
 .annotator-widget:after {
-	content: "";
 	display: block;
 	width: 18px;
 	height: 10px;
