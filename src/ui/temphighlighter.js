@@ -124,64 +124,66 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
         }else {
             // draw MP data
             if (annotation.argues.supportsBy.length != 0) {
+                
+                var dataL = annotation.argues.supportsBy;
+                var data = dataL[currDataNum];
+                console.log("TESTING2 " + currFormType);
 
-                    var dataL = annotation.argues.supportsBy;
-                    var data = dataL[currDataNum];
+                
+                if (currFormType == "auc") {
+                    for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
+                        var r = reanchorRange(data.auc.ranges[i], this.element);
+                        if (r !== null) dataRangesL.push(new DataRange(r, "auc", currDataNum));
+                    }
+                }
 
-                    if (currFormType == "auc") {
-                        for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(data.auc.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "auc", currDataNum));
+                if (currFormType == "cmax") {
+                    for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
+                        var r = reanchorRange(data.cmax.ranges[i], this.element);
+                        if (r !== null) dataRangesL.push(new DataRange(r, "cmax", currDataNum));
+                    }
+                }
+
+                if (currFormType == "clearance") {
+                    for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
+                        var r = reanchorRange(data.clearance.ranges[i], this.element);
+                        if (r !== null) dataRangesL.push(new DataRange(r, "clearance", currDataNum));
+                    }
+                }
+
+                if (currFormType == "halflife") {
+                    for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
+                        var r = reanchorRange(data.halflife.ranges[i], this.element);
+                        if (r !== null) dataRangesL.push(new DataRange(r, "halflife", currDataNum));
+                    }
+                }
+
+                // draw MP Material
+                var material = data.supportsBy.supportsBy;
+                if (material != null) {
+
+                    if (currFormType == "participants") {
+                        for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
+                            var r = reanchorRange(material.participants.ranges[i], this.element);
+                            //if (r !== null) normedRanges.push(r);
+                            if (r !== null) dataRangesL.push(new DataRange(r, "participants", currDataNum));
                         }
                     }
 
-                    if (currFormType == "cmax") {
-                        for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(data.cmax.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "cmax", currDataNum));
+                    if (currFormType == "dose1") {
+                        for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
+                            var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
+                            if (r !== null) dataRangesL.push(new DataRange(r, "dose1", currDataNum));
+                        }
+                    }
+                    if (currFormType == "dose2") {
+                        for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
+                            var r = reanchorRange(material.drug2Dose.ranges[i], this.element);
+                            if (r !== null) dataRangesL.push(new DataRange(r, "dose2", currDataNum));
                         }
                     }
 
-                    if (currFormType == "clearance") {
-                        for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(data.clearance.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "clearance", currDataNum));
-                        }
-                    }
-
-                    if (currFormType == "halflife") {
-                        for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(data.halflife.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "halflife", currDataNum));
-                        }
-                    }
-
-                    // draw MP Material
-                    var material = data.supportsBy.supportsBy;
-                    if (material != null) {
-
-                        if (currFormType == "participants") {
-                            for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
-                                var r = reanchorRange(material.participants.ranges[i], this.element);
-                                //if (r !== null) normedRanges.push(r);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "participants", currDataNum));
-                            }
-                        }
-
-                        if (currFormType == "dose1") {
-                            for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
-                                var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "dose1", currDataNum));
-                            }
-                        }
-                        if (currFormType == "dose2") {
-                            for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
-                                var r = reanchorRange(material.drug2Dose.ranges[i], this.element);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "dose2", currDataNum));
-                            }
-                        }
-
-                    }
+                }
 
             }
         }
