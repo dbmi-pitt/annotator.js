@@ -1191,23 +1191,17 @@ html
 	width: 100%;
 }
 
-body.article{
+/* body.article{ */
+/* 	height: 100%; */
+/* 	width: 100%; */
+/* 	overflow: hidden; */
+/* } */
+
+body {
 	height: 100%;
 	width: 100%;
 	overflow: hidden;
 }
-/*.sidebar.right {
-	top: 0;
-	right: 0;
-	bottom: 0;
-	width: 270px;
-	background: #448AFF;
-}*/
-
-/* margin for PMC articles 
-.article {
-	margin-top: 0px;
-}*/
 
 .viewertable {
 	font-size: small;

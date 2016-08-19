@@ -640,13 +640,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 bottom:50,
                 right:100
             });
-
-            $( window ).resize(function() {
-                $( "body" ).css('height','600px');
-            });
-
-            //console.log(window.screen.height);
-            //console.log(window.screen.availHeight);
         }
 
         this.element
