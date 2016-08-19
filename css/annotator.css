@@ -21,6 +21,7 @@
 	color: rgb(28, 33, 33);
 }
 
+
 /* Images
 -------------------------------------------------------------------- */
 
@@ -59,31 +60,26 @@
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
 }
 
-/*#tabs {
-	margin-top: 25px;
-}
-*/
 .claimquoteborder {
 	clear: both;
-	position:fixed;
-	margin-right: 110px;
-	margin-top: -20px;
-	margin-left: -70px;
+	position:relative;
 	max-height: 80px;
-	margin-bottom: 10px;
+	margin-top: 1px;
+	margin-bottom: 1px;
+	margin-left: 30px;
+ 	/* margin-right: 10px; */
+    max-width: 1200px;
 	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
 
 .dataquoteborder {
 	clear: both;
-	position:fixed;
-	/* margin-right: 120px; */
-	/* margin-top: -20px; */
-	/* max-height: 40px; */
-    margin-top: -20px;
-	margin-bottom: 10px;
-    max-height: 60px;
+	position:relative;
+	max-height: 80px;
+	margin-top: 1px;
+	margin-bottom: 1px;
+	margin-left: 30px;
     max-width: 1200px;
 	overflow-y:scroll;
 	background-color: #d1d1d1;
@@ -198,6 +194,7 @@ span[name="annotator-mp"] {
 	font-size: 10px;
 	line-height: 1;
 }
+
 
 .annotator-hide {
 	display: none;
@@ -427,6 +424,52 @@ span[name="annotator-mp"] {
 .annotator-viewer div {
 	border-top: 1px solid #858585;
 	border-top: 1px solid rgba(133, 133, 133, 0.11);
+}
+
+
+/* Annotator Claim/Data Editor Form
+-------------------------------------------------------------------- */
+
+
+.annotator-editor-form {
+	margin-top:10px;
+	padding: 0;
+	margin-bottom: 10px;
+    margin-left: 10px;
+	margin-right: 10px;
+	width: 1200px;
+	/* height:180px; */
+	overflow-y: hidden;
+	background-color: #FFFFFF;
+	border: 0px solid #7A7A7A;
+	border: 0px solid rgba(122, 122, 122, 0.6);
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	color:#000000;
+}
+
+.annotator-editor-form { 
+	font-family: "Myriad Web",Verdana,Helvetica,Arial,sans-serif;
+	font-weight: normal;
+	text-align: left;
+	padding: 0;
+	background: none;
+	-webkit-transition: none;
+	-moz-transition: none;
+	-o-transition: none;
+	transition: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	-o-box-shadow: none;
+	box-shadow: none;
+	color: rgb(28, 33, 33);
+}
+
+.annotator-editor-form {
+	/* position: absolute; */
+	font-size: 10px;
+	line-height: 1;
 }
 
 /* Annotator Viewer

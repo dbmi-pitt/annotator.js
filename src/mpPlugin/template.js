@@ -395,7 +395,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
     var out = "";
     //var divHtml = "";
     if (items[0].type == "quote") {
-        out += "<div id='" + items[0].id + "' class='claimquoteborder'></div><br><br><br>";
+        out += "<div id='" + items[0].id + "' class='claimquoteborder'></div>";
     }
     out += "<table class='clear-user-agent-styles'>";
     for (var i = 1, l=items.length; i<l; i++) {
@@ -458,8 +458,7 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
     var out = "";
     for(var i=0, l=items.length; i<l; i++) {
         if (items[i].type == "quote") {
-            // <strong>" + items[i].name +"</strong>
-            out += "<br><div id='" + items[i].id + "' class='dataquoteborder'></div><br><br>";
+            out += "<div id='" + items[i].id + "' class='dataquoteborder'></div>";
         }
         else {
             if (items[i].type != "button")
@@ -554,11 +553,12 @@ var form10 = template(context10);
 
 Template.content = [
 
-    '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
-    '<form class="annotator-widget">',
+    // '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
+    // '<form class="annotator-widget">',   // editor is not widget
+    '<form class="annotator-editor-form">',
     // '<ul class="annotator-listing"></ul>',
-
-    '<div class="annotationbody" style="margin-left:35px;margin-right:0px;height:100%;line-height:200%;margin-top:0px;overflow-y: hidden">',
+    // '<div class="annotationbody" style="margin-left:35px;margin-right:0px;height:100%;line-height:200%;margin-top:0px;overflow-y: hidden">',
+    '<div class="annotationbody" style="margin-left:20px;margin-right:20px;height:100%;margin-top:0px;overflow-y: hidden">',
     '<div id="tabs">',
     '<div id="tabs-1" style="margin-bottom:0px;">',
 
@@ -577,7 +577,7 @@ Template.content = [
     '<button id="nav-halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
     '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
 
-    '</div><br>',
+    '</div>',
 
     // Claim form
     '<div id="mp-claim-form" style="display: none;">',
@@ -633,14 +633,14 @@ Template.content = [
     '</div>',
     '</div>',
     '    <div class="annotator-controls1">',
-    '     <a href="#cancel" class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</a>',
-    '     <a href="#delete" class="annotator-delete" id="annotator-delete">Delete</a>',
+    '     <button class="annotator-cancel" onclick="exitEditorToAnnTable()" id="annotator-cancel">Cancel</button>',
+    '     <button class="annotator-delete" id="annotator-delete">Delete</button>',
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-    '     <a href="#save" class="annotator-save annotator-focus">Save</a>',
-    '     <a href="#save-close" class="annotator-save-close" id="annotator-save-close">Save and Close</a>',
+    '     <button class="annotator-save annotator-focus">Save</button>',
+    '     <button class="annotator-save-close" id="annotator-save-close">Save and Close</button>',
   '    </div>',
     '  </form>',
-    '</div>'
+    // '</div>'
 ].join('\n');
 
 
