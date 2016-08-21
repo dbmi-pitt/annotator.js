@@ -63,12 +63,10 @@
 .claimquoteborder {
 	clear: both;
 	position:relative;
-	max-height: 80px;
+	max-height: 70px;
 	margin-top: 1px;
 	margin-bottom: 1px;
-	margin-left: 30px;
- 	/* margin-right: 10px; */
-    max-width: 1200px;
+    max-width: 2000px;
 	overflow-y:scroll;
 	background-color: #d1d1d1;
 }
@@ -76,12 +74,12 @@
 .dataquoteborder {
 	clear: both;
 	position:relative;
-	max-height: 80px;
+	max-height: 70px;
 	margin-top: 1px;
 	margin-bottom: 1px;
-	margin-left: 30px;
     max-width: 1200px;
 	overflow-y:scroll;
+	margin-left: -25px;
 	background-color: #d1d1d1;
 }
 
@@ -435,7 +433,7 @@ span[name="annotator-mp"] {
 	margin-top:10px;
 	padding: 0;
 	margin-bottom: 10px;
-    margin-left: 10px;
+    margin-left: 90px;
 	margin-right: 10px;
 	width: 1200px;
 	/* height:180px; */
@@ -1227,10 +1225,10 @@ body {
 	font-color:#000000;
 }
 
-#quote {
+/*#quote {
 	width:80%;
 
-}
+}*/
 
 hr.style14 {
 	border: 0;
@@ -1289,6 +1287,7 @@ th, td {
 	font-size: small;
 	font-family: Arial; 
 	list-style-type: none;
+	margin-left: 13%;
 }
 
 .clear-user-agent-styles td:nth-of-type(even) {
