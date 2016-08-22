@@ -64,18 +64,17 @@
 	clear: both;
 	position:relative;
 	max-height: 70px;
-	margin-top: 1px;
 	margin-bottom: 1px;
     max-width: 2000px;
 	overflow-y:scroll;
 	background-color: #d1d1d1;
+	margin-top: -8px;
 }
 
 .dataquoteborder {
 	clear: both;
 	position:relative;
 	max-height: 70px;
-	margin-top: 1px;
 	margin-bottom: 1px;
     max-width: 1200px;
 	overflow-y:scroll;
