@@ -55,7 +55,7 @@
 
 .annotator-hl {
 	background: #FFFF0A;
-	background: rgba(255, 255, 10, 0.3);
+	//background: rgba(255, 255, 10, 0.3);
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
 }
 
@@ -143,7 +143,8 @@ span[name="annotator-ddi"] {
 /* Annotator Micropublication
 -------------------------------------------------------------------- */
 .annotator-mp {
-	background: rgba(176, 196, 222, 0.4);
+	background: rgba(86, 95, 115, 0.4);
+	//background: rgba(176, 196, 222, 0.4);
 	font-size: 11px;
 	font-style: strong;
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
@@ -1402,3 +1403,10 @@ input[type="radio"] {
 	font-family:  "Myriad Web",Verdana,Helvetica,Arial,sans-serif;
 }
 
+#mp-claim-data-tb th, td {
+	border: 1px solid #969696;
+}
+
+#mp-claim-method-tb th, td {
+	border: 1px solid #969696;
+}
