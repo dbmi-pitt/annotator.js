@@ -659,15 +659,19 @@ StorageAdapter.prototype.query = function (query) {
  * :returns Promise: Resolves when loading is complete.
  */
 
-StorageAdapter.prototype.load = function (query) {
+StorageAdapter.prototype.load = function (query, pageNumber) {
     var self = this;
-
-    // tempquery = query;
+    if(pageNumber == undefined) {
+        return this.query(query)
+            .then(function (data) {
+                self.runHook('annotationsLoaded', [data.results]);
+            });
+    }
     return this.query(query)
         .then(function (data) {
-            self.runHook('annotationsLoaded', [data.results]);
-	    //anns = data.results;
+            self.runHook('annotationsLoaded', [data.results, pageNumber]);
         });
+
 };
 
 // Cycle a store event, keeping track of the annotation object and updating it

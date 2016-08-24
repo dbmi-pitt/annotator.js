@@ -401,9 +401,21 @@ function main(options) {
             removeDynamicStyle();
         },
 
-        annotationsLoaded: function (anns) {
-            s.hlhighlighter.drawAll(anns);
-            s.mphighlighter.drawAll(anns);
+        annotationsLoaded: function (anns, pageNumber) {
+            if(pageNumber != undefined) {
+                console.log("[load page " + pageNumber + "]");
+                var annsByPage = [];
+                for (var i = 0; i < anns.length; i++) {
+                    if (anns[i].argues.ranges[0].start.substring(47, 48) == pageNumber)
+                        annsByPage.push(anns[i]);
+                }
+                console.log("[num of annotations: " + annsByPage.length + "]")
+                s.hlhighlighter.drawAll(annsByPage);
+                s.mphighlighter.drawAll(annsByPage);
+            } else {
+                s.hlhighlighter.drawAll(anns);
+                s.mphighlighter.drawAll(anns);
+            }
         },
 
         beforeAnnotationCreated: function (annotation) {
