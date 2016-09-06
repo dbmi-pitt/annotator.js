@@ -148,130 +148,152 @@ mpHighlighter.prototype.draw = function (annotation) {
     }
     //var normedRanges = [];
     var dataRangesL = [];
+    var hldivL = [];
 
-    try {
-        // draw MP claim
+    try {       
 
-        for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-            var r = reanchorRange(annotation.argues.ranges[i], this.element);
+        // draw MP claim        
+        var claimSelector = annotation.argues.hasTarget.hasSelector;
 
-            if (r !== null) {
-                //normedRanges.push(r);
-                dataRangesL.push(new DataRange(r, "claim", 0));
-            } else {
-                console.log("[ERROR] range failed to reanchor");
-                console.log(r);
+        var context = document.querySelector("#subcontent");          
+        var instance = new Mark(context);
+        var options = {
+            "element": "span",
+            "className": "annotator-hl",
+            "separateWordSearch": false,
+            "acrossElements": true,
+            "accuracy": "exactly",
+            "each": function(elem) {
+                // $(elem).attr('id',  annotation.id + "-claim-0");
+                $(elem).attr('name', "annotator-mp");
+                $(elem).attr('fieldname', "claim");
+                $(elem).attr('datanum', 0);        
+                hldivL.push($(elem)[0]);
             }
-        }
+                
+        };
+          
+        var markRes = instance.mark(claimSelector.exact, options);
+        if (markRes !== null) {
+            dataRangesL.push(new DataRange(markRes, "claim", 0));
+        } else {
+            console.log("[ERROR] range failed to reanchor");
+        } 
+        
+
+        // for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
+        //     var r = reanchorRange(annotation.argues.ranges[i], this.element);
+
+        //     if (r !== null) {
+        //         //normedRanges.push(r);
+        //         dataRangesL.push(new DataRange(r, "claim", 0));
+        //     } else {
+        //         console.log("[ERROR] range failed to reanchor");
+        //         console.log(r);
+        //     }
+        // }
 
         // draw MP data
-        if (annotation.argues.supportsBy.length != 0){
+        // if (annotation.argues.supportsBy.length != 0){
             
-            // draw MP data
-            var dataL = annotation.argues.supportsBy;
+        //     // draw MP data
+        //     var dataL = annotation.argues.supportsBy;
 
 
-            for (var idx = 0; idx < dataL.length; idx++) {
-                var data = dataL[idx];
+        //     for (var idx = 0; idx < dataL.length; idx++) {
+        //         var data = dataL[idx];
 
-                if (data.auc.ranges != null) {
-                    for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.auc.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
-                    }
-                }
+        //         if (data.auc.ranges != null) {
+        //             for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
+        //                 var r = reanchorRange(data.auc.ranges[i], this.element);   
+        //                 if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
+        //             }
+        //         }
 
-                if (data.cmax.ranges != null) {
-                    for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.cmax.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
-                    }
-                }
+        //         if (data.cmax.ranges != null) {
+        //             for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
+        //                 var r = reanchorRange(data.cmax.ranges[i], this.element);   
+        //                 if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
+        //             }
+        //         }
 
-                if (data.clearance.ranges != null) {
-                    for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.clearance.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
-                    }
-                }            
+        //         if (data.clearance.ranges != null) {
+        //             for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
+        //                 var r = reanchorRange(data.clearance.ranges[i], this.element);   
+        //                 if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
+        //             }
+        //         }            
 
-                if (data.halflife.ranges != null) {
-                    for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.halflife.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
-                    }
-                }
+        //         if (data.halflife.ranges != null) {
+        //             for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
+        //                 var r = reanchorRange(data.halflife.ranges[i], this.element);   
+        //                 if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
+        //             }
+        //         }
                 
-                // draw MP Material
-                var material = data.supportsBy.supportsBy;
-                if (material != null){
+        //         // draw MP Material
+        //         var material = data.supportsBy.supportsBy;
+        //         if (material != null){
                     
-                    if (material.participants.ranges != null) {
-                        for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(material.participants.ranges[i], this.element);
-                            //if (r !== null) normedRanges.push(r);  
-                            if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));  
-                        }                      
-                    }
+        //             if (material.participants.ranges != null) {
+        //                 for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
+        //                     var r = reanchorRange(material.participants.ranges[i], this.element);
+        //                     //if (r !== null) normedRanges.push(r);  
+        //                     if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));  
+        //                 }                      
+        //             }
                     
-                    if (material.drug1Dose.ranges != null) {
-                        for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
-                        }
-                    }
-                    if (material.drug2Dose.ranges != null) {
-                        for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(material.drug2Dose.ranges[i], this.element);   
-                            if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
-                        }
-                    }
+        //             if (material.drug1Dose.ranges != null) {
+        //                 for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
+        //                     var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
+        //                     if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
+        //                 }
+        //             }
+        //             if (material.drug2Dose.ranges != null) {
+        //                 for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
+        //                     var r = reanchorRange(material.drug2Dose.ranges[i], this.element);   
+        //                     if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
+        //                 }
+        //             }
                     
-                }
-            }
-        }
+        //         }
+        //     }
+        // }
         //console.log(dataRangesL);
     } catch (err) {
         console.log(err);
     }
         
 
-
     var hasLocal = (typeof annotation._local !== 'undefined' && annotation._local !== null);
 
     if (!hasLocal) {
         annotation._local = {};
     }
-    var hasHighlights = (typeof annotation._local.highlights !== 'undefined' &&
-
-    annotation._local.highlights === null);
+    var hasHighlights = (typeof annotation._local.highlights !== 'undefined' && annotation._local.highlights === null);
 
     if (!hasHighlights) {
         annotation._local.highlights = [];
     }
 
-    // for (var j = 0, jlen = normedRanges.length; j < jlen; j++) {
-    //     var normed = normedRanges[j];
+    console.log(annotation);
+
+    // for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
+    //     var dataNormed = dataRangesL[j];
     //     $.merge(
     //         annotation._local.highlights,
-    //         highlightRange(normed, this.options.highlightClass)
-    //     );
-    // }
+    //         highlightRange(dataNormed.range, this.options.highlightClass, dataNormed));
+    //}
 
-    for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
-        var dataNormed = dataRangesL[j];
-        $.merge(
-            annotation._local.highlights,
-            highlightRange(dataNormed.range, this.options.highlightClass, dataNormed));
-    }
-
-    // Save the annotation data on each highlighter element.
+    $.merge(annotation._local.highlights, hldivL);
+    
+    //Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);
 
-    // Add a data attribute for annotation id if the annotation has one
-    // if (typeof annotation.id !== 'undefined' && annotation.id !== null) {
-    //     $(annotation._local.highlights).attr('id', annotation.id);
-    // }
+    //Add a data attribute for annotation id if the annotation has one
+    if (typeof annotation.id !== 'undefined' && annotation.id !== null) {
+        $(annotation._local.highlights).attr('id', annotation.id);
+    }
     if (typeof annotation.id !== 'undefined' && annotation.id !== null) {
         for (var p =0; p < annotation._local.highlights.length; p++) {
             var fieldName = annotation._local.highlights[p].getAttribute("fieldName");
