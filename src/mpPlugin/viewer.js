@@ -243,9 +243,12 @@ var mpViewer = exports.mpViewer = Widget.extend({
         var list = this.element.find('ul:first').empty();
 
         for (var i = 0, len = this.annotations.length; i < len; i++) {
+
             var annotation = this.annotations[i].annotation;
             var fieldName = this.annotations[i].fieldName;
             var dataNum = this.annotations[i].dataNum;
+
+            console.log(annotation);
 
             if (annotation.annotationType == "MP"){
                 this._annotationItem(annotation, fieldName, dataNum)
