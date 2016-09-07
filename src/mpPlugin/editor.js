@@ -154,7 +154,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
 
-                            console.log(selectedList);
+                            //console.log(selectedList);
 
                             for(var i=0;i<selectedList.length;i++) {
                                 if(prev != selectedList[i].id) {
@@ -199,7 +199,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     drugNodes.push(selectedList[i].cloneNode(true));
                                 }
                             }
-                            console.log(drugNodes);
+                            //console.log(drugNodes);
 
                             for(var i=0;i<drugNodes.length;i++) {
 
