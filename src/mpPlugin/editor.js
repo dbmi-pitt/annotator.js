@@ -126,7 +126,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //find drugs which only be highlighted in this claim
                         //--------------- generate list and listid array ----------------
-                        var list = [];//used to store drugs
+                        var list = []; //used to store drugs
                         var listid = [];
                         var drugList = document.getElementsByName('annotator-hl');
 
@@ -138,6 +138,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var parent;
                         var childID = 0;
 
+                        // create mp claim annotation
                         if(annotation.id==undefined) {
                              //store node whose classname is "annotator-hl"
                             for(var i=0;i<nodes.length;i++) {
@@ -153,7 +154,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
 
-                            //console.log(selectedList);
+                            console.log(selectedList);
 
                             for(var i=0;i<selectedList.length;i++) {
                                 if(prev != selectedList[i].id) {
@@ -183,9 +184,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
 
-                        }else{
+                        }else{ // edit mp claim annotation
                             selectedList = $('.annotator-currhl');
                             var drugNodes = [];
+
+                            // find span with classname equals annotator-hl in quote dom
                             for(var i=0;i<selectedList.length;i++) {
                                 //filter annotator-mp
                                 while(selectedList[i].parentNode.className=="annotator-hl"||
@@ -196,24 +199,54 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     drugNodes.push(selectedList[i].cloneNode(true));
                                 }
                             }
-                            //console.log(drugNodes);
+                            console.log(drugNodes);
+
                             for(var i=0;i<drugNodes.length;i++) {
+
+                                // drug highlight in single span
                                 if(prev != drugNodes[i].id) {
                                     prev = drugNodes[i].id;
                                     prevNode = drugNodes[i];
                                     parent = drugNodes[i];
-
                                     childID = 0;
-                                    while (parent.childNodes.length > 0)
-                                        parent = parent.childNodes[0];
+
+                                    while (parent.childNodes.length > 0) {
+                                        var innerNode = null;
+                                        // find inner span that not none 
+                                        for (var j=0; j<parent.childNodes.length; j++) {
+                                            if (parent.childNodes[j].textContent != "") {
+                                                innerNode = parent.childNodes[j];
+                                                break;
+                                            }
+                                        }
+                                        if (innerNode != null) 
+                                            parent = innerNode;  
+                                        else 
+                                            break;
+                                    }
+
                                     list.push(parent.textContent);
                                     listid.push(drugNodes[i].id);
                                 }else {
-
+                                    // drug highlight is splitted in multiple spans
                                     if(!drugNodes[i].isEqualNode(prevNode)) {
                                         parent = drugNodes[i];
-                                        while (parent.childNodes.length > 0)
-                                            parent = parent.childNodes[0];
+                                        // move to most inner span node
+                                        while (parent.childNodes.length > 0) {
+                                            var innerNode = null;
+                                            // find inner span that not none 
+                                            for (var j=0; j<parent.childNodes.length; j++) {
+                                                if (parent.childNodes[j].textContent != "") {
+                                                    innerNode = parent.childNodes[j];
+                                                    break;
+                                                }
+                                            }
+                                            if (innerNode != null) 
+                                                parent = innerNode;  
+                                            else 
+                                                break;
+                                        }
+
                                         var temp = list.pop();
                                         temp += parent.textContent;
                                         list.push(temp);
@@ -231,6 +264,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         //check drug list
                         var allHighlightedDrug = [];
                         var anns = annotations.slice();
+
                         for (var i = 0, len = anns.length; i < len; i++) {
                             if (anns[i].annotationType == "DrugMention") {
                                 allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
@@ -243,13 +277,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                         }
                         //console.log(allHighlightedDrug);
-                        //console.log(list);
-
 
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
-                            // avoid replacing span itself
-                            // add to dropdown box
+                            // avoid replacing span itself add to dropdown box
                             $('#Drug1').append($('<option>', {
                                 value: listid[i],
                                 text: list[i]
@@ -259,11 +290,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 text: list[i]
                             }));
                             flag = flag + 1;
-
-                            /*if (quotecontent.indexOf(list[i]) >= 0 && "<span class=\"highlightdrug\">".indexOf(list[i]) < 0) {
-                                index++;
-                                quotecontent = quotecontent.replace(list[i], "<span class=\"highlightdrug\">" + list[i] + "</span>");
-                            }*/
                         }
                         
                         if (flag < 2) {
