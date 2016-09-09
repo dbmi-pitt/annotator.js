@@ -8,134 +8,6 @@ var Promise = util.Promise;
 var HttpStorage = require('./../storage').HttpStorage;
 var annhost = config.annotator.host;
 
-// highlightRange wraps the DOM Nodes within the provided range with a highlight
-// element of the specified class and returns the highlight Elements.
-//
-// normedRange - A NormalizedRange to be highlighted.
-// cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
-//
-// Returns an array of highlight Elements.
-function highlightRange(normedRange, cssClass) {
-    if (typeof cssClass === 'undefined' || cssClass === null) {
-        cssClass = 'annotator-hl';
-    }
-    var white = /^\s*$/;
-
-    // Ignore text nodes that contain only whitespace characters. This prevents
-    // spans being injected between elements that can only contain a restricted
-    // subset of nodes such as table rows and lists. This does mean that there
-    // may be the odd abandoned whitespace node in a paragraph that is skipped
-    // but better than breaking table layouts.
-    var nodes = normedRange.textNodes(),
-        results = [];
-    for (var i = 0, len = nodes.length; i < len; i++) {
-        var node = nodes[i];
-        if (!white.test(node.nodeValue)) {
-
-            //skip text node that been highlighted yet
-            if (node.parentNode.className != "annotator-hl"){
-                var hl = global.document.createElement('span');
-                hl.className = cssClass;
-	            //hl.id = 'annotator-hl';
-                hl.setAttribute("name", "annotator-hl");
-                node.parentNode.replaceChild(hl, node);
-                hl.appendChild(node);
-                results.push(hl);
-            }
-        }
-    }
-    return results;
-}
-
-
-function highlightOA(annotation, cssClass, storage){
-    console.log("[INFO] begin xpath fixing by OA selector");
-    var oaSelector = annotation.argues.hasTarget.hasSelector;
-    var prefix = oaSelector.prefix, suffix = oaSelector.suffix, exact = oaSelector.exact;
-    try{
-        var isFixed = false;
-        var nodes = $("p:contains('" + exact + "')" );
-        for (var n = 0, nlen = nodes.length; n < nlen; n++){
-            var node = nodes[n];
-            
-            var fullTxt = node.textContent.replace(/\s/g, " ");
-	        var re = new RegExp(exact,"g");
-            var res;
-            
-	        while (res = re.exec(fullTxt)){
-                var index = res["index"];
-                var prefixSub, suffixSub;
-                
-                prefixSub = fullTxt.substring(0,index);
-                suffixSub = fullTxt.substring(index + oaSelector.exact.length);
-                
-                var b0 = (prefixSub.length > 0 || suffixSub.length > 0); 
-                var b1 = (prefixSub.indexOf(prefix) >= 0) || (prefix.indexOf(prefixSub) >= 0);
-                var b2 = (suffixSub.indexOf(suffix) >= 0) || (suffix.indexOf(suffixSub) >= 0);
-
-                // if (prefix.indexOf("Potent inhibitors of CYP2D6 may increase")>=0) {
-                //     console.log(b1 + "|" + b2);
-                //     console.log(node);
-                //     console.log("oaSelector:" + prefix + "|" + suffix);
-                //     console.log("node hasn't been found:" + prefixSub + "|" + suffixSub);
-                //     //console.log(suffix.indexOf("40 mg twice daily with fluvox"));  
-                // }
-                
-                if (b0 && b1 && b2) {
-                    
-                    console.log("oaSelector:" + prefix + "|" + suffix);
-                    console.log("node been found:" + prefixSub + "|" + suffixSub);
-
-                    isFixed = true;
-                    var path = xpath.fromNode($(node), $(document))[0];
-                    path = path.replace("/html[1]/body[1]/article[1]/div[5]/div[1]/div[1]","");
-                    
-                    if (annotation.argues.ranges[0].start != path)
-                        annotation.argues.ranges[0].start = path;
-                    if (annotation.argues.ranges[0].end != path)
-                        annotation.argues.ranges[0].end = path;
-                    if (annotation.argues.ranges[0].startOffset != index)
-                        annotation.argues.ranges[0].startOffset = index;
-                    if (annotation.argues.ranges[0].endOffset != index + exact.length)
-                        annotation.argues.ranges[0].endOffset = index + exact.length;
-                
-                    storage.update(annotation);
-                    //this.redraw(annotation);
-                    console.log("[INFO] xpath fixing completed!");
-                }
-            }
-        }
-        if (!isFixed) {
-            console.log("[WARN] xpath fixing failed, oa selecter doesn't matched in document!");
-            console.log("oaSelector:" + prefix + "|" + exact + "|" + suffix + "|");
-            storage.delete({id : annotation.id});
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
-
-// reanchorRange will attempt to normalize a range, swallowing Range.RangeErrors
-// for those ranges which are not reanchorable in the current document.
-function reanchorRange(range, rootElement) {
-    try {
-        return Range.sniff(range).normalize(rootElement);
-    } catch (e) {
-        if (!(e instanceof Range.RangeError)) {
-            // Oh Javascript, why you so crap? This will lose the traceback.
-            throw(e);
-        }
-        // Otherwise, we simply swallow the error. Callers are responsible
-        // for only trying to draw valid annotations.
-        console.log("[ERROR] reanchor range failure!");
-        console.log(range);
-    }
-    return null;
-}
-
-
 // Highlighter provides a simple way to draw highlighted <span> tags over
 // annotated ranges within a document.
 //
@@ -204,20 +76,36 @@ Highlighter.prototype.drawAll = function (annotations) {
 // Returns an Array of drawn highlight elements.
 Highlighter.prototype.draw = function (annotation) {
 
+    console.log("draw drug");
+    console.log(annotation);
+
     if (annotation.annotationType != "DrugMention")
         return null;
 
-    var normedRanges = [];
+    //var normedRanges = [];
     var oaAnnotations = [];
+    var hldivL = [];
 
-    for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-        var r = reanchorRange(annotation.argues.ranges[i], this.element);
-        if (r !== null) { // xpath reanchored by range
-            normedRanges.push(r);
-        } else { // use OA prefix suffix approach
-            oaAnnotations.push(annotation);
-        }
-    }
+    var options = {
+        "element": "span",
+        "className": "annotator-hl",
+        "separateWordSearch": false,
+        "acrossElements": true,
+        "accuracy": "partially",
+        "each": function(elem) {            
+            $(elem).attr('name', "annotator-hl");                
+            $(elem).attr('data-markjs', false);   
+            hldivL.push($(elem)[0]);
+        }                
+    };
+
+
+    // mark context
+    var context = document.querySelector("#subcontent");          
+    var markObj = new Mark(context);
+
+    var drugSelector = annotation.argues.hasTarget.hasSelector;          
+    markObj.mark(drugSelector.exact, options);
 
     var hasLocal = (typeof annotation._local !== 'undefined' &&
     annotation._local !== null);
@@ -230,29 +118,8 @@ Highlighter.prototype.draw = function (annotation) {
         annotation._local.highlights = [];
     }
 
-    // highlight by xpath range
-    for (var j = 0, jlen = normedRanges.length; j < jlen; j++) {
-        var normed = normedRanges[j];
-        
-        $.merge(
-            annotation._local.highlights,
-            highlightRange(normed, this.options.highlightClass)
-        );
-    }
-
-    // fix xpath by OA prefix suffix selector
-    if (oaAnnotations.length > 0){
-
-        if (!storage){
-	        var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + annhost + '/annotatorstore","urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search"}}';
-	        var queryOptions = JSON.parse(queryOptStr);
-            var storage = new HttpStorage(queryOptions);
-        }
-
-        for (var m = 0, mlen = oaAnnotations.length; m < mlen; m++) {
-            highlightOA(oaAnnotations[m], this.options.highlightClass, storage);
-        }
-    }
+    // add highlight divs to list for editing or deleting
+    $.merge(annotation._local.highlights, hldivL);    
 
     // Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);

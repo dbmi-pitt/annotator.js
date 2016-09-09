@@ -68,13 +68,18 @@ TextSelector.prototype.captureDocumentSelection = function () {
         return [];
     }
 
+    console.log("TextSelector - captureDocumentSelection");
+    console.log(selection);
+
     for (i = 0; i < selection.rangeCount; i++) {
         var r = selection.getRangeAt(i),
             browserRange = new Range.BrowserRange(r),
             normedRange = browserRange.normalize().limit(this.element);
 
+        // get list of text nodes by start and end node fails when bring mark.js in
         var nodes = normedRange.textNodes();
-        //console.log("[textSelector--normedRange]");
+
+        //console.log(nodes);
 
         var tempParent;
         //get drug node list
@@ -118,7 +123,7 @@ TextSelector.prototype.captureDocumentSelection = function () {
     }
 
     ranges.childNodes = nodes;
-    console.log("textselector - ranges")
+
     //console.log(textnodes);
     return ranges;
 };

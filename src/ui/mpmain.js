@@ -41,7 +41,7 @@ function annotationFactory(contextEl, ignoreSelector) {
     return function (ranges) {
         var text = [],
             serializedRanges = [];
-            //console.log(ranges);
+
         for (var i = 0, len = ranges.length; i < len; i++) {
             var r = ranges[i];
             text.push(trim(r.text()));
@@ -56,7 +56,7 @@ function annotationFactory(contextEl, ignoreSelector) {
 
         return {
             argues : {
-                ranges: serializedRanges,
+                // ranges: serializedRanges,
                 hasTarget: {
                     hasSelector: {
                         "@type": "TextQuoteSelector",
@@ -301,8 +301,11 @@ function main(options) {
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
                 console.log("mpmain - textselector - onSelection");
+
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
+
+
                 if (ranges.length > 0) {
                     //var mpAnnotation = makeMPAnnotation(ranges);
                     hlAnnotation = makeHLAnnotation(ranges);
@@ -417,7 +420,11 @@ function main(options) {
 		    annotation.rawurl = options.source;
     		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
 		    annotation.email = options.email;
-            annotation.childNodes = rangeChildNodes;
+
+            console.log("beforeAnnotationCreated");
+
+            // keep text selection in annotation for draw current annotating text
+            annotation.childNodes = rangeChildNodes; 
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
                 s.currhighlighter.draw(annotation, "add");
@@ -460,7 +467,6 @@ function main(options) {
 
                 } else {
                     s.currhighlighter.draw(hlAnnotation, "add");
-
                 }
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);

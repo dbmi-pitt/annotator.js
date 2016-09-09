@@ -1,6 +1,6 @@
 "use strict";
 
-var Range = require('xpath-range').Range;
+//var Range = require('xpath-range').Range;
 
 var util = require('../util');
 
@@ -70,17 +70,19 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 
 // Return customized options for mark.js highlight 
 function markOptions(fieldType, dataNum, hldivL) {
-    
+
     return {
         "element": "span",
         "className": "annotator-hl",
         "separateWordSearch": false,
         "acrossElements": true,
-        "accuracy": "exactly",
+        "accuracy": "partially",
         "each": function(elem) {
+            
             $(elem).attr('name', "annotator-mp");
             $(elem).attr('fieldname', fieldType);
-            $(elem).attr('datanum', dataNum);        
+            $(elem).attr('datanum', dataNum);     
+            $(elem).attr('data-markjs', false);  
             hldivL.push($(elem)[0]);
         }                
     };
@@ -99,9 +101,12 @@ mpHighlighter.prototype.draw = function (annotation) {
             return null;
     }
 
+    console.log("mphighlighter - draw");
     var hldivL = [];
 
     try {       
+        //console.log(annotation);
+
         // mark context
         var context = document.querySelector("#subcontent");          
         var markObj = new Mark(context);
@@ -173,9 +178,11 @@ mpHighlighter.prototype.draw = function (annotation) {
         annotation._local.highlights = [];
     }
 
+    console.log("TEST3");
+    console.log(hldivL);
+
     // add highlight span divs to annotation._local
     $.merge(annotation._local.highlights, hldivL);    
-    console.log(annotation);
 
     //Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);

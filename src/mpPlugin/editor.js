@@ -62,20 +62,23 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         var nodes = [];
                         nodes = annotation.childNodes;
+                        console.log("TEST1");
+                        console.log(annotation);
+                        console.log(nodes);
 
                         //--------------generate quote-----------------
                         var quoteobject = $("<div id='quotearea'/>");
                         var p = document.createElement("p");
 
-                        //generate quote: add new annotation
+                        // if createing claim, there is no annotation id assigned yet
                         if(annotation.id==undefined) {
                             var childrenInQuote = nodes;
                             var goodChild;
                             var prevNode = null;
                             for (var qi = 0; qi < childrenInQuote.length; qi++) {
                                 var tempContent = $(childrenInQuote[qi]).text();
-                                while(childrenInQuote[qi].parentNode.className=="annotator-hl"||
-                                childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+                                console.log(tempContent);
+                                while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
                                     childrenInQuote[qi]= childrenInQuote[qi].parentNode;
                                 }
                                 if(!childrenInQuote[qi].isEqualNode(prevNode)) {
@@ -107,7 +110,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
-                        //console.log(quotecontent);
+
+                        console.log("TEST2");
+                        console.log(quotecontent);
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
                             quotecontent = quotecontent.split("annotator-currhl").join("");
@@ -130,31 +135,34 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var listid = [];
                         var drugList = document.getElementsByName('annotator-hl');
 
-                        var selectedNodes = [];
-                        //console.log(nodes);
+                        var selectedNodes = [];                        
                         var selectedList = [];
                         var prev = "";
                         var prevNode = null;
                         var parent;
                         var childID = 0;
 
-                        // create mp claim annotation
+                        // if createing claim, there is no annotation id assigned yet
                         if(annotation.id==undefined) {
                              //store node whose classname is "annotator-hl"
                             for(var i=0;i<nodes.length;i++) {
                                 //filter annotator-mp
                                 var currnode = nodes[i];
+
+                                //console.log(currnode);
+
                                 while(nodes[i].parentNode.className=="annotator-hl"||
-                                nodes[i].parentNode.className=="annotator-currhl") {
+                                      nodes[i].parentNode.className=="annotator-currhl") {
                                     nodes[i]= nodes[i].parentNode;
-                                }
+                                }                                
+
                                 if($(nodes[i]).attr("name") == "annotator-hl") {
                                     selectedList.push(nodes[i].cloneNode(true));
                                     selectedNodes.push(currnode);
                                 }
                             }
-
-                            //console.log(selectedList);
+                            console.log("SELECTED LIST:");
+                            console.log(selectedList);
 
                             for(var i=0;i<selectedList.length;i++) {
                                 if(prev != selectedList[i].id) {
@@ -163,33 +171,84 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     parent = selectedList[i];
 
                                     childID = 0;
-                                    while (parent.childNodes.length > 0)
-                                        parent = parent.childNodes[0];
+
+                                    // while (parent.childNodes.length > 0)
+                                    //     parent = parent.childNodes[0];
+                                    while (parent.childNodes.length > 0) {
+                                        var innerNode = null;
+                                        // find inner span that not none 
+                                        for (var j=0; j<parent.childNodes.length; j++) {
+                                            if (parent.childNodes[j].textContent != "") {
+                                                innerNode = parent.childNodes[j];
+                                                break;
+                                            }
+                                        }
+                                        if (innerNode != null) 
+                                            parent = innerNode;  
+                                        else 
+                                            break;
+                                    }
+
+                                    console.log("1 push text to list:");
+                                    console.log(parent.textContent);
+                                    console.log(list);
+
                                     list.push(parent.textContent);
                                     listid.push(selectedList[i].id);
-                                }else {
+                                    
+                                    console.log(list);
+
+                                } else {
 
                                     if(!selectedList[i].isEqualNode(prevNode)) {
                                         parent = selectedList[i];
-                                        while (parent.childNodes.length > 0)
-                                            parent = parent.childNodes[0];
+
+                                        while (parent.childNodes.length > 0) {
+                                            var innerNode = null;
+                                            
+                                            // find inner span that not none 
+                                            for (var j=0; j<parent.childNodes.length; j++) {
+                                                if (parent.childNodes[j].textContent != "") {
+                                                innerNode = parent.childNodes[j];
+                                                    break;
+                                                }
+                                            }
+                                            if (innerNode != null) 
+                                                parent = innerNode;  
+                                            else 
+                                                break;
+                                        }
+                                        // while (parent.childNodes.length > 0)
+                                        //     parent = parent.childNodes[0];
+
                                         var temp = list.pop();
                                         temp += parent.textContent;
+
+                                        console.log("2 push text to list:");
+                                        console.log(temp);
+
                                         list.push(temp);
-                                    }else {
+                                    } else {
                                         var temp = list.pop();
                                         temp += selectedNodes[i].textContent;
+
+                                        console.log("3 push text to list:");
+                                        console.log(temp);
+
                                         list.push(temp);
                                     }
                                 }
                             }
 
-                        }else{ // edit mp claim annotation
+                        } else { // edit mp claim annotation
                             selectedList = $('.annotator-currhl');
                             var drugNodes = [];
 
                             // find span with classname equals annotator-hl in quote dom
                             for(var i=0;i<selectedList.length;i++) {
+
+                                //console.log(selectedList[i]);
+
                                 //filter annotator-mp
                                 while(selectedList[i].parentNode.className=="annotator-hl"||
                                 selectedList[i].parentNode.className=="annotator-currhl") {
@@ -225,6 +284,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                             break;
                                     }
 
+                                    console.log("4 push text to list:");
+                                    console.log(parent.textContent);
+
                                     list.push(parent.textContent);
                                     listid.push(drugNodes[i].id);
                                 }else {
@@ -249,15 +311,24 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                                         var temp = list.pop();
                                         temp += parent.textContent;
+
+                                        console.log("5 push text to list:");
+                                        console.log(temp);
                                         list.push(temp);
                                     }else {
                                         var temp = list.pop();
                                         temp += drugNodes[i].textContent;
+
+                                        console.log("6 push text to list:");
+                                        console.log(drugNodes[i].textContent);
+
                                         list.push(drugNodes[i].textContent);
                                     }
                                 }
                             }
                         }
+
+                        //console.log(list);
 
                         var flag = 0;
 
@@ -276,7 +347,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 listid.splice(i,1);
                             }
                         }
-                        //console.log(allHighlightedDrug);
+                        console.log(allHighlightedDrug);
 
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
@@ -399,6 +470,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             postDataForm(currFormType);
                         }
                     }                     
+                    delete annotation.childNodes;
                 },
                 
                 submit:function (field, annotation) {
@@ -456,8 +528,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             partTmp.value = $('#participants').val();
 
                             // if field not binded with text, then assign current span to it
-                            if (partTmp.ranges == null && partTmp.hasTarget == null  && cachedOATarget != null && cachedOARanges != null) {
-                                partTmp.ranges = cachedOARanges;           
+                            //if (partTmp.ranges == null && partTmp.hasTarget == null  && cachedOATarget != null && cachedOARanges != null) {
+                            if (partTmp.hasTarget == null && cachedOATarget != null) {
+                                //partTmp.ranges = cachedOARanges;           
                                 partTmp.hasTarget = cachedOATarget;    
                             }
                             mpData.supportsBy.supportsBy.participants = partTmp;
@@ -474,9 +547,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose1Tmp.formulation = drug1F;
                             dose1Tmp.duration = drug1D;
                             dose1Tmp.regimens = drug1R;
-                            if (dose1Tmp.ranges == null && dose1Tmp.hasTarget == null) {
+                            //if (dose1Tmp.ranges == null && dose1Tmp.hasTarget == null) {
+                            if (dose1Tmp.hasTarget == null) {
                                 dose1Tmp.hasTarget = cachedOATarget;
-                                dose1Tmp.ranges = cachedOARanges;
+                                //dose1Tmp.ranges = cachedOARanges;
                             }
                             mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;   
                         }
@@ -492,9 +566,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose2Tmp.formulation = drug2F;
                             dose2Tmp.duration = drug2D;
                             dose2Tmp.regimens = drug2R;
-                            if (dose2Tmp.ranges == null && dose2Tmp.hasTarget == null) {
+                            //if (dose2Tmp.ranges == null && dose2Tmp.hasTarget == null) {
+                            if (dose2Tmp.hasTarget == null) {
                                 dose2Tmp.hasTarget = cachedOATarget;
-                                dose2Tmp.ranges = cachedOARanges;
+                                //dose2Tmp.ranges = cachedOARanges;
                             }
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
                         }
@@ -519,9 +594,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.auc.type = aucType;
                                 mpData.auc.direction = aucDirection;      
                             }
-                            if (mpData.auc.ranges == null && mpData.auc.hasTarget == null) {
+                            //if (mpData.auc.ranges == null && mpData.auc.hasTarget == null) {
+                            if (mpData.auc.hasTarget == null) {
                                 mpData.auc.hasTarget = cachedOATarget;
-                                mpData.auc.ranges = cachedOARanges;
+                                //mpData.auc.ranges = cachedOARanges;
                             }                            
                         } else {
                             console.log("[WARNING] auc required fields not filled!");
@@ -543,9 +619,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.cmax.type = cmaxType;
                                 mpData.cmax.direction = cmaxDirection;      
                             }
-                            if (mpData.cmax.ranges == null && mpData.cmax.hasTarget == null) {
+                            //if (mpData.cmax.ranges == null && mpData.cmax.hasTarget == null) {
+                            if (mpData.cmax.hasTarget == null) {
                                 mpData.cmax.hasTarget = cachedOATarget;
-                                mpData.cmax.ranges = cachedOARanges;
+                                //mpData.cmax.ranges = cachedOARanges;
                             }                            
                         } else {
                             console.log("[WARNING] cmax required fields not filled!");
@@ -568,9 +645,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.clearance.type = clearanceType;
                                 mpData.clearance.direction = clearanceDirection;      
                             }
-                            if (mpData.clearance.ranges == null && mpData.clearance.hasTarget == null) {
+                            //if (mpData.clearance.ranges == null && mpData.clearance.hasTarget == null) {
+                            if (mpData.clearance.hasTarget == null) {
                                 mpData.clearance.hasTarget = cachedOATarget;
-                                mpData.clearance.ranges = cachedOARanges;
                             }                            
                         } else {
                             console.log("[WARNING] clearance required fields not filled!");
@@ -593,9 +670,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.halflife.type = halflifeType;
                                 mpData.halflife.direction = halflifeDirection;      
                             }
-                            if (mpData.halflife.ranges == null && mpData.halflife.hasTarget == null) {
+                            //if (mpData.halflife.ranges == null && mpData.halflife.hasTarget == null) {
+                            if (mpData.halflife.hasTarget == null) {
                                 mpData.halflife.hasTarget = cachedOATarget;
-                                mpData.halflife.ranges = cachedOARanges;
+                                //mpData.halflife.ranges = cachedOARanges;
                             }                            
                         } else {
                             console.log("[WARNING] halflife required fields not filled!");
