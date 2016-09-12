@@ -111,8 +111,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
 
-                        console.log("TEST2");
-                        console.log(quotecontent);
+                        //console.log("TEST2");
+                        //console.log(quotecontent);
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
                             quotecontent = quotecontent.split("annotator-currhl").join("");
@@ -161,8 +161,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     selectedNodes.push(currnode);
                                 }
                             }
-                            console.log("SELECTED LIST:");
-                            console.log(selectedList);
+                            //console.log("SELECTED LIST:");
+                            //console.log(selectedList);
 
                             for(var i=0;i<selectedList.length;i++) {
                                 if(prev != selectedList[i].id) {
@@ -196,7 +196,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     list.push(parent.textContent);
                                     listid.push(selectedList[i].id);
                                     
-                                    console.log(list);
+                                    //console.log(list);
 
                                 } else {
 
@@ -224,16 +224,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                         var temp = list.pop();
                                         temp += parent.textContent;
 
-                                        console.log("2 push text to list:");
-                                        console.log(temp);
+                                        //console.log("2 push text to list:");
+                                        //console.log(temp);
 
                                         list.push(temp);
                                     } else {
                                         var temp = list.pop();
                                         temp += selectedNodes[i].textContent;
 
-                                        console.log("3 push text to list:");
-                                        console.log(temp);
+                                        //console.log("3 push text to list:");
+                                        //console.log(temp);
 
                                         list.push(temp);
                                     }
@@ -284,8 +284,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                             break;
                                     }
 
-                                    console.log("4 push text to list:");
-                                    console.log(parent.textContent);
+                                    //console.log("4 push text to list:");
+                                    //console.log(parent.textContent);
 
                                     list.push(parent.textContent);
                                     listid.push(drugNodes[i].id);
@@ -319,8 +319,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                         var temp = list.pop();
                                         temp += drugNodes[i].textContent;
 
-                                        console.log("6 push text to list:");
-                                        console.log(drugNodes[i].textContent);
+                                        //console.log("6 push text to list:");
+                                        //console.log(drugNodes[i].textContent);
 
                                         list.push(drugNodes[i].textContent);
                                     }
