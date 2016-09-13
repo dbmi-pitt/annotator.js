@@ -56,7 +56,7 @@ function annotationFactory(contextEl, ignoreSelector) {
 
         return {
             argues : {
-                // ranges: serializedRanges,
+                ranges: serializedRanges,
                 hasTarget: {
                     hasSelector: {
                         "@type": "TextQuoteSelector",

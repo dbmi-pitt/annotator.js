@@ -1,11 +1,87 @@
 "use strict";
 
-//var Range = require('xpath-range').Range;
+var Range = require('xpath-range').Range;
 
 var util = require('../util');
 
 var $ = util.$;
 var Promise = util.Promise;
+
+
+// DS for highlight div information and xpath ranges
+// range - xpath range
+// field - field name for claim or data (ex. auc, cmax, etc)
+// dataNum - the index of data for specific claim (begin with 0) 
+function DataRange(range, field, dataNum) {
+    this.range = range;
+    this.field = field;
+    this.dataNum = dataNum;
+}
+
+
+
+// highlightRange wraps the DOM Nodes within the provided range with a highlight
+// element of the specified class and returns the highlight Elements.
+//
+// normedRange - A NormalizedRange to be highlighted.
+// cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
+// dataRange - DS for range, div field information and data index
+// Returns an array of highlight Elements.
+function highlightRange(normedRange, cssClass, dataRange) {
+    if (typeof cssClass === 'undefined' || cssClass === null) {
+        cssClass = 'annotator-hl';
+    }
+    var white = /^\s*$/;
+
+    // Ignore text nodes that contain only whitespace characters. This prevents
+    // spans being injected between elements that can only contain a restricted
+    // subset of nodes such as table rows and lists. This does mean that there
+    // may be the odd abandoned whitespace node in a paragraph that is skipped
+    // but better than breaking table layouts.
+    var nodes = normedRange.textNodes(),
+        results = [];
+
+    for (var i = 0, len = nodes.length; i < len; i++) {
+        var node = nodes[i];
+        if (!white.test(node.nodeValue)) {
+            var mphl = global.document.createElement('span');
+            mphl.className = cssClass;
+            mphl.setAttribute("name", "annotator-mp");
+            // add data field and data num for mp highlights 
+            mphl.setAttribute("fieldName", dataRange.field);
+            mphl.setAttribute("dataNum", dataRange.dataNum);
+            node.parentNode.replaceChild(mphl, node);
+            mphl.appendChild(node);
+            results.push(mphl);
+        }
+    }
+    return results;
+}
+
+
+// reanchorRange will attempt to normalize a range, swallowing Range.RangeErrors
+// for those ranges which are not reanchorable in the current document.
+function reanchorRange(range, rootElement) {
+    try {
+
+        console.log("reanchorRange");
+        return Range.sniff(range).normalize(rootElement);
+    } catch (e) {
+
+        if (!(e instanceof Range.RangeError)) {
+            // Oh Javascript, why you so crap? This will lose the traceback.
+            throw(e);
+        }
+        // Otherwise, we simply swallow the error. Callers are responsible
+        // for only trying to draw valid annotations.
+        console.log(e);
+    }
+
+    console.log("[ERROR] mphighlighter - reanchorRange - return null");
+    return null;
+}
+
+
 
 // Highlighter provides a simple way to draw highlighted <span> tags over
 // annotated ranges within a document.
@@ -69,6 +145,9 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 };
 
 // Return customized options for mark.js highlight 
+// fieldType - claim or data field name
+// dataNum - data index
+// hldivL - list for holding span wrapped text nodes
 function markOptions(fieldType, dataNum, hldivL) {
 
     return {
@@ -88,6 +167,39 @@ function markOptions(fieldType, dataNum, hldivL) {
     };
 }
 
+// Private: Draw single field for mp claim, data or material. Use xpath range to draw first, oa selector as 2nd option. 
+// obj - field block with attributes ranges and hasTarget 
+// field - name of specific field for claim, data or material (ex auc, cmax, etc)  
+// idx - data index (0 if it's claim)
+// dataRanges - list of xpath ranges
+// hldivL - list of span text nodes   
+mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
+
+    if (obj.ranges != null) { // draw by xpath range
+        for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
+            var r = reanchorRange(obj.ranges[i], this.element);   
+            if (r !== null) { 
+                dataRangesL.push(new DataRange(r, field, idx));
+                console.log("draw by xpath: " + field);
+            } else 
+                console.log("[Error]: draw by xpath failed: " + field);
+        }
+    } else if (obj.hasTarget != null) { // draw by oa selector
+        // mark context
+        var context = document.querySelector("#subcontent");          
+        var markObj = new Mark(context);
+
+        var oaselector = obj.hasTarget.hasSelector;
+        markObj.mark(oaselector.exact, markOptions(field, idx, hldivL));
+        console.log("draw by oaselector: " + field);
+    } else {
+        console.log("[Warning]: draw failed on field: " + field);
+        console.log(obj);
+    }
+
+}
+
+
 
 // Public: Draw highlights for the MP annotation.
 // Including: claim, [{data, method, material}, {..}]
@@ -95,25 +207,22 @@ function markOptions(fieldType, dataNum, hldivL) {
 //
 // Returns an Array of drawn highlight elements.
 mpHighlighter.prototype.draw = function (annotation) {
+    var self = this;
 
     if(annotation.annotationType!=undefined) {
         if (annotation.annotationType != "MP")
             return null;
     }
 
-    console.log("mphighlighter - draw");
+
     var hldivL = [];
+    var dataRangesL = [];
 
     try {       
-        //console.log(annotation);
-
-        // mark context
-        var context = document.querySelector("#subcontent");          
-        var markObj = new Mark(context);
+        console.log("mphighlighter - draw");
 
         // draw MP claim        
-        var claimSelector = annotation.argues.hasTarget.hasSelector;          
-        markObj.mark(claimSelector.exact, markOptions("claim",0, hldivL));
+        self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL);
 
         // draw MP data
         if (annotation.argues.supportsBy.length != 0){            
@@ -121,44 +230,36 @@ mpHighlighter.prototype.draw = function (annotation) {
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
 
-                if (data.auc.hasTarget != null) {
-                    var aucSelector = data.auc.hasTarget.hasSelector;
-                    markObj.mark(aucSelector.exact, markOptions("auc",idx, hldivL));
+                if (data.auc.ranges != null || data.auc.hasTarget != null) {
+                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL);
                 }
 
-                if (data.cmax.hasTarget != null) {
-                    var cmaxSelector = data.cmax.hasTarget.hasSelector;
-                    markObj.mark(cmaxSelector.exact, markOptions("cmax",idx, hldivL));
+                if (data.cmax.ranges != null || data.cmax.hasTarget != null) {
+                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL);
                 }
 
-                if (data.clearance.hasTarget != null) {
-                    var clearanceSelector = data.clearance.hasTarget.hasSelector;
-                    markObj.mark(clearanceSelector.exact, markOptions("clearance",idx, hldivL));
+                if (data.clearance.ranges != null || data.clearance.hasTarget != null) {
+                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);
                 }
 
-                if (data.halflife.hasTarget != null) {
-                    var halflifeSelector = data.halflife.hasTarget.hasSelector;
-                    markObj.mark(halflifeSelector.exact, markOptions("halflife",idx, hldivL));
+                if (data.halflife.ranges != null || data.halflife.hasTarget !=null) {
+                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);
                 }
                 
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
 
                 if (material != null){                    
-                    if (material.participants.hasTarget != null) {
-                        var partSelector = material.participants.hasTarget.hasSelector;
-                        markObj.mark(partSelector.exact, markOptions("participants",idx, hldivL));           
+                    if (material.participants.ranges != null || material.participants.hasTarget != null) {
+                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL);
                     }
 
-                    if (material.drug1Dose.hasTarget != null) {
-                        var dose1Selector = material.drug1Dose.hasTarget.hasSelector;
-                        markObj.mark(dose1Selector.exact, markOptions("drug1Dose",idx, hldivL));           
+                    if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) {
+                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);
                     }
-
-                    if (material.drug2Dose.hasTarget != null) {
-                        var dose2Selector = material.drug2Dose.hasTarget.hasSelector;
-                        markObj.mark(dose2Selector.exact, markOptions("drug2Dose",idx, hldivL));           
-                    }                                     
+                    if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) {
+                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL);
+                    }
                 }
             }
         }
@@ -178,12 +279,17 @@ mpHighlighter.prototype.draw = function (annotation) {
         annotation._local.highlights = [];
     }
 
-    console.log("TEST3");
-    console.log(hldivL);
-
-    // add highlight span divs to annotation._local
+    // add span divs from oaselector to annotation._local
     $.merge(annotation._local.highlights, hldivL);    
 
+    // add span divs from xpath to annotation._local
+    for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
+        var dataNormed = dataRangesL[j];
+        $.merge(
+            annotation._local.highlights,
+            highlightRange(dataNormed.range, this.options.highlightClass, dataNormed));
+    }
+    
     //Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);
 

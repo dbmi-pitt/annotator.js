@@ -76,8 +76,8 @@ Highlighter.prototype.drawAll = function (annotations) {
 // Returns an Array of drawn highlight elements.
 Highlighter.prototype.draw = function (annotation) {
 
-    console.log("draw drug");
-    console.log(annotation);
+    // console.log("draw drug");
+    // console.log(annotation);
 
     if (annotation.annotationType != "DrugMention")
         return null;

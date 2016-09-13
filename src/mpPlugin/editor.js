@@ -529,11 +529,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                             // if field not binded with text, then assign current span to it
                             //if (partTmp.ranges == null && partTmp.hasTarget == null  && cachedOATarget != null && cachedOARanges != null) {
-                            if (partTmp.hasTarget == null && cachedOATarget != null) {
-                                //partTmp.ranges = cachedOARanges;           
-                                partTmp.hasTarget = cachedOATarget;    
+                            // if (partTmp.hasTarget == null && cachedOATarget != null) {
+                            //     //partTmp.ranges = cachedOARanges;           
+                            //     partTmp.hasTarget = cachedOATarget;    
+                            // }
+                            // mpData.supportsBy.supportsBy.participants = partTmp;
+
+                            if (partTmp.ranges == null) {
+                                partTmp.ranges = cachedOARanges;
                             }
-                            mpData.supportsBy.supportsBy.participants = partTmp;
+                            if (partTmp.hasTarget == null) {
+                                partTmp.hasTarget = cachedOATarget;
+                            }
+                            mpData.supportsBy.supportsBy.participants = partTmp;  
                         }
 
                         var dose1Tmp = mpData.supportsBy.supportsBy.drug1Dose;
@@ -548,11 +556,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose1Tmp.duration = drug1D;
                             dose1Tmp.regimens = drug1R;
                             //if (dose1Tmp.ranges == null && dose1Tmp.hasTarget == null) {
+                            // if (dose1Tmp.hasTarget == null) {
+                            //     dose1Tmp.hasTarget = cachedOATarget;
+                            //     //dose1Tmp.ranges = cachedOARanges;
+                            // }
+                            // mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;  
+
+                            if (dose1Tmp.ranges == null) {
+                                dose1Tmp.ranges = cachedOARanges;
+                            }
                             if (dose1Tmp.hasTarget == null) {
                                 dose1Tmp.hasTarget = cachedOATarget;
-                                //dose1Tmp.ranges = cachedOARanges;
                             }
-                            mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;   
+                            mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;    
                         }
 
                         var dose2Tmp = mpData.supportsBy.supportsBy.drug2Dose;
@@ -566,10 +582,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose2Tmp.formulation = drug2F;
                             dose2Tmp.duration = drug2D;
                             dose2Tmp.regimens = drug2R;
-                            //if (dose2Tmp.ranges == null && dose2Tmp.hasTarget == null) {
+
+                            if (dose2Tmp.ranges == null) {
+                                dose2Tmp.ranges = cachedOARanges;
+                            }
                             if (dose2Tmp.hasTarget == null) {
                                 dose2Tmp.hasTarget = cachedOATarget;
-                                //dose2Tmp.ranges = cachedOARanges;
                             }
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
                         }
@@ -594,11 +612,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.auc.type = aucType;
                                 mpData.auc.direction = aucDirection;      
                             }
-                            //if (mpData.auc.ranges == null && mpData.auc.hasTarget == null) {
+
+                            if (mpData.auc.ranges == null) {
+                                mpData.auc.ranges = cachedOARanges;
+                            }
                             if (mpData.auc.hasTarget == null) {
                                 mpData.auc.hasTarget = cachedOATarget;
-                                //mpData.auc.ranges = cachedOARanges;
-                            }                            
+                            }
                         } else {
                             console.log("[WARNING] auc required fields not filled!");
                         }                        
@@ -619,10 +639,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.cmax.type = cmaxType;
                                 mpData.cmax.direction = cmaxDirection;      
                             }
-                            //if (mpData.cmax.ranges == null && mpData.cmax.hasTarget == null) {
+
+                            if (mpData.cmax.ranges == null) {
+                                mpData.cmax.ranges = cachedOARanges;
+                            }
                             if (mpData.cmax.hasTarget == null) {
                                 mpData.cmax.hasTarget = cachedOATarget;
-                                //mpData.cmax.ranges = cachedOARanges;
                             }                            
                         } else {
                             console.log("[WARNING] cmax required fields not filled!");
@@ -645,10 +667,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.clearance.type = clearanceType;
                                 mpData.clearance.direction = clearanceDirection;      
                             }
-                            //if (mpData.clearance.ranges == null && mpData.clearance.hasTarget == null) {
-                            if (mpData.clearance.hasTarget == null) {
-                                mpData.clearance.hasTarget = cachedOATarget;
-                            }                            
+
+                            if (mpData.clearnace.ranges == null) {
+                                mpData.clearnace.ranges = cachedOARanges;
+                            }
+                            if (mpData.clearnace.hasTarget == null) {
+                                mpData.clearnace.hasTarget = cachedOATarget;
+                            }                                  
                         } else {
                             console.log("[WARNING] clearance required fields not filled!");
                         }                
@@ -669,12 +694,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.halflife.value = halflifeValue;
                                 mpData.halflife.type = halflifeType;
                                 mpData.halflife.direction = halflifeDirection;      
+                            } 
+
+                            if (mpData.halflife.ranges == null) {
+                                mpData.halflife.ranges = cachedOARanges;
                             }
-                            //if (mpData.halflife.ranges == null && mpData.halflife.hasTarget == null) {
                             if (mpData.halflife.hasTarget == null) {
                                 mpData.halflife.hasTarget = cachedOATarget;
-                                //mpData.halflife.ranges = cachedOARanges;
-                            }                            
+                            }                           
                         } else {
                             console.log("[WARNING] halflife required fields not filled!");
                         }                
