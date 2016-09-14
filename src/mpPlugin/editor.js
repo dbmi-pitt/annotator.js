@@ -62,7 +62,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         var nodes = [];
                         nodes = annotation.childNodes;
-                        console.log("TEST1");
                         console.log(annotation);
 
                         //--------------generate quote-----------------
@@ -73,7 +72,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var prevNode = null;
                         
                         var childrenInQuote = $(".annotator-currhl"); // when highlighting in red, get all text nodes by class name annotator-currhl
-                        console.log(childrenInQuote);
                         
                         for (var qi = 0; qi < childrenInQuote.length; qi++) {
                             var tempContent = $(childrenInQuote[qi]).text();
@@ -88,51 +86,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 p.appendChild(goodChild);
                             }
                         }                       
-
-                        // // if createing claim, there is no annotation id assigned yet
-                        // if(annotation.id==undefined) {
-                        //     var goodChild;
-                        //     var prevNode = null;
-
-                        //     //var childrenInQuote = nodes;
-                        //     var childrenInQuote = tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
-
-                        //     //console.log(childrenInQuote);
-
-                        //     for (var qi = 0; qi < childrenInQuote.length; qi++) {
-                        //         var tempContent = $(childrenInQuote[qi]).text();
-                        //         console.log(tempContent);
-
-                        //         while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
-                        //             childrenInQuote[qi]= childrenInQuote[qi].parentNode;
-                        //         }
-                        //         if(!childrenInQuote[qi].isEqualNode(prevNode)) {
-                        //             prevNode = childrenInQuote[qi];
-                        //             goodChild = prevNode.cloneNode(true);
-                        //             goodChild.innerHTML = tempContent;
-                        //             p.appendChild(goodChild);
-                        //         }
-                        //     }
-                        //     //console.log(p);
-                        //     //generate quote: edit an existed annotation
-                        // } else {
-                        //     var tempChildrenOfClaim = [];
-                        //     var prevNode = null;
-                        //     tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
-                        //     var childrenOfClaim = [];
-
-                        //     for(var i=0;i<tempChildrenOfClaim.length;i++) {
-                        //         var tempContent = $(tempChildrenOfClaim[i]).text();
-                        //         while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
-                        //             tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
-                        //         }
-                        //         if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
-                        //             var goodChild = tempChildrenOfClaim[i].cloneNode(true);
-                        //             goodChild.innerHTML = tempContent;
-                        //             p.appendChild(goodChild);
-                        //         }
-                        //     }
-                        // }
 
                         $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
@@ -212,13 +165,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                             break;
                                     }
 
-                                    console.log("1 push text to list:");
-                                    console.log(parent.textContent);
-                                    console.log(list);
-
                                     list.push(parent.textContent);
-                                    listid.push(selectedList[i].id);
-                                    
+                                    listid.push(selectedList[i].id);                
                                     //console.log(list);
 
                                 } else {
@@ -247,17 +195,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                         var temp = list.pop();
                                         temp += parent.textContent;
 
-                                        //console.log("2 push text to list:");
-                                        //console.log(temp);
-
                                         list.push(temp);
                                     } else {
                                         var temp = list.pop();
                                         temp += selectedNodes[i].textContent;
-
-                                        //console.log("3 push text to list:");
-                                        //console.log(temp);
-
                                         list.push(temp);
                                     }
                                 }
@@ -269,9 +210,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                             // find span with classname equals annotator-hl in quote dom
                             for(var i=0;i<selectedList.length;i++) {
-
-                                //console.log(selectedList[i]);
-
                                 //filter annotator-mp
                                 while(selectedList[i].parentNode.className=="annotator-hl"||
                                 selectedList[i].parentNode.className=="annotator-currhl") {
@@ -335,8 +273,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                         var temp = list.pop();
                                         temp += parent.textContent;
 
-                                        console.log("5 push text to list:");
-                                        console.log(temp);
+                                        //console.log("5 push text to list:");
+                                        //console.log(temp);
                                         list.push(temp);
                                     }else {
                                         var temp = list.pop();
@@ -350,8 +288,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
                         }
-
-                        //console.log(list);
 
                         var flag = 0;
 
@@ -370,7 +306,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 listid.splice(i,1);
                             }
                         }
-                        console.log(allHighlightedDrug);
+                        //console.log(allHighlightedDrug);
 
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {

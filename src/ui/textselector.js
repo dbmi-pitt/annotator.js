@@ -68,8 +68,8 @@ TextSelector.prototype.captureDocumentSelection = function () {
         return [];
     }
 
-    console.log("TextSelector - captureDocumentSelection");
-    console.log(selection);
+    // console.log("TextSelector - captureDocumentSelection");
+    // console.log(selection);
 
     for (i = 0; i < selection.rangeCount; i++) {
         var r = selection.getRangeAt(i),

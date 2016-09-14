@@ -131,7 +131,7 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
                 dataRangesL.push(new DataRange(r, field, idx));
                 //console.log("temp draw by xpath: " + field);
             } else 
-                //console.log("[Error]: temp draw by xpath failed: " + field);
+                console.log("[Error]: temp draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
         // mark context

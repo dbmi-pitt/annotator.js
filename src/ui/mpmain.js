@@ -498,8 +498,7 @@ function main(options) {
         }
         ,
         annotationDeleted: function (ann) {
-            console.log("mpmain - annotationDeleted called");
-            console.log(ann);
+            //console.log("mpmain - annotationDeleted called");
             showAnnTable();
             setTimeout(function(){
                 annotationTable(options.source, options.email);

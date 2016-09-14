@@ -230,36 +230,26 @@ mpHighlighter.prototype.draw = function (annotation) {
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
 
-                if (data.auc.ranges != null || data.auc.hasTarget != null) {
-                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL);
-                }
+                if (data.auc.ranges != null || data.auc.hasTarget != null) 
+                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL);     
 
-                if (data.cmax.ranges != null || data.cmax.hasTarget != null) {
+                if (data.cmax.ranges != null || data.cmax.hasTarget != null) 
                     self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL);
-                }
-
-                if (data.clearance.ranges != null || data.clearance.hasTarget != null) {
-                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);
-                }
-
-                if (data.halflife.ranges != null || data.halflife.hasTarget !=null) {
-                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);
-                }
                 
+                if (data.clearance.ranges != null || data.clearance.hasTarget != null)
+                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);                
+                if (data.halflife.ranges != null || data.halflife.hasTarget !=null) 
+                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);                                
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
 
                 if (material != null){                    
-                    if (material.participants.ranges != null || material.participants.hasTarget != null) {
-                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL);
-                    }
-
-                    if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) {
-                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);
-                    }
-                    if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) {
-                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL);
-                    }
+                    if (material.participants.ranges != null || material.participants.hasTarget != null)
+                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL);                    
+                    if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) 
+                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);                    
+                    if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) 
+                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL);                    
                 }
             }
         }
