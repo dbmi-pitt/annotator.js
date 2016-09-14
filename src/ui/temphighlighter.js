@@ -180,28 +180,28 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                 var dataL = annotation.argues.supportsBy;
                 var data = dataL[currDataNum];
 
-                if (currentFormType == "auc" && (data.auc.ranges != null || data.auc.hasTarget != null)) 
-                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL);
+                if (currFormType == "auc" && (data.auc.ranges != null || data.auc.hasTarget != null)) 
+                    self.drawField(data.auc, "auc", currDataNum, dataRangesL, hldivL);
 
-                if (currentFormType == "cmax" && (data.cmax.ranges != null || data.cmax.hasTarget != null)) 
-                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL);
+                if (currFormType == "cmax" && (data.cmax.ranges != null || data.cmax.hasTarget != null)) 
+                    self.drawField(data.cmax, "cmax", currDataNum, dataRangesL, hldivL);
 
-                if (currentFormType == "clearance" && (data.clearance.ranges != null || data.clearance.hasTarget != null)) 
-                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);
-                if (currentFormType == "halflife" && (data.halflife.ranges != null || data.halflife.hasTarget != null)) 
-                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);               
+                if (currFormType == "clearance" && (data.clearance.ranges != null || data.clearance.hasTarget != null)) 
+                    self.drawField(data.clearance, "clearance", currDataNum, dataRangesL, hldivL);
+                if (currFormType == "halflife" && (data.halflife.ranges != null || data.halflife.hasTarget != null)) 
+                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL);               
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
                 if (material != null){                    
 
-                    if (currentFormType == "participants" && (material.participants.ranges != null || material.participants.hasTarget != null)) 
-                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL);
+                    if (currFormType == "participants" && (material.participants.ranges != null || material.participants.hasTarget != null)) 
+                        self.drawField(material.participants, "participants", currDataNum, dataRangesL, hldivL);
                     
-                    if (currentFormType == "dose1" && (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null)) 
-                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);
+                    if (currFormType == "dose1" && (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null)) 
+                        self.drawField(material.drug1Dose, "dose1", currDataNum, dataRangesL, hldivL);
                     
-                    if (currentFormType == "dose2" && (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null)) 
-                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL);                                                
+                    if (currFormType == "dose2" && (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null)) 
+                        self.drawField(material.drug2Dose, "dose2", currDataNum, dataRangesL, hldivL);                                                
                 }                                
             }
         }
