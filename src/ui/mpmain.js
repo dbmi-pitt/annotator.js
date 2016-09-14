@@ -304,7 +304,8 @@ function main(options) {
 
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
-
+                //console.log($("#__p2"));
+                //console.log(rangeChildNodes);
 
                 if (ranges.length > 0) {
                     //var mpAnnotation = makeMPAnnotation(ranges);

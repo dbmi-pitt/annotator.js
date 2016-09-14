@@ -64,55 +64,78 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         nodes = annotation.childNodes;
                         console.log("TEST1");
                         console.log(annotation);
-                        console.log(nodes);
 
                         //--------------generate quote-----------------
                         var quoteobject = $("<div id='quotearea'/>");
                         var p = document.createElement("p");
 
-                        // if createing claim, there is no annotation id assigned yet
-                        if(annotation.id==undefined) {
-                            var childrenInQuote = nodes;
-                            var goodChild;
-                            var prevNode = null;
-                            for (var qi = 0; qi < childrenInQuote.length; qi++) {
-                                var tempContent = $(childrenInQuote[qi]).text();
-                                console.log(tempContent);
-                                while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
-                                    childrenInQuote[qi]= childrenInQuote[qi].parentNode;
-                                }
-                                if(!childrenInQuote[qi].isEqualNode(prevNode)) {
-                                    prevNode = childrenInQuote[qi];
-                                    goodChild = prevNode.cloneNode(true);
-                                    goodChild.innerHTML = tempContent;
-                                    p.appendChild(goodChild);
-                                }
+                        var goodChild;
+                        var prevNode = null;
+                        
+                        var childrenInQuote = $(".annotator-currhl"); // when highlighting in red, get all text nodes by class name annotator-currhl
+                        console.log(childrenInQuote);
+                        
+                        for (var qi = 0; qi < childrenInQuote.length; qi++) {
+                            var tempContent = $(childrenInQuote[qi]).text();
+                            
+                            while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+                                childrenInQuote[qi]= childrenInQuote[qi].parentNode;
                             }
-                            //console.log(p);
-                            //generate quote: edit an existed annotation
-                        } else {
-                            var tempChildrenOfClaim = [];
-                            var prevNode = null;
-                            tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
-                            var childrenOfClaim = [];
-                            for(var i=0;i<tempChildrenOfClaim.length;i++) {
-                                var tempContent = $(tempChildrenOfClaim[i]).text();
-                                while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
-                                    tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
-                                }
-                                if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
-                                    var goodChild = tempChildrenOfClaim[i].cloneNode(true);
-                                    goodChild.innerHTML = tempContent;
-                                    p.appendChild(goodChild);
-                                }
+                            if(!childrenInQuote[qi].isEqualNode(prevNode)) {
+                                prevNode = childrenInQuote[qi];
+                                goodChild = prevNode.cloneNode(true);
+                                goodChild.innerHTML = tempContent;
+                                p.appendChild(goodChild);
                             }
-                        }
+                        }                       
+
+                        // // if createing claim, there is no annotation id assigned yet
+                        // if(annotation.id==undefined) {
+                        //     var goodChild;
+                        //     var prevNode = null;
+
+                        //     //var childrenInQuote = nodes;
+                        //     var childrenInQuote = tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
+
+                        //     //console.log(childrenInQuote);
+
+                        //     for (var qi = 0; qi < childrenInQuote.length; qi++) {
+                        //         var tempContent = $(childrenInQuote[qi]).text();
+                        //         console.log(tempContent);
+
+                        //         while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+                        //             childrenInQuote[qi]= childrenInQuote[qi].parentNode;
+                        //         }
+                        //         if(!childrenInQuote[qi].isEqualNode(prevNode)) {
+                        //             prevNode = childrenInQuote[qi];
+                        //             goodChild = prevNode.cloneNode(true);
+                        //             goodChild.innerHTML = tempContent;
+                        //             p.appendChild(goodChild);
+                        //         }
+                        //     }
+                        //     //console.log(p);
+                        //     //generate quote: edit an existed annotation
+                        // } else {
+                        //     var tempChildrenOfClaim = [];
+                        //     var prevNode = null;
+                        //     tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
+                        //     var childrenOfClaim = [];
+
+                        //     for(var i=0;i<tempChildrenOfClaim.length;i++) {
+                        //         var tempContent = $(tempChildrenOfClaim[i]).text();
+                        //         while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
+                        //             tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
+                        //         }
+                        //         if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
+                        //             var goodChild = tempChildrenOfClaim[i].cloneNode(true);
+                        //             goodChild.innerHTML = tempContent;
+                        //             p.appendChild(goodChild);
+                        //         }
+                        //     }
+                        // }
 
                         $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
-
-                        //console.log("TEST2");
-                        //console.log(quotecontent);
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
                             quotecontent = quotecontent.split("annotator-currhl").join("");
