@@ -53,7 +53,6 @@ function annotationFactory(contextEl, ignoreSelector) {
         var prefix = "", suffix = "";
         prefix = getTxtFromNode(ranges[0].start, false, ignoreSelector, 50);
         suffix = getTxtFromNode(ranges[0].end, true, ignoreSelector, 50);
-
         return {
             argues : {
                 ranges: serializedRanges,
@@ -61,7 +60,7 @@ function annotationFactory(contextEl, ignoreSelector) {
                     hasSelector: {
                         "@type": "TextQuoteSelector",
                         "exact": text.join(' / '),
-                        "prefix": prefix, 
+                        "prefix": prefix,
                         "suffix": suffix
                     }
                 },
@@ -304,13 +303,10 @@ function main(options) {
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
                 if (ranges.length > 0) {
-                    //var mpAnnotation = makeMPAnnotation(ranges);
                     hlAnnotation = makeHLAnnotation(ranges);
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
-                    //s.mpadder.load(mpAnnotation, s.interactionPoint);
-
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
@@ -403,16 +399,46 @@ function main(options) {
 
         annotationsLoaded: function (anns, pageNumber) {
             if(pageNumber != undefined) {
+                //load by page
                 console.log("[load page " + pageNumber + "]");
                 var annsByPage = [];
                 for (var i = 0; i < anns.length; i++) {
                     if (anns[i].argues.ranges[0].start.substring(47, 48) == pageNumber)
                         annsByPage.push(anns[i]);
+
+                    else if (anns[i].argues.supportsBy.length != 0) {
+                        var data = anns[i].argues.supportsBy;
+                        for (var j = 0; j < data.length; j++) {
+                            if (typeof data[j].auc.ranges != "undefined" &&
+                                (data[j].auc.ranges[0].start.substring(47, 48) == pageNumber || data[j].auc.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].cmax.ranges != "undefined" &&
+                                (data[j].cmax.ranges[0].start.substring(47, 48) == pageNumber || data[j].cmax.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].halflife.ranges != "undefined" &&
+                                (data[j].halflife.ranges[0].start.substring(47, 48) == pageNumber || data[j].halflife.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].clearance.ranges != "undefined" &&
+                                (data[j].clearance.ranges[0].start.substring(47, 48) == pageNumber || data[j].clearance.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
+                                (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug1Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
+                                (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug2Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
+                                (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.participants.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            }
+                        }
+                    }
                 }
                 console.log("[num of annotations: " + annsByPage.length + "]")
                 s.hlhighlighter.drawAll(annsByPage);
                 s.mphighlighter.drawAll(annsByPage);
             } else {
+                //load one time
                 s.hlhighlighter.drawAll(anns);
                 s.mphighlighter.drawAll(anns);
             }

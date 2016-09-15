@@ -30,8 +30,8 @@
 	background-repeat: no-repeat;
 }
 
-.annotator-adderddi {
-	background-image: url(../img/annotator-icon-spriteDDI.png?embed);
+.annotator-adderselect {
+	background-image: url(../img/annotator-icon-spriteSelect.png?embed);
 	background-repeat: no-repeat;
 }
 
@@ -150,8 +150,8 @@ span[name="annotator-ddi"] {
 } 
 
 span[name="annotator-mp"] {
- 	background: #B0C4DE;
-	background: rgba(176, 196, 222, 0.4);
+ 	background: #969696;
+	background: rgba(45, 50, 64, 0.4);
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
 }
 
@@ -172,7 +172,7 @@ span[name="annotator-mp"] {
 /* NB: If you change the list of classes for which z-index is set,
        you should update setupDynamicStyle() in annotator.ui.main */
 .annotator-adderhl,
-.annotator-adderddi,
+.annotator-adderselect,
 .annotator-addermp,
 .annotator-outer,
 .annotator-notice {
@@ -183,7 +183,7 @@ span[name="annotator-mp"] {
 	z-index: 1010;
 }
 .annotator-adderhl,
-.annotator-adderddi,
+.annotator-adderselect,
 .annotator-addermp,
 .annotator-outer,
 .annotator-widget,
@@ -202,7 +202,7 @@ span[name="annotator-mp"] {
 /* Annotator Adder
 -------------------------------------------------------------------- */
 .annotator-adderhl,
-.annotator-adderddi {
+.annotator-adderselect {
 	margin-top: -48px;
 	margin-left: -24px;
 	width: 48px;
@@ -220,7 +220,7 @@ span[name="annotator-mp"] {
 .annotator-adderhl:hover {
 	background-position: center top;
 }
-.annotator-adderddi:hover {
+.annotator-adderselect:hover {
 	background-position: center top;
 }
 .annotator-addermp:hover {
@@ -230,7 +230,7 @@ span[name="annotator-mp"] {
 .annotator-adderhl:active {
 	background-position: center right;
 }
-.annotator-adderddi:active {
+.annotator-adderselect:active {
 	background-position: center right;
 }
 .annotator-addermp:active {
@@ -249,7 +249,7 @@ span[name="annotator-mp"] {
 	cursor: pointer;
 }
 
-.annotator-adderddi button {
+.annotator-adderselect button {
 	display: block;
 	width: 36px;
 	height: 41px;
