@@ -4,12 +4,12 @@
 var util = require('../util');
 var xUtil = require('../xutil');
 var textselector = require('./textselector');
+var crpgadder = require('./../mpPlugin/crosspageadder');
 
 // mp
 var mpadder = require('./../mpPlugin/adder');
 var mphighlighter = require('./../mpPlugin/highlighter');
 var currhighlighter = require('./temphighlighter');
-
 var mpeditor = require('./../mpPlugin/editor');
 var mpviewer = require('./../mpPlugin/viewer');
 
@@ -264,6 +264,21 @@ function main(options) {
         });
         s.hladder.attach();
 
+        // multi select adder
+        s.crpgadder = new crpgadder.Adder({
+            onCreate: function (ann) {
+                console.log(ann);
+                console.log(currAnnotation);
+                undrawCurrhighlighter();
+                s.currhighlighter.draw(currAnnotation, "add");
+                //app.annotations.create(ann);
+            },
+            onUpdate: function (ann) {
+                //app.annotations.update(ann);
+            }
+        });
+        s.crpgadder.attach();
+
         // mp editor
         s.mpeditor = new mpeditor.mpEditor({
             extensions: options.editorExtensions,
@@ -273,11 +288,9 @@ function main(options) {
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
                     $( "#dialog-claim-delete-confirm" ).show();
-
                 } else {
-
                     // delete confirmation for data & material
-                    $("#dialog-data-delete-confirm").show();
+                    $( "#dialog-data-delete-confirm" ).show();
                 }
             }
         });
@@ -307,9 +320,12 @@ function main(options) {
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
+                    s.crpgadder.load(hlAnnotation, s.interactionPoint);
+                    console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
+                    s.crpgadder.hide();
                 }
             }
         });
@@ -403,10 +419,19 @@ function main(options) {
                 console.log("[load page " + pageNumber + "]");
                 var annsByPage = [];
                 for (var i = 0; i < anns.length; i++) {
-                    if (anns[i].argues.ranges[0].start.substring(47, 48) == pageNumber)
-                        annsByPage.push(anns[i]);
+                    var ranges = anns[i].argues.ranges;
+                    var flag = false;
+                    for (var j = 0; j < ranges.length; j++) {
+                        if (ranges[j].start.substring(47, 48) == pageNumber) {
+                            annsByPage.push(anns[i]);
+                            flag = true;
+                            break;
+                        }
+                    }
 
-                    else if (anns[i].argues.supportsBy.length != 0) {
+                    //data(not claim) in this annotation may appear in different pages
+                    //In order to load them successfully, check them every time
+                    if (!flag && anns[i].argues.supportsBy.length != 0) {
                         var data = anns[i].argues.supportsBy;
                         for (var j = 0; j < data.length; j++) {
                             if (typeof data[j].auc.ranges != "undefined" &&

@@ -83,7 +83,7 @@ var Adder = Widget.extend({
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
                 top: position.top,
-                left: position.left + 35
+                left: position.left
             });
         }
         Widget.prototype.show.call(this);
@@ -99,7 +99,7 @@ var Adder = Widget.extend({
         if (event.which > 1) {
             return;
         }
-
+        multiSelected = true;
         event.preventDefault();
         // Prevent the selection code from firing when the mouse button is
         // released
@@ -147,21 +147,25 @@ var Adder = Widget.extend({
         // $('.annotator-adderddi').hide();
         $('.annotator-addermp').removeClass().addClass('annotator-addermp annotator-hide');
         $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
-        $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
+        //$('.annotator-adderddi').removeClass().addClass('annotator-adderhl annotator-hide');
 
         this.ignoreMouseup = false;
 
         // Create a new annotation
         if (this.annotation !== null && typeof this.onCreate === 'function') {
-            if (multiSelected == true) {
+            this.annotation.annotationType = "MP";
+
+            //multi select test code
+            if (currAnnotation == undefined) {
+                currAnnotation = this.annotation;
+                console.log(currAnnotation);
+            } else {
                 var newRange = this.annotation.argues.ranges[0];
                 console.log(newRange);
                 currAnnotation.argues.ranges.push(newRange);
                 console.log(currAnnotation);
-                this.annotation = currAnnotation;
-                multiSelected = false;
             }
-            this.annotation.annotationType = "DrugMention";
+
             this.onCreate(this.annotation, event);
         }
     }
@@ -169,7 +173,7 @@ var Adder = Widget.extend({
 
 Adder.template = [
 
-    '<div class="annotator-adderhl annotator-hide">',
+    '<div class="annotator-adderselect annotator-hide">',
 
     '  <button class="hl-adder-btn" type="button" title="Highlight">' + _t('Annotate') + '</button>',
     '</div>'

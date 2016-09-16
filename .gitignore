@@ -3,3 +3,11 @@
 doc/_build/
 node_modules/
 pkg/
+
+*.iml
+
+*.xml
+
+*.command
+
+*.psd
