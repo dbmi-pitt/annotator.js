@@ -149,7 +149,14 @@ Highlighter.prototype.draw = function (annotation) {
 
 
     var drugMention = annotation.argues;
-    if (drugMention.hasTarget != null) { // draw by oa selector
+
+    console.log("drughighlighter - called");
+
+    if (drugMention.hasTarget !=null) { // draw by oa selector
+        var drugName = drugMention.hasTarget.hasSelector.exact;
+
+        console.log("drug highlighter - drug: " + drugName);
+
         // mark context
         var options = {
             "element": "span",
@@ -164,20 +171,27 @@ Highlighter.prototype.draw = function (annotation) {
             }                
         };
 
-        var context = document.querySelector("#subcontent");          
-        var markObj = new Mark(context);        
-        markObj.mark(drugMention.hasTarget.hasSelector.exact, options);
+        try {
+            console.log("mphighlighter - drawField - use oaSelector");
 
-    } else if (drugMention.ranges != null) { // draw by ranges
+            var listP = document.getElementsByTagName("p"); // highlight within all p tag
+            for (var i=0; i < listP.length; i++) {
+                var instance = new Mark(listP[i]);
+                instance.mark(drugName, options);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+
+    } else if (drugMention.ranges.length > 0) { // draw by ranges
         for (var i = 0, ilen = drugMention.ranges.length; i < ilen; i++) {
             var r = reanchorRange(drugMention.ranges[i], this.element);   
             if (r !== null) { 
                 normedRanges.push(r);
-                console.log("draw drug by xpath");
+                console.log("draw drug by xpath: " + drugName);
             } else 
                 console.log("[Error]: draw by xpath failed: " + field);
         }
-
     }
 
     var hasLocal = (typeof annotation._local !== 'undefined' &&

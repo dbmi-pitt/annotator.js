@@ -150,18 +150,24 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 // hldivL - list for holding span wrapped text nodes
 function markOptions(fieldType, dataNum, hldivL) {
 
+    console.log("markOptions");
+
     return {
         "element": "span",
         "className": "annotator-hl",
         "separateWordSearch": false,
         "acrossElements": true,
-        "accuracy": "partially",
+        "accuracy": "partially"
+        ,
         "each": function(elem) {
             
             $(elem).attr('name', "annotator-mp");
             $(elem).attr('fieldname', fieldType);
             $(elem).attr('datanum', dataNum);     
             $(elem).attr('data-markjs', false);  
+
+            console.log($(elem));
+
             hldivL.push($(elem)[0]);
         }                
     };
@@ -175,7 +181,10 @@ function markOptions(fieldType, dataNum, hldivL) {
 // hldivL - list of span text nodes   
 mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
 
-    if (obj.ranges != null) { // draw by xpath range
+    //console.log("mphighlighter - drawField - called");
+    //console.log(obj);
+
+    if (obj.ranges.length > 0) { // draw by xpath range
         for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
             var r = reanchorRange(obj.ranges[i], this.element);   
             if (r !== null) { 
@@ -185,12 +194,16 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
                 console.log("[Error]: draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
-        // mark context
-        var context = document.querySelector("#subcontent");          
-        var markObj = new Mark(context);
+
+        console.log("mphighlighter - drawField - use oaSelector");
 
         var oaselector = obj.hasTarget.hasSelector;
-        markObj.mark(oaselector.exact, markOptions(field, idx, hldivL));
+        var listP = document.getElementsByTagName("p"); // highlight within all p tag
+        for (var i=0; i < listP.length; i++) {
+            var instance = new Mark(listP[i]);
+            instance.mark(oaselector.exact, markOptions(field, idx, hldivL));
+        }
+
         console.log("draw by oaselector: " + field);
     } else {
         console.log("[Warning]: draw failed on field: " + field);
