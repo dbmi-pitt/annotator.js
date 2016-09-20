@@ -166,7 +166,8 @@ Highlighter.prototype.draw = function (annotation) {
             "accuracy": "partially",
             "each": function(elem) {            
                 $(elem).attr('name', "annotator-hl");                
-                $(elem).attr('data-markjs', true); //on show once for drug highlight
+                //$(elem).attr('data-markjs', true); //on show once for drug highlight
+                $(elem).attr('data-markjs', false); 
                 hldivL.push($(elem)[0]);
             }                
         };
