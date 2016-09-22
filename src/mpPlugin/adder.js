@@ -94,7 +94,7 @@ var mpAdder = Widget.extend({
             this.element.css({
                 top: position.top,
                 // avoid overlapping with drug mention editor
-                left: position.left + 35
+                left: position.left + 70
             });
         }
         Widget.prototype.show.call(this);
@@ -161,8 +161,8 @@ var mpAdder = Widget.extend({
         this.hide();
         // Hide drug mention, mp and DDI adder
         $('.annotator-addermp').removeClass().addClass('annotator-addermp annotator-hide');
-        $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');     
-        //$('.annotator-adderddi').removeClass().addClass('annotator-adderhl annotator-hide');
+        $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
+        $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
 
 
         var editorType = currFormType;
@@ -175,7 +175,14 @@ var mpAdder = Widget.extend({
             isTextSelected = true;
             cachedOATarget = this.annotation.argues.hasTarget;
             cachedOARanges = this.annotation.argues.ranges;
-
+            if (multiSelected == true) {
+                var newRange = this.annotation.argues.ranges[0];
+                console.log(newRange);
+                currAnnotation.argues.ranges.push(newRange);
+                console.log(currAnnotation);
+                this.annotation = currAnnotation;
+                multiSelected = false;
+            }
             this.annotation.annotationType = "MP";
             this.onCreate(this.annotation, event);
         }        

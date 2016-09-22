@@ -62,16 +62,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         var nodes = [];
                         nodes = annotation.childNodes;
-                        // console.log("claim - annotation.childNodes: ");
-                        // console.log(nodes);
+                        console.log("claim - annotation.childNodes: ");
+                        console.log(nodes);
 
                         //--------------generate quote-----------------
                         var quoteobject = $("<div id='quotearea'/>");
                         var p = document.createElement("p");
 
                         //generate quote: add new annotation
-                        if(annotation.id==undefined) {
-                            var childrenInQuote = nodes;
+                        /*if(annotation.id==undefined) {
+                            var childrenInQuote = $(".annotator-currhl");
                             var goodChild;
                             var prevNode = null;
                             for (var qi = 0; qi < childrenInQuote.length; qi++) {
@@ -89,9 +89,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                             //console.log(p);
                             //generate quote: edit an existed annotation
-                        } else {
+                        } else {*/
                             var tempChildrenOfClaim = [];
                             var prevNode = null;
+                            var goodChild;
                             tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
                             var childrenOfClaim = [];
                             for(var i=0;i<tempChildrenOfClaim.length;i++) {
@@ -100,16 +101,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
                                 }
                                 if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
-                                    var goodChild = tempChildrenOfClaim[i].cloneNode(true);
+                                    prevNode = tempChildrenOfClaim[i];
+                                    goodChild = tempChildrenOfClaim[i].cloneNode(true);
                                     goodChild.innerHTML = tempContent;
                                     p.appendChild(goodChild);
                                 }
                             }
-                        }
+
 
                         $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
-                        //console.log(quotecontent);
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
                             quotecontent = quotecontent.split("annotator-currhl").join("");
@@ -140,17 +141,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var parent;
                         var childID = 0;
 
-                        if(annotation.id==undefined) {
+                        /*if(annotation.id==undefined) {
                              //store node whose classname is "annotator-hl"
-                            for(var i=0;i<nodes.length;i++) {
+                            var currList = $('.annotator-currhl');
+                            for(var i=0;i<currList.length;i++) {
                                 //filter annotator-mp
-                                var currnode = nodes[i];
-                                while(nodes[i].parentNode.className=="annotator-hl"||
-                                nodes[i].parentNode.className=="annotator-currhl") {
-                                    nodes[i]= nodes[i].parentNode;
+                                var currnode = currList[i];
+                                while(currList[i].parentNode.className=="annotator-hl"||
+                                currList[i].parentNode.className=="annotator-currhl") {
+                                    currList[i]= currList[i].parentNode;
                                 }
-                                if($(nodes[i]).attr("name") == "annotator-hl") {
-                                    selectedList.push(nodes[i].cloneNode(true));
+                                if($(currList[i]).attr("name") == "annotator-hl") {
+                                    selectedList.push(currList[i].cloneNode(true));
                                     selectedNodes.push(currnode);
                                 }
                             }
@@ -185,7 +187,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
 
-                        }else{
+                        }else{*/
                             selectedList = $('.annotator-currhl');
                             var drugNodes = [];
                             for(var i=0;i<selectedList.length;i++) {
@@ -226,7 +228,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     }
                                 }
                             }
-                        }
 
                         var flag = 0;
 

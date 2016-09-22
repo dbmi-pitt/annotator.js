@@ -4,12 +4,12 @@
 var util = require('../util');
 var xUtil = require('../xutil');
 var textselector = require('./textselector');
+var crpgadder = require('./../mpPlugin/crosspageadder');
 
 // mp
 var mpadder = require('./../mpPlugin/adder');
 var mphighlighter = require('./../mpPlugin/highlighter');
 var currhighlighter = require('./temphighlighter');
-
 var mpeditor = require('./../mpPlugin/editor');
 var mpviewer = require('./../mpPlugin/viewer');
 
@@ -53,7 +53,6 @@ function annotationFactory(contextEl, ignoreSelector) {
         var prefix = "", suffix = "";
         prefix = getTxtFromNode(ranges[0].start, false, ignoreSelector, 50);
         suffix = getTxtFromNode(ranges[0].end, true, ignoreSelector, 50);
-
         return {
             argues : {
                 ranges: serializedRanges,
@@ -61,7 +60,7 @@ function annotationFactory(contextEl, ignoreSelector) {
                     hasSelector: {
                         "@type": "TextQuoteSelector",
                         "exact": text.join(' / '),
-                        "prefix": prefix, 
+                        "prefix": prefix,
                         "suffix": suffix
                     }
                 },
@@ -265,6 +264,21 @@ function main(options) {
         });
         s.hladder.attach();
 
+        // multi select adder
+        s.crpgadder = new crpgadder.Adder({
+            onCreate: function (ann) {
+                console.log(ann);
+                console.log(currAnnotation);
+                undrawCurrhighlighter();
+                s.currhighlighter.draw(currAnnotation, "add");
+                //app.annotations.create(ann);
+            },
+            onUpdate: function (ann) {
+                //app.annotations.update(ann);
+            }
+        });
+        s.crpgadder.attach();
+
         // mp editor
         s.mpeditor = new mpeditor.mpEditor({
             extensions: options.editorExtensions,
@@ -274,11 +288,9 @@ function main(options) {
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
                     $( "#dialog-claim-delete-confirm" ).show();
-
                 } else {
-
                     // delete confirmation for data & material
-                    $("#dialog-data-delete-confirm").show();
+                    $( "#dialog-data-delete-confirm" ).show();
                 }
             }
         });
@@ -304,16 +316,16 @@ function main(options) {
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
                 if (ranges.length > 0) {
-                    //var mpAnnotation = makeMPAnnotation(ranges);
                     hlAnnotation = makeHLAnnotation(ranges);
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
-                    //s.mpadder.load(mpAnnotation, s.interactionPoint);
-
+                    s.crpgadder.load(hlAnnotation, s.interactionPoint);
+                    console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
+                    s.crpgadder.hide();
                 }
             }
         });
@@ -401,9 +413,60 @@ function main(options) {
             removeDynamicStyle();
         },
 
-        annotationsLoaded: function (anns) {
-            s.hlhighlighter.drawAll(anns);
-            s.mphighlighter.drawAll(anns);
+        annotationsLoaded: function (anns, pageNumber) {
+            if(pageNumber != undefined) {
+                //load by page
+                console.log("[load page " + pageNumber + "]");
+                var annsByPage = [];
+                for (var i = 0; i < anns.length; i++) {
+                    var ranges = anns[i].argues.ranges;
+                    var flag = false;
+                    for (var j = 0; j < ranges.length; j++) {
+                        if (ranges[j].start.substring(47, 48) == pageNumber) {
+                            annsByPage.push(anns[i]);
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    //data(not claim) in this annotation may appear in different pages
+                    //In order to load them successfully, check them every time
+                    if (!flag && anns[i].argues.supportsBy.length != 0) {
+                        var data = anns[i].argues.supportsBy;
+                        for (var j = 0; j < data.length; j++) {
+                            if (typeof data[j].auc.ranges != "undefined" &&
+                                (data[j].auc.ranges[0].start.substring(47, 48) == pageNumber || data[j].auc.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].cmax.ranges != "undefined" &&
+                                (data[j].cmax.ranges[0].start.substring(47, 48) == pageNumber || data[j].cmax.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].halflife.ranges != "undefined" &&
+                                (data[j].halflife.ranges[0].start.substring(47, 48) == pageNumber || data[j].halflife.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].clearance.ranges != "undefined" &&
+                                (data[j].clearance.ranges[0].start.substring(47, 48) == pageNumber || data[j].clearance.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
+                                (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug1Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
+                                (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug2Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
+                                (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.participants.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                annsByPage.push(anns[i]);
+                            }
+                        }
+                    }
+                }
+                console.log("[num of annotations: " + annsByPage.length + "]")
+                s.hlhighlighter.drawAll(annsByPage);
+                s.mphighlighter.drawAll(annsByPage);
+            } else {
+                //load one time
+                s.hlhighlighter.drawAll(anns);
+                s.mphighlighter.drawAll(anns);
+            }
         },
 
         beforeAnnotationCreated: function (annotation) {
