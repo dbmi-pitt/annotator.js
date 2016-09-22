@@ -99,7 +99,6 @@ var Adder = Widget.extend({
         if (event.which > 1) {
             return;
         }
-        multiSelected = true;
         event.preventDefault();
         // Prevent the selection code from firing when the mouse button is
         // released
@@ -156,7 +155,7 @@ var Adder = Widget.extend({
             this.annotation.annotationType = "MP";
 
             //multi select test code
-            if (currAnnotation == undefined) {
+            if (currAnnotation == undefined || multiSelected == false) {
                 currAnnotation = this.annotation;
                 console.log(currAnnotation);
             } else {
@@ -165,7 +164,7 @@ var Adder = Widget.extend({
                 currAnnotation.argues.ranges.push(newRange);
                 console.log(currAnnotation);
             }
-
+            multiSelected = true;
             this.onCreate(this.annotation, event);
         }
     }
