@@ -65,29 +65,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         console.log(annotation);
 
                         //--------------generate quote-----------------
-                        var quoteobject = $("<div id='quotearea'/>");
-                        var p = document.createElement("p");
 
-                        var goodChild;
-                        var prevNode = null;
-                        
                         var childrenInQuote = $(".annotator-currhl"); // when highlighting in red, get all text nodes by class name annotator-currhl
-                        
-                        for (var qi = 0; qi < childrenInQuote.length; qi++) {
-                            var tempContent = $(childrenInQuote[qi]).text();
-                            
-                            while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
-                                childrenInQuote[qi]= childrenInQuote[qi].parentNode;
-                            }
-                            if(!childrenInQuote[qi].isEqualNode(prevNode)) {
-                                prevNode = childrenInQuote[qi];
-                                goodChild = prevNode.cloneNode(true);
-                                goodChild.innerHTML = tempContent;
-                                p.appendChild(goodChild);
-                            }
-                        }                       
+                        var selectedList = childrenInQuote; 
+                        var quoteobject = $("<div id='quotearea'/>"); // quote area as DOM obj                       
+                                                
+                        var divP = generateQuoteArea(childrenInQuote); // create current highlight contents
+                        $(quoteobject).append(divP);
 
-                        $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
@@ -101,196 +86,65 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         while(quotecontent.indexOf(" name=\"annotator-hl\"")!=-1) {
                             quotecontent = quotecontent.split(" name=\"annotator-hl\"").join("");
                         }
-                        //console.log(quotecontent);
+
                         $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
 
                         //find drugs which only be highlighted in this claim
                         //--------------- generate list and listid array ----------------
-                        var list = []; //used to store drugs
-                        var listid = [];
-                        var drugList = document.getElementsByName('annotator-hl');
+                        var list = []; // list of drug name in string
+                        var listid = []; // list of drug mention annotation id
 
                         var selectedNodes = [];                        
-                        var selectedList = [];
                         var prev = "";
                         var prevNode = null;
-                        var parent;
-                        var childID = 0;
+                        var parentNode;
+                        var drugNodes = [];
 
-                        // if createing claim, there is no annotation id assigned yet
-                        if(annotation.id==undefined) {
-                             //store node whose classname is "annotator-hl"
-                            for(var i=0;i<nodes.length;i++) {
-                                //filter annotator-mp
-                                var currnode = nodes[i];
-
-                                //console.log(currnode);
-
-                                while(nodes[i].parentNode.className=="annotator-hl"||
-                                      nodes[i].parentNode.className=="annotator-currhl") {
-                                    nodes[i]= nodes[i].parentNode;
-                                }                                
-
-                                if($(nodes[i]).attr("name") == "annotator-hl") {
-                                    selectedList.push(nodes[i].cloneNode(true));
-                                    selectedNodes.push(currnode);
-                                }
+                        // find span with classname equals annotator-hl in quote dom
+                        for(var i=0;i<selectedList.length;i++) {
+                            //filter annotator-mp
+                            while(selectedList[i].parentNode.className=="annotator-hl"||
+                                  selectedList[i].parentNode.className=="annotator-currhl") {
+                                selectedList[i]= selectedList[i].parentNode;
                             }
-                            //console.log("SELECTED LIST:");
-                            //console.log(selectedList);
-
-                            for(var i=0;i<selectedList.length;i++) {
-                                if(prev != selectedList[i].id) {
-                                    prev = selectedList[i].id;
-                                    prevNode = selectedList[i];
-                                    parent = selectedList[i];
-
-                                    childID = 0;
-
-                                    // while (parent.childNodes.length > 0)
-                                    //     parent = parent.childNodes[0];
-                                    while (parent.childNodes.length > 0) {
-                                        var innerNode = null;
-                                        // find inner span that not none 
-                                        for (var j=0; j<parent.childNodes.length; j++) {
-                                            if (parent.childNodes[j].textContent != "") {
-                                                innerNode = parent.childNodes[j];
-                                                break;
-                                            }
-                                        }
-                                        if (innerNode != null) 
-                                            parent = innerNode;  
-                                        else 
-                                            break;
-                                    }
-
-                                    list.push(parent.textContent);
-                                    listid.push(selectedList[i].id);                
-                                    //console.log(list);
-
-                                } else {
-
-                                    if(!selectedList[i].isEqualNode(prevNode)) {
-                                        parent = selectedList[i];
-
-                                        while (parent.childNodes.length > 0) {
-                                            var innerNode = null;
-                                            
-                                            // find inner span that not none 
-                                            for (var j=0; j<parent.childNodes.length; j++) {
-                                                if (parent.childNodes[j].textContent != "") {
-                                                innerNode = parent.childNodes[j];
-                                                    break;
-                                                }
-                                            }
-                                            if (innerNode != null) 
-                                                parent = innerNode;  
-                                            else 
-                                                break;
-                                        }
-                                        // while (parent.childNodes.length > 0)
-                                        //     parent = parent.childNodes[0];
-
-                                        var temp = list.pop();
-                                        temp += parent.textContent;
-
-                                        list.push(temp);
-                                    } else {
-                                        var temp = list.pop();
-                                        temp += selectedNodes[i].textContent;
-                                        list.push(temp);
-                                    }
-                                }
+                            if($(selectedList[i]).attr("name") == "annotator-hl") {
+                                drugNodes.push(selectedList[i].cloneNode(true));
                             }
-
-                        } else { // edit mp claim annotation
-                            selectedList = $('.annotator-currhl');
-                            var drugNodes = [];
-
-                            // find span with classname equals annotator-hl in quote dom
-                            for(var i=0;i<selectedList.length;i++) {
-                                //filter annotator-mp
-                                while(selectedList[i].parentNode.className=="annotator-hl"||
-                                selectedList[i].parentNode.className=="annotator-currhl") {
-                                    selectedList[i]= selectedList[i].parentNode;
-                                }
-                                if($(selectedList[i]).attr("name") == "annotator-hl") {
-                                    drugNodes.push(selectedList[i].cloneNode(true));
-                                }
-                            }
-                            //console.log(drugNodes);
-
-                            for(var i=0;i<drugNodes.length;i++) {
-
-                                // drug highlight in single span
-                                if(prev != drugNodes[i].id) {
-                                    prev = drugNodes[i].id;
-                                    prevNode = drugNodes[i];
-                                    parent = drugNodes[i];
-                                    childID = 0;
-
-                                    while (parent.childNodes.length > 0) {
-                                        var innerNode = null;
-                                        // find inner span that not none 
-                                        for (var j=0; j<parent.childNodes.length; j++) {
-                                            if (parent.childNodes[j].textContent != "") {
-                                                innerNode = parent.childNodes[j];
-                                                break;
-                                            }
-                                        }
-                                        if (innerNode != null) 
-                                            parent = innerNode;  
-                                        else 
-                                            break;
-                                    }
-
-                                    //console.log("4 push text to list:");
-                                    //console.log(parent.textContent);
-
-                                    list.push(parent.textContent);
-                                    listid.push(drugNodes[i].id);
+                        }
+                        //console.log(drugNodes);
+                        
+                        for(var i=0;i<drugNodes.length;i++) {
+                            
+                            // drug highlight in single span
+                            if(prev != drugNodes[i].id) {
+                                prev = drugNodes[i].id;
+                                prevNode = drugNodes[i];
+                                parentNode = moveToChildNode(drugNodes[i]);
+                                
+                                list.push(parentNode.textContent);
+                                listid.push(drugNodes[i].id);
+                            }else {
+                                // drug highlight is splitted in multiple spans
+                                if(!drugNodes[i].isEqualNode(prevNode)) {
+                                    
+                                    parentNode = moveToChildNode(drugNodes[i]);                                        
+                                    var temp = list.pop();
+                                    temp += parentNode.textContent;
+                                    
+                                    list.push(temp);
                                 }else {
-                                    // drug highlight is splitted in multiple spans
-                                    if(!drugNodes[i].isEqualNode(prevNode)) {
-                                        parent = drugNodes[i];
-                                        // move to most inner span node
-                                        while (parent.childNodes.length > 0) {
-                                            var innerNode = null;
-                                            // find inner span that not none 
-                                            for (var j=0; j<parent.childNodes.length; j++) {
-                                                if (parent.childNodes[j].textContent != "") {
-                                                    innerNode = parent.childNodes[j];
-                                                    break;
-                                                }
-                                            }
-                                            if (innerNode != null) 
-                                                parent = innerNode;  
-                                            else 
-                                                break;
-                                        }
-
-                                        var temp = list.pop();
-                                        temp += parent.textContent;
-
-                                        //console.log("5 push text to list:");
-                                        //console.log(temp);
-                                        list.push(temp);
-                                    }else {
-                                        var temp = list.pop();
-                                        temp += drugNodes[i].textContent;
-
-                                        //console.log("6 push text to list:");
-                                        //console.log(drugNodes[i].textContent);
-
-                                        list.push(drugNodes[i].textContent);
-                                    }
+                                    var temp = list.pop();
+                                    temp += drugNodes[i].textContent;
+                                    
+                                    list.push(drugNodes[i].textContent);
                                 }
                             }
                         }
 
-                        var flag = 0;
 
+                        var flag = 0;
+                    
                         //check drug list
                         var allHighlightedDrug = [];
                         var anns = annotations.slice();
@@ -307,7 +161,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                         }
                         //console.log(allHighlightedDrug);
-
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
                             // avoid replacing span itself add to dropdown box
@@ -486,14 +339,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         if ($('#participants').val().trim() != "" &&  partTmp.value != $('#participants').val()) {                            
                             partTmp.value = $('#participants').val();
 
-                            // if field not binded with text, then assign current span to it
-                            //if (partTmp.ranges == null && partTmp.hasTarget == null  && cachedOATarget != null && cachedOARanges != null) {
-                            // if (partTmp.hasTarget == null && cachedOATarget != null) {
-                            //     //partTmp.ranges = cachedOARanges;           
-                            //     partTmp.hasTarget = cachedOATarget;    
-                            // }
-                            // mpData.supportsBy.supportsBy.participants = partTmp;
-
                             if (partTmp.ranges == null) {
                                 partTmp.ranges = cachedOARanges;
                             }
@@ -514,12 +359,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose1Tmp.formulation = drug1F;
                             dose1Tmp.duration = drug1D;
                             dose1Tmp.regimens = drug1R;
-                            //if (dose1Tmp.ranges == null && dose1Tmp.hasTarget == null) {
-                            // if (dose1Tmp.hasTarget == null) {
-                            //     dose1Tmp.hasTarget = cachedOATarget;
-                            //     //dose1Tmp.ranges = cachedOARanges;
-                            // }
-                            // mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;  
 
                             if (dose1Tmp.ranges == null) {
                                 dose1Tmp.ranges = cachedOARanges;
@@ -1475,7 +1314,7 @@ function loadDataItemFromAnnotation(loadData) {
 
 
 
-
+// post process data form (1.show current data form and hide others. 2.show delete button if there are value been load. 3.hide nav list for ev relationship and study type data form)
 function postDataForm(targetField) {
 
     console.log("mpeditor - postDataForm: " + targetField);
@@ -1503,12 +1342,9 @@ function postDataForm(targetField) {
                 fieldVal = $("#" + fieldM[field]).val();
             } else { // when field is text input
                 $("#mp-data-nav").show();
-                console.log("TESTING DOSE:");
-                console.log(fieldM[field]);
                 fieldVal = $("#" + fieldM[field]).val();
             }
-
-            console.log(fieldVal);
+            //console.log(fieldVal);
                 
             if (fieldVal !=null && fieldVal != "")
                 $("#annotator-delete").show();
@@ -1524,7 +1360,7 @@ function postDataForm(targetField) {
     }
 }
 
-
+// clean all value of claim form
 function cleanClaimForm() {
 
     $("#quote").empty();
@@ -1545,7 +1381,7 @@ function cleanClaimForm() {
 
 }
 
-
+// clean all value of data form
 function cleanDataForm() {
     $("#participants").empty();
     $("#drug1Dose").empty();
@@ -1584,4 +1420,50 @@ function cleanDataForm() {
     // study type questions
     $('input[name=grouprandom]').prop('checked', false);
     $('input[name=parallelgroup]').prop('checked', false);    
+}
+
+// return not-none child node 
+function moveToChildNode(parent) {
+    // move to most inner span node
+    while (parent.childNodes.length > 0) {
+        var innerNode = null;
+        // find inner span that not none 
+        for (var j=0; j<parent.childNodes.length; j++) {
+            if (parent.childNodes[j].textContent != "") {
+                innerNode = parent.childNodes[j];
+                break;
+            }
+        }
+        if (innerNode != null) 
+            parent = innerNode;  
+        else 
+            break;                                            
+    }
+    return parent;
+}
+
+
+// inputs: nodes in current highlights
+// return quote content as list of DOM node 
+function generateQuoteArea(childrenInQuote) {
+    var p = document.createElement("p");
+    var prevNode = null; 
+    var goodChild; // good child means drug highlights with new parent node
+    
+    for (var qi = 0; qi < childrenInQuote.length; qi++) { 
+        var tempContent = $(childrenInQuote[qi]).text();
+        
+        // if parent node is hl or currhl, then move up to parent
+        while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+            childrenInQuote[qi]= childrenInQuote[qi].parentNode;
+        }
+        // if previous node and current node having the same parent, then skip. else, add current node to quote                             
+        if(!childrenInQuote[qi].isEqualNode(prevNode)) {
+            prevNode = childrenInQuote[qi];
+            goodChild = prevNode.cloneNode(true);
+            goodChild.innerHTML = tempContent;
+            p.appendChild(goodChild);
+        }
+    }                       
+    return p;
 }
