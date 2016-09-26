@@ -444,9 +444,16 @@ function main(options) {
         },
         annotationCreated: function (ann) {
             if (ann.annotationType == "MP"){
-                console.log("mpmain - annotationCreated called");
+                console.log("mpmain - annotationCreated called!");
+
                 s.mphighlighter.draw(ann);
                 currAnnotationId = ann.id;
+
+                // add current user to email list for import and update ann table
+                if (!userEmails.has(ann.email)) { 
+                    userEmails.add(ann.email);
+                }
+
                 updateAnnTable(ann.rawurl);
 
                 // show dialog for adding multiple claim/data on the same span
@@ -501,7 +508,7 @@ function main(options) {
             //console.log("mpmain - annotationDeleted called");
             showAnnTable();
             setTimeout(function(){
-                annotationTable(options.source, options.email);
+                updateAnnTable(options.source);
             },1000);
         }
     };
@@ -534,7 +541,7 @@ $( "#claim-delete-dialog-close" ).click(function() {
 
 //delete data confirmation
 $( "#data-delete-confirm-btn" ).click(function() {
-    //console.log("delete data: id = "+currAnnotation.id);
+
     $("#dialog-data-delete-confirm").hide();
     if (currFormType == "participants") {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};
