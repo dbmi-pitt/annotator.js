@@ -134,12 +134,26 @@ var mpEditor = exports.mpEditor = Widget.extend({
                        
                         if(claim.qualifiedBy!=undefined) {
                             //load fields from annotation.claim
+                            var existFlag = false;
                             $("#Drug1 > option").each(function () {
-                                if (this.value === claim.qualifiedBy.drug1ID) $(this).prop('selected', true);
+                                if (this.value === claim.qualifiedBy.drug1ID) {
+                                    $(this).prop('selected', true);
+                                    existFlag = true;
+                                }
                             });
+                            if (!existFlag) {
+                                $("#Drug1").val(claim.qualifiedBy.drug1 + "_0");
+                            }
+                            existFlag = false;
                             $('#Drug2 > option').each(function () {
-                                if (this.value === claim.qualifiedBy.drug2ID) $(this).prop('selected', true);
+                                if (this.value === claim.qualifiedBy.drug2ID) {
+                                    $(this).prop('selected', true);
+                                    existFlag = true;
+                                }
                             });
+                            if (!existFlag) {
+                                $("#Drug2").val(claim.qualifiedBy.drug2 + "_0");
+                            }
                         }
 
                         var drug1 = $('#Drug1 option:selected').text();
