@@ -447,7 +447,7 @@ function main(options) {
                 console.log("mpmain - annotationCreated called");
                 s.mphighlighter.draw(ann);
                 currAnnotationId = ann.id;
-                annotationTable(ann.rawurl, ann.email);
+                updateAnnTable(ann.rawurl);
 
                 // show dialog for adding multiple claim/data on the same span
                 addClaimDataDialog(ann);
@@ -484,7 +484,7 @@ function main(options) {
                 hlAnnotation = undefined;
                 s.mphighlighter.redraw(ann);
                 currAnnotationId = ann.id;
-                annotationTable(ann.rawurl, ann.email);
+                updateAnnTable(ann.rawurl);
            
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.redraw(ann);
