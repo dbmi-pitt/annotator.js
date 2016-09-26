@@ -64,7 +64,7 @@ function highlightRange(normedRange, cssClass, dataRange) {
 function reanchorRange(range, rootElement) {
     try {
 
-        console.log("reanchorRange");
+        //console.log("reanchorRange");
         return Range.sniff(range).normalize(rootElement);
     } catch (e) {
 
@@ -149,9 +149,6 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 // dataNum - data index
 // hldivL - list for holding span wrapped text nodes
 function markOptions(fieldType, dataNum, hldivL) {
-
-    console.log("markOptions");
-
     return {
         "element": "span",
         "className": "annotator-hl",
@@ -165,9 +162,6 @@ function markOptions(fieldType, dataNum, hldivL) {
             $(elem).attr('fieldname', fieldType);
             $(elem).attr('datanum', dataNum);     
             $(elem).attr('data-markjs', false);  
-
-            console.log($(elem));
-
             hldivL.push($(elem)[0]);
         }                
     };
@@ -189,13 +183,13 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
             var r = reanchorRange(obj.ranges[i], this.element);   
             if (r !== null) { 
                 dataRangesL.push(new DataRange(r, field, idx));
-                console.log("draw by xpath: " + field);
+                //console.log("draw by xpath: " + field);
             } else 
                 console.log("[Error]: draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
 
-        console.log("mphighlighter - drawField - use oaSelector");
+        //console.log("mphighlighter - drawField - use oaSelector");
 
         var oaselector = obj.hasTarget.hasSelector;
         var listP = document.getElementsByTagName("p"); // highlight within all p tag
@@ -204,7 +198,7 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
             instance.mark(oaselector.exact, markOptions(field, idx, hldivL));
         }
 
-        console.log("draw by oaselector: " + field);
+        //console.log("draw by oaselector: " + field);
     } else {
         console.log("[Warning]: draw failed on field: " + field);
         console.log(obj);

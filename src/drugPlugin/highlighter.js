@@ -173,7 +173,7 @@ Highlighter.prototype.draw = function (annotation) {
         };
 
         try {
-            console.log("mphighlighter - drawField - use oaSelector");
+            //console.log("mphighlighter - drawField - use oaSelector");
 
             var listP = document.getElementsByTagName("p"); // highlight within all p tag
             for (var i=0; i < listP.length; i++) {
@@ -189,7 +189,7 @@ Highlighter.prototype.draw = function (annotation) {
             var r = reanchorRange(drugMention.ranges[i], this.element);   
             if (r !== null) { 
                 normedRanges.push(r);
-                console.log("draw drug by xpath: " + drugName);
+                //console.log("draw drug by xpath: " + drugName);
             } else 
                 console.log("[Error]: draw by xpath failed: " + field);
         }
