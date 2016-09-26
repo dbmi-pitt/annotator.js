@@ -134,13 +134,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                        
                         if(claim.qualifiedBy!=undefined) {
                             //load fields from annotation.claim
-                            var existFlag = false;
+                            var existFlag = false; // if elasticsearch store has drugID info
                             $("#Drug1 > option").each(function () {
                                 if (this.value === claim.qualifiedBy.drug1ID) {
                                     $(this).prop('selected', true);
                                     existFlag = true;
                                 }
                             });
+                            //highlight by drugname when store lacks drugID
                             if (!existFlag) {
                                 $("#Drug1").val(claim.qualifiedBy.drug1 + "_0");
                             }
@@ -151,6 +152,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     existFlag = true;
                                 }
                             });
+                            //highlight by drugname when store lacks drugID
                             if (!existFlag) {
                                 $("#Drug2").val(claim.qualifiedBy.drug2 + "_0");
                             }
