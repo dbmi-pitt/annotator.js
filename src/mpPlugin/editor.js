@@ -60,19 +60,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // clean claim editor
                         cleanClaimForm();
 
-                        var nodes = [];
-                        nodes = annotation.childNodes;
-                        console.log(annotation);
-
                         //--------------generate quote-----------------
-
                         var childrenInQuote = $(".annotator-currhl"); // when highlighting in red, get all text nodes by class name annotator-currhl
-                        var selectedList = childrenInQuote; 
-                        var quoteobject = $("<div id='quotearea'/>"); // quote area as DOM obj                       
-                                                
-                        var divP = generateQuoteArea(childrenInQuote); // create current highlight contents
-                        $(quoteobject).append(divP);
+                        var quoteobject = $("<div id='quotearea'/>"); // quote area as DOM obj
 
+                        //find drugs which only be highlighted in this claim
+                        var list = []; //store drug name in this quote
+                        var listid = []; //store corresponding drug index in this quote
+
+                        var divP = generateQuoteArea(childrenInQuote, list, listid); // create current highlight contents
+                        $(quoteobject).append(divP);
                         var quotecontent = $(quoteobject).html();
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
@@ -82,69 +79,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-mp\"").join("");
                             quotecontent = quotecontent.split("name=\"annotator-mp\" class=\"annotator-hl\"").join("");
                         }
-
                         while(quotecontent.indexOf(" name=\"annotator-hl\"")!=-1) {
                             quotecontent = quotecontent.split(" name=\"annotator-hl\"").join("");
                         }
-
                         $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
 
-                        //find drugs which only be highlighted in this claim
-                        //--------------- generate list and listid array ----------------
-                        var list = []; // list of drug name in string
-                        var listid = []; // list of drug mention annotation id
 
-                        var selectedNodes = [];                        
-                        var prev = "";
-                        var prevNode = null;
-                        var parentNode;
-                        var drugNodes = [];
-
-                        // find span with classname equals annotator-hl in quote dom
-                        for(var i=0;i<selectedList.length;i++) {
-                            //filter annotator-mp
-                            while(selectedList[i].parentNode.className=="annotator-hl"||
-                                  selectedList[i].parentNode.className=="annotator-currhl") {
-                                selectedList[i]= selectedList[i].parentNode;
-                            }
-                            if($(selectedList[i]).attr("name") == "annotator-hl") {
-                                drugNodes.push(selectedList[i].cloneNode(true));
-                            }
-                        }
-                        //console.log(drugNodes);
-                        
-                        for(var i=0;i<drugNodes.length;i++) {
-                            
-                            // drug highlight in single span
-                            if(prev != drugNodes[i].id) {
-                                prev = drugNodes[i].id;
-                                prevNode = drugNodes[i];
-                                parentNode = moveToChildNode(drugNodes[i]);
-                                
-                                list.push(parentNode.textContent);
-                                listid.push(drugNodes[i].id);
-                            }else {
-                                // drug highlight is splitted in multiple spans
-                                if(!drugNodes[i].isEqualNode(prevNode)) {
-                                    
-                                    parentNode = moveToChildNode(drugNodes[i]);                                        
-                                    var temp = list.pop();
-                                    temp += parentNode.textContent;
-                                    
-                                    list.push(temp);
-                                }else {
-                                    var temp = list.pop();
-                                    temp += drugNodes[i].textContent;
-                                    
-                                    list.push(drugNodes[i].textContent);
-                                }
-                            }
-                        }
-
-
+                        //----------------generate drug dropdown list---------------
                         var flag = 0;
-                    
                         //check drug list
                         var allHighlightedDrug = [];
                         var anns = annotations.slice();
@@ -165,11 +108,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         for (var i = 0, len = list.length; i < len; i++) {
                             // avoid replacing span itself add to dropdown box
                             $('#Drug1').append($('<option>', {
-                                value: listid[i],
+                                value: list[i] + "_" + listid[i],
                                 text: list[i]
                             }));
                             $('#Drug2').append($('<option>', {
-                                value: listid[i],
+                                value: list[i] + "_" + listid[i],
                                 text: list[i]
                             }));
                             flag = flag + 1;
@@ -1437,7 +1380,7 @@ function moveToChildNode(parent) {
         if (innerNode != null) 
             parent = innerNode;  
         else 
-            break;                                            
+            break;
     }
     return parent;
 }
@@ -1445,10 +1388,11 @@ function moveToChildNode(parent) {
 
 // inputs: nodes in current highlights
 // return quote content as list of DOM node 
-function generateQuoteArea(childrenInQuote) {
+function generateQuoteArea(childrenInQuote, list, listid) {
     var p = document.createElement("p");
     var prevNode = null; 
     var goodChild; // good child means drug highlights with new parent node
+    var indexDict = {}; //hashmap<drugName, drugIndex>
     
     for (var qi = 0; qi < childrenInQuote.length; qi++) { 
         var tempContent = $(childrenInQuote[qi]).text();
@@ -1462,6 +1406,21 @@ function generateQuoteArea(childrenInQuote) {
             prevNode = childrenInQuote[qi];
             goodChild = prevNode.cloneNode(true);
             goodChild.innerHTML = tempContent;
+
+            //change drugMention elements' id to "drugName-drugIndex", e.g. terazosin-0
+            if (goodChild.getAttribute("name") == "annotator-hl") {
+                if (tempContent in indexDict) {
+                    indexDict[tempContent] = indexDict[tempContent] + 1;
+                    goodChild.id = tempContent + "_" + indexDict[tempContent];
+                    list.push(tempContent);
+                    listid.push(indexDict[tempContent]);
+                } else {
+                    indexDict[tempContent] = 0;
+                    goodChild.id = tempContent + "_" + indexDict[tempContent];
+                    list.push(tempContent);
+                    listid.push(indexDict[tempContent]);
+                }
+            }
             p.appendChild(goodChild);
         }
     }                       
