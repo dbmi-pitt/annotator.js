@@ -175,7 +175,7 @@ var mpAdder = Widget.extend({
             isTextSelected = true;
             cachedOATarget = this.annotation.argues.hasTarget;
             cachedOARanges = this.annotation.argues.ranges;
-            if (multiSelected == true) {
+            if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
                 var newRange = this.annotation.argues.ranges[0];
                 console.log(newRange);
                 currAnnotation.argues.ranges.push(newRange);
