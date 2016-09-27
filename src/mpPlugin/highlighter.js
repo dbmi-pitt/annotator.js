@@ -7,73 +7,6 @@ var util = require('../util');
 var $ = util.$;
 var Promise = util.Promise;
 
-function DataRange(range, field, dataNum) {
-    this.range = range;
-    this.field = field;
-    this.dataNum = dataNum;
-}
-
-
-
-// highlightRange wraps the DOM Nodes within the provided range with a highlight
-// element of the specified class and returns the highlight Elements.
-//
-// normedRange - A NormalizedRange to be highlighted.
-// cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
-//
-// Returns an array of highlight Elements.
-function highlightRange(normedRange, cssClass, dataRange) {
-    if (typeof cssClass === 'undefined' || cssClass === null) {
-        cssClass = 'annotator-hl';
-    }
-    var white = /^\s*$/;
-
-    // Ignore text nodes that contain only whitespace characters. This prevents
-    // spans being injected between elements that can only contain a restricted
-    // subset of nodes such as table rows and lists. This does mean that there
-    // may be the odd abandoned whitespace node in a paragraph that is skipped
-    // but better than breaking table layouts.
-    var nodes = normedRange.textNodes(),
-        results = [];
-
-    for (var i = 0, len = nodes.length; i < len; i++) {
-        var node = nodes[i];
-        if (!white.test(node.nodeValue)) {
-            var mphl = global.document.createElement('span');
-            mphl.className = cssClass;
-            mphl.setAttribute("name", "annotator-mp");
-            // add data field and data num for mp highlights 
-            mphl.setAttribute("fieldName", dataRange.field);
-            mphl.setAttribute("dataNum", dataRange.dataNum);
-            node.parentNode.replaceChild(mphl, node);
-            mphl.appendChild(node);
-            results.push(mphl);
-        }
-    }
-    return results;
-}
-
-
-// reanchorRange will attempt to normalize a range, swallowing Range.RangeErrors
-// for those ranges which are not reanchorable in the current document.
-function reanchorRange(range, rootElement) {
-    try {
-        return Range.sniff(range).normalize(rootElement);
-    } catch (e) {
-        if (!(e instanceof Range.RangeError)) {
-            // Oh Javascript, why you so crap? This will lose the traceback.
-            throw(e);
-        }
-        // Otherwise, we simply swallow the error. Callers are responsible
-        // for only trying to draw valid annotations.
-        console.log(e);
-    }
-
-    console.log("[ERROR] mphighlighter - reanchorRange - return null");
-    return null;
-}
-
-
 // Highlighter provides a simple way to draw highlighted <span> tags over
 // annotated ranges within a document.
 //
@@ -135,6 +68,25 @@ mpHighlighter.prototype.drawAll = function (annotations) {
     return p;
 };
 
+// Return customized options for mark.js highlight 
+function markOptions(fieldType, dataNum, hldivL) {
+    
+    return {
+        "element": "span",
+        "className": "annotator-hl",
+        "separateWordSearch": false,
+        "acrossElements": true,
+        "accuracy": "exactly",
+        "each": function(elem) {
+            $(elem).attr('name', "annotator-mp");
+            $(elem).attr('fieldname', fieldType);
+            $(elem).attr('datanum', dataNum);        
+            hldivL.push($(elem)[0]);
+        }                
+    };
+}
+
+
 // Public: Draw highlights for the MP annotation.
 // Including: claim, [{data, method, material}, {..}]
 // annotation - An annotation Object for which to draw highlights.
@@ -146,120 +98,65 @@ mpHighlighter.prototype.draw = function (annotation) {
         if (annotation.annotationType != "MP")
             return null;
     }
-    //var normedRanges = [];
-    var dataRangesL = [];
+
     var hldivL = [];
 
     try {       
+        // mark context
+        var context = document.querySelector("#subcontent");          
+        var markObj = new Mark(context);
 
         // draw MP claim        
-        var claimSelector = annotation.argues.hasTarget.hasSelector;
-
-        var context = document.querySelector("#subcontent");          
-        var instance = new Mark(context);
-        var options = {
-            "element": "span",
-            "className": "annotator-hl",
-            "separateWordSearch": false,
-            "acrossElements": true,
-            "accuracy": "exactly",
-            "each": function(elem) {
-                // $(elem).attr('id',  annotation.id + "-claim-0");
-                $(elem).attr('name', "annotator-mp");
-                $(elem).attr('fieldname', "claim");
-                $(elem).attr('datanum', 0);        
-                hldivL.push($(elem)[0]);
-            }
-                
-        };
-          
-        var markRes = instance.mark(claimSelector.exact, options);
-        if (markRes !== null) {
-            dataRangesL.push(new DataRange(markRes, "claim", 0));
-        } else {
-            console.log("[ERROR] range failed to reanchor");
-        } 
-        
-
-        // for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-        //     var r = reanchorRange(annotation.argues.ranges[i], this.element);
-
-        //     if (r !== null) {
-        //         //normedRanges.push(r);
-        //         dataRangesL.push(new DataRange(r, "claim", 0));
-        //     } else {
-        //         console.log("[ERROR] range failed to reanchor");
-        //         console.log(r);
-        //     }
-        // }
+        var claimSelector = annotation.argues.hasTarget.hasSelector;          
+        markObj.mark(claimSelector.exact, markOptions("claim",0, hldivL));
 
         // draw MP data
-        // if (annotation.argues.supportsBy.length != 0){
-            
-        //     // draw MP data
-        //     var dataL = annotation.argues.supportsBy;
+        if (annotation.argues.supportsBy.length != 0){            
+            var dataL = annotation.argues.supportsBy;
+            for (var idx = 0; idx < dataL.length; idx++) {
+                var data = dataL[idx];
 
+                if (data.auc.hasTarget != null) {
+                    var aucSelector = data.auc.hasTarget.hasSelector;
+                    markObj.mark(aucSelector.exact, markOptions("auc",idx, hldivL));
+                }
 
-        //     for (var idx = 0; idx < dataL.length; idx++) {
-        //         var data = dataL[idx];
+                if (data.cmax.hasTarget != null) {
+                    var cmaxSelector = data.cmax.hasTarget.hasSelector;
+                    markObj.mark(cmaxSelector.exact, markOptions("cmax",idx, hldivL));
+                }
 
-        //         if (data.auc.ranges != null) {
-        //             for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
-        //                 var r = reanchorRange(data.auc.ranges[i], this.element);   
-        //                 if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
-        //             }
-        //         }
+                if (data.clearance.hasTarget != null) {
+                    var clearanceSelector = data.clearance.hasTarget.hasSelector;
+                    markObj.mark(clearanceSelector.exact, markOptions("clearance",idx, hldivL));
+                }
 
-        //         if (data.cmax.ranges != null) {
-        //             for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
-        //                 var r = reanchorRange(data.cmax.ranges[i], this.element);   
-        //                 if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
-        //             }
-        //         }
-
-        //         if (data.clearance.ranges != null) {
-        //             for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
-        //                 var r = reanchorRange(data.clearance.ranges[i], this.element);   
-        //                 if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
-        //             }
-        //         }            
-
-        //         if (data.halflife.ranges != null) {
-        //             for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
-        //                 var r = reanchorRange(data.halflife.ranges[i], this.element);   
-        //                 if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
-        //             }
-        //         }
+                if (data.halflife.hasTarget != null) {
+                    var halflifeSelector = data.halflife.hasTarget.hasSelector;
+                    markObj.mark(halflifeSelector.exact, markOptions("halflife",idx, hldivL));
+                }
                 
-        //         // draw MP Material
-        //         var material = data.supportsBy.supportsBy;
-        //         if (material != null){
-                    
-        //             if (material.participants.ranges != null) {
-        //                 for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
-        //                     var r = reanchorRange(material.participants.ranges[i], this.element);
-        //                     //if (r !== null) normedRanges.push(r);  
-        //                     if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));  
-        //                 }                      
-        //             }
-                    
-        //             if (material.drug1Dose.ranges != null) {
-        //                 for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
-        //                     var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
-        //                     if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
-        //                 }
-        //             }
-        //             if (material.drug2Dose.ranges != null) {
-        //                 for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
-        //                     var r = reanchorRange(material.drug2Dose.ranges[i], this.element);   
-        //                     if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
-        //                 }
-        //             }
-                    
-        //         }
-        //     }
-        // }
-        //console.log(dataRangesL);
+                // draw MP Material
+                var material = data.supportsBy.supportsBy;
+
+                if (material != null){                    
+                    if (material.participants.hasTarget != null) {
+                        var partSelector = material.participants.hasTarget.hasSelector;
+                        markObj.mark(partSelector.exact, markOptions("participants",idx, hldivL));           
+                    }
+
+                    if (material.drug1Dose.hasTarget != null) {
+                        var dose1Selector = material.drug1Dose.hasTarget.hasSelector;
+                        markObj.mark(dose1Selector.exact, markOptions("drug1Dose",idx, hldivL));           
+                    }
+
+                    if (material.drug2Dose.hasTarget != null) {
+                        var dose2Selector = material.drug2Dose.hasTarget.hasSelector;
+                        markObj.mark(dose2Selector.exact, markOptions("drug2Dose",idx, hldivL));           
+                    }                                     
+                }
+            }
+        }
     } catch (err) {
         console.log(err);
     }
@@ -276,17 +173,10 @@ mpHighlighter.prototype.draw = function (annotation) {
         annotation._local.highlights = [];
     }
 
+    // add highlight span divs to annotation._local
+    $.merge(annotation._local.highlights, hldivL);    
     console.log(annotation);
 
-    // for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
-    //     var dataNormed = dataRangesL[j];
-    //     $.merge(
-    //         annotation._local.highlights,
-    //         highlightRange(dataNormed.range, this.options.highlightClass, dataNormed));
-    //}
-
-    $.merge(annotation._local.highlights, hldivL);
-    
     //Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);
 
@@ -321,9 +211,11 @@ mpHighlighter.prototype.undraw = function (annotation) {
 
         for (i = 0; i < localhighlights.length; i++){
             var mpSpan = localhighlights[i];
+
             if (mpSpan.parentNode !== null) 
                 $(mpSpan).replaceWith(mpSpan.childNodes);
         }
+
     } else {        
 
         for (var i = 0, len = annotation._local.highlights.length; i < len; i++) 

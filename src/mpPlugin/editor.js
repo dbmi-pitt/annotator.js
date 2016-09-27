@@ -62,51 +62,29 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         var nodes = [];
                         nodes = annotation.childNodes;
-                        console.log("claim - annotation.childNodes: ");
-                        console.log(nodes);
 
                         //--------------generate quote-----------------
                         var quoteobject = $("<div id='quotearea'/>");
                         var p = document.createElement("p");
 
                         //generate quote: add new annotation
-                        /*if(annotation.id==undefined) {
-                            var childrenInQuote = $(".annotator-currhl");
-                            var goodChild;
-                            var prevNode = null;
-                            for (var qi = 0; qi < childrenInQuote.length; qi++) {
-                                var tempContent = $(childrenInQuote[qi]).text();
-                                while(childrenInQuote[qi].parentNode.className=="annotator-hl"||
-                                childrenInQuote[qi].parentNode.className=="annotator-currhl") {
-                                    childrenInQuote[qi]= childrenInQuote[qi].parentNode;
-                                }
-                                if(!childrenInQuote[qi].isEqualNode(prevNode)) {
-                                    prevNode = childrenInQuote[qi];
-                                    goodChild = prevNode.cloneNode(true);
-                                    goodChild.innerHTML = tempContent;
-                                    p.appendChild(goodChild);
-                                }
+                        var tempChildrenOfClaim = [];
+                        var prevNode = null;
+                        var goodChild;
+                        tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
+                        var childrenOfClaim = [];
+                        for(var i=0;i<tempChildrenOfClaim.length;i++) {
+                            var tempContent = $(tempChildrenOfClaim[i]).text();
+                            while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
+                                tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
                             }
-                            //console.log(p);
-                            //generate quote: edit an existed annotation
-                        } else {*/
-                            var tempChildrenOfClaim = [];
-                            var prevNode = null;
-                            var goodChild;
-                            tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
-                            var childrenOfClaim = [];
-                            for(var i=0;i<tempChildrenOfClaim.length;i++) {
-                                var tempContent = $(tempChildrenOfClaim[i]).text();
-                                while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
-                                    tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
-                                }
-                                if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
-                                    prevNode = tempChildrenOfClaim[i];
-                                    goodChild = tempChildrenOfClaim[i].cloneNode(true);
-                                    goodChild.innerHTML = tempContent;
-                                    p.appendChild(goodChild);
-                                }
+                            if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
+                                prevNode = tempChildrenOfClaim[i];
+                                goodChild = tempChildrenOfClaim[i].cloneNode(true);
+                                goodChild.innerHTML = tempContent;
+                                p.appendChild(goodChild);
                             }
+                        }
 
 
                         $(quoteobject).append(p);
@@ -141,96 +119,49 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var parent;
                         var childID = 0;
 
-                        /*if(annotation.id==undefined) {
-                             //store node whose classname is "annotator-hl"
-                            var currList = $('.annotator-currhl');
-                            for(var i=0;i<currList.length;i++) {
-                                //filter annotator-mp
-                                var currnode = currList[i];
-                                while(currList[i].parentNode.className=="annotator-hl"||
-                                currList[i].parentNode.className=="annotator-currhl") {
-                                    currList[i]= currList[i].parentNode;
-                                }
-                                if($(currList[i]).attr("name") == "annotator-hl") {
-                                    selectedList.push(currList[i].cloneNode(true));
-                                    selectedNodes.push(currnode);
-                                }
+                        selectedList = $('.annotator-currhl');
+                        var drugNodes = [];
+                        for(var i=0;i<selectedList.length;i++) {
+                            //filter annotator-mp
+                            while(selectedList[i].parentNode.className=="annotator-hl"||
+                                  selectedList[i].parentNode.className=="annotator-currhl") {
+                                selectedList[i]= selectedList[i].parentNode;
                             }
-
-                            //console.log(selectedList);
-
-                            for(var i=0;i<selectedList.length;i++) {
-                                if(prev != selectedList[i].id) {
-                                    prev = selectedList[i].id;
-                                    prevNode = selectedList[i];
-                                    parent = selectedList[i];
-
-                                    childID = 0;
-                                    while (parent.childNodes.length > 0)
-                                        parent = parent.childNodes[0];
-                                    list.push(parent.textContent);
-                                    listid.push(selectedList[i].id);
-                                }else {
-
-                                    if(!selectedList[i].isEqualNode(prevNode)) {
-                                        parent = selectedList[i];
-                                        while (parent.childNodes.length > 0)
-                                            parent = parent.childNodes[0];
-                                        var temp = list.pop();
-                                        temp += parent.textContent;
-                                        list.push(temp);
-                                    }else {
-                                        var temp = list.pop();
-                                        temp += selectedNodes[i].textContent;
-                                        list.push(temp);
-                                    }
-                                }
+                            if($(selectedList[i]).attr("name") == "annotator-hl") {
+                                drugNodes.push(selectedList[i].cloneNode(true));
                             }
-
-                        }else{*/
-                            selectedList = $('.annotator-currhl');
-                            var drugNodes = [];
-                            for(var i=0;i<selectedList.length;i++) {
-                                //filter annotator-mp
-                                while(selectedList[i].parentNode.className=="annotator-hl"||
-                                selectedList[i].parentNode.className=="annotator-currhl") {
-                                    selectedList[i]= selectedList[i].parentNode;
-                                }
-                                if($(selectedList[i]).attr("name") == "annotator-hl") {
-                                    drugNodes.push(selectedList[i].cloneNode(true));
-                                }
-                            }
-                            //console.log(drugNodes);
-                            for(var i=0;i<drugNodes.length;i++) {
-                                if(prev != drugNodes[i].id) {
-                                    prev = drugNodes[i].id;
-                                    prevNode = drugNodes[i];
+                        }
+                        //console.log(drugNodes);
+                        for(var i=0;i<drugNodes.length;i++) {
+                            if(prev != drugNodes[i].id) {
+                                prev = drugNodes[i].id;
+                                prevNode = drugNodes[i];
+                                parent = drugNodes[i];
+                                
+                                childID = 0;
+                                while (parent.childNodes.length > 0)
+                                    parent = parent.childNodes[0];
+                                list.push(parent.textContent);
+                                listid.push(drugNodes[i].id);
+                            }else {
+                                
+                                if(!drugNodes[i].isEqualNode(prevNode)) {
                                     parent = drugNodes[i];
-
-                                    childID = 0;
                                     while (parent.childNodes.length > 0)
                                         parent = parent.childNodes[0];
-                                    list.push(parent.textContent);
-                                    listid.push(drugNodes[i].id);
+                                    var temp = list.pop();
+                                    temp += parent.textContent;
+                                    list.push(temp);
                                 }else {
-
-                                    if(!drugNodes[i].isEqualNode(prevNode)) {
-                                        parent = drugNodes[i];
-                                        while (parent.childNodes.length > 0)
-                                            parent = parent.childNodes[0];
-                                        var temp = list.pop();
-                                        temp += parent.textContent;
-                                        list.push(temp);
-                                    }else {
-                                        var temp = list.pop();
-                                        temp += drugNodes[i].textContent;
-                                        list.push(drugNodes[i].textContent);
-                                    }
+                                    var temp = list.pop();
+                                    temp += drugNodes[i].textContent;
+                                    list.push(drugNodes[i].textContent);
                                 }
                             }
-
+                        }
+                        
                         var flag = 0;
-
+                        
                         //check drug list
                         var allHighlightedDrug = [];
                         var anns = annotations.slice();
