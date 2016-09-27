@@ -41,7 +41,7 @@ function annotationFactory(contextEl, ignoreSelector) {
     return function (ranges) {
         var text = [],
             serializedRanges = [];
-            //console.log(ranges);
+
         for (var i = 0, len = ranges.length; i < len; i++) {
             var r = ranges[i];
             text.push(trim(r.text()));
@@ -313,8 +313,12 @@ function main(options) {
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
                 console.log("mpmain - textselector - onSelection");
+
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
+                //console.log($("#__p2"));
+                //console.log(rangeChildNodes);
+
                 if (ranges.length > 0) {
                     hlAnnotation = makeHLAnnotation(ranges);
                     s.interactionPoint = util.mousePosition(event);
@@ -480,7 +484,11 @@ function main(options) {
 		    annotation.rawurl = options.source;
     		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
 		    annotation.email = options.email;
-            annotation.childNodes = rangeChildNodes;
+
+            console.log("beforeAnnotationCreated");
+
+            // keep text selection in annotation for draw current annotating text
+            annotation.childNodes = rangeChildNodes; 
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
                 s.currhighlighter.draw(annotation, "add");
@@ -499,10 +507,17 @@ function main(options) {
         },
         annotationCreated: function (ann) {
             if (ann.annotationType == "MP"){
-                console.log("mpmain - annotationCreated called");
+                console.log("mpmain - annotationCreated called!");
+
                 s.mphighlighter.draw(ann);
                 currAnnotationId = ann.id;
-                annotationTable(ann.rawurl, ann.email);
+
+                // add current user to email list for import and update ann table
+                if (!userEmails.has(ann.email)) { 
+                    userEmails.add(ann.email);
+                }
+
+                updateAnnTable(ann.rawurl);
 
                 // show dialog for adding multiple claim/data on the same span
                 addClaimDataDialog(ann);
@@ -523,7 +538,6 @@ function main(options) {
 
                 } else {
                     s.currhighlighter.draw(hlAnnotation, "add");
-
                 }
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
@@ -540,7 +554,7 @@ function main(options) {
                 hlAnnotation = undefined;
                 s.mphighlighter.redraw(ann);
                 currAnnotationId = ann.id;
-                annotationTable(ann.rawurl, ann.email);
+                updateAnnTable(ann.rawurl);
            
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.redraw(ann);
@@ -554,11 +568,10 @@ function main(options) {
         }
         ,
         annotationDeleted: function (ann) {
-            console.log("mpmain - annotationDeleted called");
-            console.log(ann);
+            //console.log("mpmain - annotationDeleted called");
             showAnnTable();
             setTimeout(function(){
-                annotationTable(options.source, options.email);
+                updateAnnTable(options.source);
             },1000);
         }
     };
@@ -591,7 +604,7 @@ $( "#claim-delete-dialog-close" ).click(function() {
 
 //delete data confirmation
 $( "#data-delete-confirm-btn" ).click(function() {
-    //console.log("delete data: id = "+currAnnotation.id);
+
     $("#dialog-data-delete-confirm").hide();
     if (currFormType == "participants") {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.participants = {};

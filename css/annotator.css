@@ -1346,7 +1346,7 @@ input[type="radio"] {
 /*table tr:nth-of-type(odd),table tr:nth-of-type(odd){background-color:#EEF9FF}.main-content .content-full table.alt tr:nth-of-type(odd){background-color:#FFF}.main-content .content-full table.alt tr:nth-of-type(even){background-color:#EEF9FF}.main-content .content-full .norows table tr:nth-of-type(odd),.norows table tr:nth-of-type(odd){background-color:#fff}
 /*.viewertable tr:nth-of-type(odd),.viewertable tr:nth-of-type(odd){background-color:#EEF9FF}.main-content .content-full .viewertable.alt tr:nth-of-type(odd){background-color:#FFF}.main-content .content-full .viewertable.alt tr:nth-of-type(even){background-color:#EEF9FF}.main-content .content-full .norows .viewertable tr:nth-of-type(odd),.norows .viewertable tr:nth-of-type(odd){background-color:#fff}*/
 
-/* dialog box styles
+/* dialog warning box styles
 -------------------------------------------------------------------- */
 
 /* Pop up dialog (background) */
@@ -1385,6 +1385,7 @@ input[type="radio"] {
     font-size: 13px;
     border: 3px solid #3e72a6;
 }
+
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
@@ -1438,10 +1439,44 @@ input[type="radio"] {
 	font-family:  "Myriad Web",Verdana,Helvetica,Arial,sans-serif;
 }
 
-#mp-claim-data-tb th, td {
-	border: 1px solid #969696;
+
+/* Annotation import panel dialog content
+-------------------------------------------------------------------- */
+
+.import-dialog-content {
+    position: relative;
+    display: block;
+    background-color: #fefefe;
+    margin: auto;
+    width: 80%;
+    height: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+
+    padding-top: 0.077em;
+    padding-right: 0.077em;
+    padding-bottom: 0.077em;
+    padding-left: 0.077em;
+
+    font-size: 13px;
+    border: 3px solid #3e72a6;
 }
 
-#mp-claim-method-tb th, td {
-	border: 1px solid #969696;
+
+/* Pop up dialog (background) */
+.import-dialog-background {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 80px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }

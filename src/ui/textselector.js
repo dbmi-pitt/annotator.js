@@ -69,13 +69,18 @@ TextSelector.prototype.captureDocumentSelection = function () {
         return [];
     }
 
+    // console.log("TextSelector - captureDocumentSelection");
+    // console.log(selection);
+
     for (i = 0; i < selection.rangeCount; i++) {
         var r = selection.getRangeAt(i),
             browserRange = new Range.BrowserRange(r),
             normedRange = browserRange.normalize().limit(this.element);
 
-        nodes.push(normedRange.textNodes());
-        //console.log("[textSelector--normedRange]");
+        // get list of text nodes by start and end node fails when bring mark.js in
+        var nodes = normedRange.textNodes();
+
+        //console.log(nodes);
 
         /* useless
         var tempParent;
@@ -120,7 +125,6 @@ TextSelector.prototype.captureDocumentSelection = function () {
     }
 
     ranges.childNodes = nodes;
-    console.log("textselector - ranges")
     return ranges;
 };
 

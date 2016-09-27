@@ -60,34 +60,17 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // clean claim editor
                         cleanClaimForm();
 
-                        var nodes = [];
-                        nodes = annotation.childNodes;
-
                         //--------------generate quote-----------------
-                        var quoteobject = $("<div id='quotearea'/>");
-                        var p = document.createElement("p");
+                        var childrenInQuote = $(".annotator-currhl"); // when highlighting in red, get all text nodes by class name annotator-currhl
+                        var quoteobject = $("<div id='quotearea'/>"); // quote area as DOM obj
 
-                        //generate quote: add new annotation
-                        var tempChildrenOfClaim = [];
-                        var prevNode = null;
-                        var goodChild;
-                        tempChildrenOfClaim = $(".annotator-currhl"); //used to store childrens in claim
-                        var childrenOfClaim = [];
-                        for(var i=0;i<tempChildrenOfClaim.length;i++) {
-                            var tempContent = $(tempChildrenOfClaim[i]).text();
-                            while(tempChildrenOfClaim[i].parentNode.className== "annotator-hl") {
-                                tempChildrenOfClaim[i]= tempChildrenOfClaim[i].parentNode;
-                            }
-                            if(!tempChildrenOfClaim[i].isEqualNode(prevNode)) {
-                                prevNode = tempChildrenOfClaim[i];
-                                goodChild = tempChildrenOfClaim[i].cloneNode(true);
-                                goodChild.innerHTML = tempContent;
-                                p.appendChild(goodChild);
-                            }
-                        }
+                        //find drugs which only be highlighted in this claim
+                        var list = []; //store drug name in this quote
+                        var listid = []; //store corresponding drug index in this quote
 
+                        var divP = generateQuoteArea(childrenInQuote, list, listid); // create current highlight contents
+                        $(quoteobject).append(divP);
 
-                        $(quoteobject).append(p);
                         var quotecontent = $(quoteobject).html();
 
                         while(quotecontent.indexOf("annotator-currhl")!=-1) {
@@ -97,74 +80,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-mp\"").join("");
                             quotecontent = quotecontent.split("name=\"annotator-mp\" class=\"annotator-hl\"").join("");
                         }
-
                         while(quotecontent.indexOf(" name=\"annotator-hl\"")!=-1) {
                             quotecontent = quotecontent.split(" name=\"annotator-hl\"").join("");
                         }
-                        //console.log(quotecontent);
                         $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
 
-                        //find drugs which only be highlighted in this claim
-                        //--------------- generate list and listid array ----------------
-                        var list = [];//used to store drugs
-                        var listid = [];
-                        var drugList = document.getElementsByName('annotator-hl');
-
-                        var selectedNodes = [];
-                        //console.log(nodes);
-                        var selectedList = [];
-                        var prev = "";
-                        var prevNode = null;
-                        var parent;
-                        var childID = 0;
-
-                        selectedList = $('.annotator-currhl');
-                        var drugNodes = [];
-                        for(var i=0;i<selectedList.length;i++) {
-                            //filter annotator-mp
-                            while(selectedList[i].parentNode.className=="annotator-hl"||
-                                  selectedList[i].parentNode.className=="annotator-currhl") {
-                                selectedList[i]= selectedList[i].parentNode;
-                            }
-                            if($(selectedList[i]).attr("name") == "annotator-hl") {
-                                drugNodes.push(selectedList[i].cloneNode(true));
-                            }
-                        }
-                        //console.log(drugNodes);
-                        for(var i=0;i<drugNodes.length;i++) {
-                            if(prev != drugNodes[i].id) {
-                                prev = drugNodes[i].id;
-                                prevNode = drugNodes[i];
-                                parent = drugNodes[i];
-                                
-                                childID = 0;
-                                while (parent.childNodes.length > 0)
-                                    parent = parent.childNodes[0];
-                                list.push(parent.textContent);
-                                listid.push(drugNodes[i].id);
-                            }else {
-                                
-                                if(!drugNodes[i].isEqualNode(prevNode)) {
-                                    parent = drugNodes[i];
-                                    while (parent.childNodes.length > 0)
-                                        parent = parent.childNodes[0];
-                                    var temp = list.pop();
-                                    temp += parent.textContent;
-                                    list.push(temp);
-                                }else {
-                                    var temp = list.pop();
-                                    temp += drugNodes[i].textContent;
-                                    list.push(drugNodes[i].textContent);
-                                }
-                            }
-                        }
-                        
+                        //----------------generate drug dropdown list---------------
                         var flag = 0;
-                        
                         //check drug list
                         var allHighlightedDrug = [];
                         var anns = annotations.slice();
+
                         for (var i = 0, len = anns.length; i < len; i++) {
                             if (anns[i].annotationType == "DrugMention") {
                                 allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
@@ -177,27 +104,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                         }
                         //console.log(allHighlightedDrug);
-                        //console.log(list);
-
-
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
-                            // avoid replacing span itself
-                            // add to dropdown box
+                            // avoid replacing span itself add to dropdown box
                             $('#Drug1').append($('<option>', {
-                                value: listid[i],
+                                value: list[i] + "_" + listid[i],
                                 text: list[i]
                             }));
                             $('#Drug2').append($('<option>', {
-                                value: listid[i],
+                                value: list[i] + "_" + listid[i],
                                 text: list[i]
                             }));
                             flag = flag + 1;
-
-                            /*if (quotecontent.indexOf(list[i]) >= 0 && "<span class=\"highlightdrug\">".indexOf(list[i]) < 0) {
-                                index++;
-                                quotecontent = quotecontent.replace(list[i], "<span class=\"highlightdrug\">" + list[i] + "</span>");
-                            }*/
                         }
                         
                         if (flag < 2) {
@@ -216,12 +134,28 @@ var mpEditor = exports.mpEditor = Widget.extend({
                        
                         if(claim.qualifiedBy!=undefined) {
                             //load fields from annotation.claim
+                            var existFlag = false; // if elasticsearch store has drugID info
                             $("#Drug1 > option").each(function () {
-                                if (this.value === claim.qualifiedBy.drug1ID) $(this).prop('selected', true);
+                                if (this.value === claim.qualifiedBy.drug1ID) {
+                                    $(this).prop('selected', true);
+                                    existFlag = true;
+                                }
                             });
+                            //highlight by drugname when store lacks drugID
+                            if (!existFlag) {
+                                $("#Drug1").val(claim.qualifiedBy.drug1 + "_0");
+                            }
+                            existFlag = false;
                             $('#Drug2 > option').each(function () {
-                                if (this.value === claim.qualifiedBy.drug2ID) $(this).prop('selected', true);
+                                if (this.value === claim.qualifiedBy.drug2ID) {
+                                    $(this).prop('selected', true);
+                                    existFlag = true;
+                                }
                             });
+                            //highlight by drugname when store lacks drugID
+                            if (!existFlag) {
+                                $("#Drug2").val(claim.qualifiedBy.drug2 + "_0");
+                            }
                         }
 
                         var drug1 = $('#Drug1 option:selected').text();
@@ -307,6 +241,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             postDataForm(currFormType);
                         }
                     }                     
+                    delete annotation.childNodes;
                 },
                 
                 submit:function (field, annotation) {
@@ -363,12 +298,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         if ($('#participants').val().trim() != "" &&  partTmp.value != $('#participants').val()) {                            
                             partTmp.value = $('#participants').val();
 
-                            // if field not binded with text, then assign current span to it
-                            if (partTmp.ranges == null && partTmp.hasTarget == null  && cachedOATarget != null && cachedOARanges != null) {
-                                partTmp.ranges = cachedOARanges;           
-                                partTmp.hasTarget = cachedOATarget;    
+                            if (partTmp.ranges == null) {
+                                partTmp.ranges = cachedOARanges;
                             }
-                            mpData.supportsBy.supportsBy.participants = partTmp;
+                            if (partTmp.hasTarget == null) {
+                                partTmp.hasTarget = cachedOATarget;
+                            }
+                            mpData.supportsBy.supportsBy.participants = partTmp;  
                         }
 
                         var dose1Tmp = mpData.supportsBy.supportsBy.drug1Dose;
@@ -382,11 +318,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose1Tmp.formulation = drug1F;
                             dose1Tmp.duration = drug1D;
                             dose1Tmp.regimens = drug1R;
-                            if (dose1Tmp.ranges == null && dose1Tmp.hasTarget == null) {
-                                dose1Tmp.hasTarget = cachedOATarget;
+
+                            if (dose1Tmp.ranges == null) {
                                 dose1Tmp.ranges = cachedOARanges;
                             }
-                            mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;   
+                            if (dose1Tmp.hasTarget == null) {
+                                dose1Tmp.hasTarget = cachedOATarget;
+                            }
+                            mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;    
                         }
 
                         var dose2Tmp = mpData.supportsBy.supportsBy.drug2Dose;
@@ -400,9 +339,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             dose2Tmp.formulation = drug2F;
                             dose2Tmp.duration = drug2D;
                             dose2Tmp.regimens = drug2R;
-                            if (dose2Tmp.ranges == null && dose2Tmp.hasTarget == null) {
-                                dose2Tmp.hasTarget = cachedOATarget;
+
+                            if (dose2Tmp.ranges == null) {
                                 dose2Tmp.ranges = cachedOARanges;
+                            }
+                            if (dose2Tmp.hasTarget == null) {
+                                dose2Tmp.hasTarget = cachedOATarget;
                             }
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
                         }
@@ -427,10 +369,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.auc.type = aucType;
                                 mpData.auc.direction = aucDirection;      
                             }
-                            if (mpData.auc.ranges == null && mpData.auc.hasTarget == null) {
-                                mpData.auc.hasTarget = cachedOATarget;
+
+                            if (mpData.auc.ranges == null) {
                                 mpData.auc.ranges = cachedOARanges;
-                            }                            
+                            }
+                            if (mpData.auc.hasTarget == null) {
+                                mpData.auc.hasTarget = cachedOATarget;
+                            }
                         } else {
                             console.log("[WARNING] auc required fields not filled!");
                         }                        
@@ -451,9 +396,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.cmax.type = cmaxType;
                                 mpData.cmax.direction = cmaxDirection;      
                             }
-                            if (mpData.cmax.ranges == null && mpData.cmax.hasTarget == null) {
-                                mpData.cmax.hasTarget = cachedOATarget;
+
+                            if (mpData.cmax.ranges == null) {
                                 mpData.cmax.ranges = cachedOARanges;
+                            }
+                            if (mpData.cmax.hasTarget == null) {
+                                mpData.cmax.hasTarget = cachedOATarget;
                             }                            
                         } else {
                             console.log("[WARNING] cmax required fields not filled!");
@@ -476,10 +424,13 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.clearance.type = clearanceType;
                                 mpData.clearance.direction = clearanceDirection;      
                             }
-                            if (mpData.clearance.ranges == null && mpData.clearance.hasTarget == null) {
-                                mpData.clearance.hasTarget = cachedOATarget;
-                                mpData.clearance.ranges = cachedOARanges;
-                            }                            
+
+                            if (mpData.clearnace.ranges == null) {
+                                mpData.clearnace.ranges = cachedOARanges;
+                            }
+                            if (mpData.clearnace.hasTarget == null) {
+                                mpData.clearnace.hasTarget = cachedOATarget;
+                            }                                  
                         } else {
                             console.log("[WARNING] clearance required fields not filled!");
                         }                
@@ -500,11 +451,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 mpData.halflife.value = halflifeValue;
                                 mpData.halflife.type = halflifeType;
                                 mpData.halflife.direction = halflifeDirection;      
-                            }
-                            if (mpData.halflife.ranges == null && mpData.halflife.hasTarget == null) {
-                                mpData.halflife.hasTarget = cachedOATarget;
+                            } 
+
+                            if (mpData.halflife.ranges == null) {
                                 mpData.halflife.ranges = cachedOARanges;
-                            }                            
+                            }
+                            if (mpData.halflife.hasTarget == null) {
+                                mpData.halflife.hasTarget = cachedOATarget;
+                            }                           
                         } else {
                             console.log("[WARNING] halflife required fields not filled!");
                         }                
@@ -1319,7 +1273,7 @@ function loadDataItemFromAnnotation(loadData) {
 
 
 
-
+// post process data form (1.show current data form and hide others. 2.show delete button if there are value been load. 3.hide nav list for ev relationship and study type data form)
 function postDataForm(targetField) {
 
     console.log("mpeditor - postDataForm: " + targetField);
@@ -1347,12 +1301,9 @@ function postDataForm(targetField) {
                 fieldVal = $("#" + fieldM[field]).val();
             } else { // when field is text input
                 $("#mp-data-nav").show();
-                console.log("TESTING DOSE:");
-                console.log(fieldM[field]);
                 fieldVal = $("#" + fieldM[field]).val();
             }
-
-            console.log(fieldVal);
+            //console.log(fieldVal);
                 
             if (fieldVal !=null && fieldVal != "")
                 $("#annotator-delete").show();
@@ -1368,7 +1319,7 @@ function postDataForm(targetField) {
     }
 }
 
-
+// clean all value of claim form
 function cleanClaimForm() {
 
     $("#quote").empty();
@@ -1389,7 +1340,7 @@ function cleanClaimForm() {
 
 }
 
-
+// clean all value of data form
 function cleanDataForm() {
     $("#participants").empty();
     $("#drug1Dose").empty();
@@ -1428,4 +1379,66 @@ function cleanDataForm() {
     // study type questions
     $('input[name=grouprandom]').prop('checked', false);
     $('input[name=parallelgroup]').prop('checked', false);    
+}
+
+// return not-none child node 
+function moveToChildNode(parent) {
+    // move to most inner span node
+    while (parent.childNodes.length > 0) {
+        var innerNode = null;
+        // find inner span that not none 
+        for (var j=0; j<parent.childNodes.length; j++) {
+            if (parent.childNodes[j].textContent != "") {
+                innerNode = parent.childNodes[j];
+                break;
+            }
+        }
+        if (innerNode != null) 
+            parent = innerNode;  
+        else 
+            break;
+    }
+    return parent;
+}
+
+
+// inputs: nodes in current highlights
+// return quote content as list of DOM node 
+function generateQuoteArea(childrenInQuote, list, listid) {
+    var p = document.createElement("p");
+    var prevNode = null; 
+    var goodChild; // good child means drug highlights with new parent node
+    var indexDict = {}; //hashmap<drugName, drugIndex>
+    
+    for (var qi = 0; qi < childrenInQuote.length; qi++) { 
+        var tempContent = $(childrenInQuote[qi]).text();
+        
+        // if parent node is hl or currhl, then move up to parent
+        while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+            childrenInQuote[qi]= childrenInQuote[qi].parentNode;
+        }
+        // if previous node and current node having the same parent, then skip. else, add current node to quote                             
+        if(!childrenInQuote[qi].isEqualNode(prevNode)) {
+            prevNode = childrenInQuote[qi];
+            goodChild = prevNode.cloneNode(true);
+            goodChild.innerHTML = tempContent;
+
+            //change drugMention elements' id to "drugName-drugIndex", e.g. terazosin-0
+            if (goodChild.getAttribute("name") == "annotator-hl") {
+                if (tempContent in indexDict) {
+                    indexDict[tempContent] = indexDict[tempContent] + 1;
+                    goodChild.id = tempContent + "_" + indexDict[tempContent];
+                    list.push(tempContent);
+                    listid.push(indexDict[tempContent]);
+                } else {
+                    indexDict[tempContent] = 0;
+                    goodChild.id = tempContent + "_" + indexDict[tempContent];
+                    list.push(tempContent);
+                    listid.push(indexDict[tempContent]);
+                }
+            }
+            p.appendChild(goodChild);
+        }
+    }                       
+    return p;
 }
