@@ -153,7 +153,7 @@ var Adder = Widget.extend({
 
         // Create a new annotation
         if (this.annotation !== null && typeof this.onCreate === 'function') {
-            if (multiSelected == true) {
+            if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
                 var newRange = this.annotation.argues.ranges[0];
                 console.log(newRange);
                 currAnnotation.argues.ranges.push(newRange);

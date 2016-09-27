@@ -320,7 +320,9 @@ function main(options) {
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
-                    s.crpgadder.load(hlAnnotation, s.interactionPoint);
+                    if (sourceURL.indexOf(".pdf") != -1) {
+                        s.crpgadder.load(hlAnnotation, s.interactionPoint);
+                    }
                     console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
@@ -333,6 +335,7 @@ function main(options) {
         // mp viewer
         s.mpviewer = new mpviewer.mpViewer({
             onEdit: function (ann, field, dataNum) {
+                hlAnnotation = undefined; //clean cached textSelected ranges
                 // Copy the interaction point from the shown viewer:
                 s.interactionPoint = util.$(s.mpviewer.element)
                     .css(['top', 'left']);
@@ -484,7 +487,7 @@ function main(options) {
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
                 s.currhighlighter.draw(annotation, "add");
-                //hlAnnotation = undefined; //clean cached textSelected ranges
+                hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
                 // return s.hleditor.load(annotation, s.interactionPoint);
@@ -519,17 +522,14 @@ function main(options) {
 
                 console.log("mpmain - beforeAnnotationUpdated")
                 if(hlAnnotation==undefined) {
+                    //edit claim or data of current annotation
                     s.currhighlighter.draw(annotation, "edit");
-
                 } else {
+                    //add new data to current annotation
                     s.currhighlighter.draw(hlAnnotation, "add");
-
                 }
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
-            } else if (annotation.annotationType == "DrugMention") {
-                // return s.hleditor.load(annotation, s.interactionPoint);
-                return null;
             } else {
                 return null;
             }
@@ -537,7 +537,6 @@ function main(options) {
         annotationUpdated: function (ann) {
             console.log("mpmain - annotationUpdated called");
             if (ann.annotationType == "MP"){
-                hlAnnotation = undefined;
                 s.mphighlighter.redraw(ann);
                 currAnnotationId = ann.id;
                 annotationTable(ann.rawurl, ann.email);

@@ -56,7 +56,7 @@
 
 .annotator-hl {
 	background: #FFFF0A;
-	//background: rgba(255, 255, 10, 0.3);
+	background: rgba(255, 255, 10, 0.3);
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
 }
 
@@ -150,8 +150,8 @@ span[name="annotator-ddi"] {
 } 
 
 span[name="annotator-mp"] {
- 	background: #969696;
-	background: rgba(45, 50, 64, 0.4);
+ 	background: #B0C4DE;
+	background: rgba(176, 196, 222, 0.4);
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
 }
 
