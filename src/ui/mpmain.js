@@ -21,7 +21,8 @@ var hlviewer = require('./../drugPlugin/viewer');
 
 var _t = util.gettext;
 var rangeChildNodes = [];
-var hlAnnotation;
+var hlAnnotation;  //a dummy annotation, used to store textSelected ranges
+var adderClick = false;  //to mark the adder is clicked, can be used to distinguish update annotation or add new data
 var publics;
 
 // trim strips whitespace from either end of a string.
@@ -246,6 +247,7 @@ function main(options) {
         s.mpadder = new mpadder.mpAdder({
             onCreate: function (ann) {
                 app.annotations.create(ann);
+                adderClick = true;
             },
             onUpdate: function (ann) {
                 app.annotations.update(ann);
@@ -257,6 +259,7 @@ function main(options) {
         s.hladder = new hladder.Adder({
             onCreate: function (ann) {
                 app.annotations.create(ann);
+                adderClick = true;
             },
             onUpdate: function (ann) {
                 app.annotations.update(ann);
@@ -264,7 +267,7 @@ function main(options) {
         });
         s.hladder.attach();
 
-        // multi select adder
+        // multi select adder (will not create annotation)
         s.crpgadder = new crpgadder.Adder({
             onCreate: function (ann) {
                 console.log(ann);
@@ -495,6 +498,7 @@ function main(options) {
             // call different editor based on annotation type
             if (annotation.annotationType == "MP"){
                 s.currhighlighter.draw(annotation, "add");
+                adderClick = false;
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else if (annotation.annotationType == "DrugMention") {
@@ -534,15 +538,19 @@ function main(options) {
         beforeAnnotationUpdated: function (annotation) {
 
             if (annotation.annotationType == "MP"){
-
-                console.log("mpmain - beforeAnnotationUpdated")
-                if(hlAnnotation==undefined) {
+                /*Parameters:
+                    annotation: the original annotation, already existed one
+                    hlAnnotation: a dummy annotation, used to store textSelected ranges
+                */
+                console.log("mpmain - beforeAnnotationUpdated");
+                if (!adderClick || hlAnnotation == undefined) {
                     //edit claim or data of current annotation
                     s.currhighlighter.draw(annotation, "edit");
                 } else {
                     //add new data to current annotation
                     s.currhighlighter.draw(hlAnnotation, "add");
                 }
+                adderClick = false;
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else {
