@@ -124,7 +124,7 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
 // hldivL - list of span text nodes   
 currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
 
-    if (obj.ranges != null) { // draw by xpath range
+    if (obj.ranges.length > 0) { // draw by xpath range
         for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
             var r = reanchorRange(obj.ranges[i], this.element);   
             if (r !== null) { 
@@ -134,12 +134,18 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
                 console.log("[Error]: temp draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
+
         // mark context
         var context = document.querySelector("#subcontent");          
         var markObj = new Mark(context);
 
         var oaselector = obj.hasTarget.hasSelector;
-        markObj.mark(oaselector.exact, markOptions(field, idx, hldivL));
+        var listP = document.getElementsByTagName("p"); // highlight within all p tag
+        for (var i=0; i < listP.length; i++) {
+            var instance = new Mark(listP[i]);
+            instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));
+        }
+
         //console.log("temp draw by oaselector: " + field);
     } else {
         console.log("[Warning]: temp draw failed on field: " + field);

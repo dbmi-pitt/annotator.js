@@ -543,6 +543,8 @@ function main(options) {
                     hlAnnotation: a dummy annotation, used to store textSelected ranges
                 */
                 console.log("mpmain - beforeAnnotationUpdated");
+                console.log(annotation);
+
                 if (!adderClick || hlAnnotation == undefined) {
                     //edit claim or data of current annotation
                     s.currhighlighter.draw(annotation, "edit");

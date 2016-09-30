@@ -153,8 +153,8 @@ function markOptions(fieldType, dataNum, hldivL) {
         "className": "annotator-hl",
         "separateWordSearch": false,
         "acrossElements": true,
-        "accuracy": "partially"
-        ,
+        "accuracy": "partially",
+        "caseSensitive": true, 
         "each": function(elem) {
             
             $(elem).attr('name', "annotator-mp");

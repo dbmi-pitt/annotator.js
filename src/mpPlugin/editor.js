@@ -62,6 +62,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //--------------generate quote-----------------
                         var childrenInQuote = $(".annotator-currhl"); // when highlighting in red, get all text nodes by class name annotator-currhl
+
                         var quoteobject = $("<div id='quotearea'/>"); // quote area as DOM obj
 
                         //find drugs which only be highlighted in this claim
@@ -69,6 +70,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var listid = []; //store corresponding drug index in this quote
 
                         var divP = generateQuoteArea(childrenInQuote, list, listid); // create current highlight contents
+
                         $(quoteobject).append(divP);
 
                         var quotecontent = $(quoteobject).html();
