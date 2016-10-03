@@ -82,8 +82,8 @@ var Adder = Widget.extend({
     show: function (position) {
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
-                top: position.top,
-                left: position.left
+                top: position.top + 35,
+                right: 0
             });
         }
         Widget.prototype.show.call(this);
@@ -99,7 +99,6 @@ var Adder = Widget.extend({
         if (event.which > 1) {
             return;
         }
-
         event.preventDefault();
         // Prevent the selection code from firing when the mouse button is
         // released
@@ -147,31 +146,35 @@ var Adder = Widget.extend({
         // $('.annotator-adderddi').hide();
         $('.annotator-addermp').removeClass().addClass('annotator-addermp annotator-hide');
         $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
-        $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
+        //$('.annotator-adderddi').removeClass().addClass('annotator-adderhl annotator-hide');
 
         this.ignoreMouseup = false;
 
-        // Create a new annotation
-        if (this.annotation !== null && typeof this.onCreate === 'function') {
-            if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
-                var newRange = this.annotation.argues.ranges[0];
-                console.log(newRange);
-                currAnnotation.argues.ranges.push(newRange);
+        // Create a new annotation || add a new data
+        if ((this.annotation !== null && typeof this.onCreate === 'function') || (editorType != "claim" && typeof this.onUpdate === 'function')) {
+            this.annotation.annotationType = "MP";
+
+            //cancel multi select test code
+            if (currAnnotation == undefined || multiSelected == false) {
+                console.log("nothing can be deleted from multiSelected highlights");
+            } else {
+                //var newRange = this.annotation.argues.ranges[0];
+                //var newExact = this.annotation.argues.hasTarget.hasSelector.exact;
+                //currAnnotation.aruges.hasTarget.hasSelector.exact += " / " + exact;
+                //currAnnotation.argues.ranges.push(newRange);
+
                 console.log(currAnnotation);
-                this.annotation = currAnnotation;
-                multiSelected = false;
             }
-            this.annotation.annotationType = "DrugMention";
-            this.onCreate(this.annotation, event);
+            multiSelected = true;
         }
     }
 });
 
 Adder.template = [
 
-    '<div class="annotator-adderhl annotator-hide">',
+    '<div class="annotator-addercancel annotator-hide">',
 
-    '  <button class="hl-adder-btn" type="button" title="Highlight">' + _t('Annotate') + '</button>',
+    '  <button class="hl-adder-btn" type="button" title="Cancel Highlight">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 

@@ -34,7 +34,7 @@ var mpAdder = Widget.extend({
         // .on("click." + NS, 'button', function (e) {
         //     self._onClick(e);
         // })
-        .on("click." + NS, '.mp-main-menu', function (e) {         
+        .on("click." + NS, '.mp-main-menu', function (e) {
             self._onClick(e);
         })
 
@@ -94,7 +94,7 @@ var mpAdder = Widget.extend({
             this.element.css({
                 top: position.top,
                 // avoid overlapping with drug mention editor
-                left: position.left + 70
+                left: position.left + 35
             });
         }
         Widget.prototype.show.call(this);
@@ -213,10 +213,24 @@ var mpAdder = Widget.extend({
 
                     // text has been selected, cached selector                    
                     isTextSelected = true;
-                    // get selection for data
-                    cachedOATarget = temp.annotation.argues.hasTarget;
-                    cachedOARanges = temp.annotation.argues.ranges;            
-
+                    
+                    //this data is comprised of multiple sections
+                    if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
+                        var newRange = temp.annotation.argues.ranges[0];
+                        var exact = temp.annotation.argues.hasTarget.hasSelector.exact;
+                        console.log(newRange);
+                        currAnnotation.argues.ranges.push(newRange);
+                        currAnnotation.argues.hasTarget.hasSelector.exact += " / " + exact;
+                        console.log(currAnnotation);
+                        cachedOATarget = currAnnotation.argues.hasTarget;
+                        cachedOARanges = currAnnotation.argues.ranges;
+                        
+                    } else {
+                        // get selection for data
+                        cachedOATarget = temp.annotation.argues.hasTarget;
+                        cachedOARanges = temp.annotation.argues.ranges;  
+                    }
+                              
                     // console.log("[TEST] highlight text span!");
                     // for (var i = 0, ilen = cachedOARanges.length; i < ilen; i++) {
                     //     //var r = reanchorRange(cachedOARanges[i], this.element);  
@@ -228,7 +242,7 @@ var mpAdder = Widget.extend({
                     //     } 
                     // }
 
-                });                            
+                });                         
         }
     }   
 });

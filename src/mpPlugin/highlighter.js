@@ -99,9 +99,10 @@ mpHighlighter.prototype.destroy = function () {
 // Public: Draw highlights for all the given annotations
 //
 // annotations - An Array of annotation Objects for which to draw highlights.
+// pageNumber - only in PDF, highlight sections which in this pageNumber, avoid duplicates
 //
 // Returns nothing.
-mpHighlighter.prototype.drawAll = function (annotations) {
+mpHighlighter.prototype.drawAll = function (annotations, pageNumber) {
     var self = this;
 
     var p = new Promise(function (resolve) {
@@ -111,11 +112,11 @@ mpHighlighter.prototype.drawAll = function (annotations) {
             if (typeof annList === 'undefined' || annList === null) {
                 annList = [];
             }
-
+            console.log("[test] " + pageNumber);
             var now = annList.splice(0, self.options.chunkSize);
             for (var i = 0, len = now.length; i < len; i++) {
                 if (now[i].annotationType == "MP")
-                    highlights = highlights.concat(self.draw(now[i]));
+                    highlights = highlights.concat(self.draw(now[i], pageNumber));
             }
 
             // If there are more to do, do them after a delay
@@ -140,7 +141,7 @@ mpHighlighter.prototype.drawAll = function (annotations) {
 // annotation - An annotation Object for which to draw highlights.
 //
 // Returns an Array of drawn highlight elements.
-mpHighlighter.prototype.draw = function (annotation) {
+mpHighlighter.prototype.draw = function (annotation, pageNumber) {
 
     if(annotation.annotationType!=undefined) {
         if (annotation.annotationType != "MP")
@@ -153,14 +154,16 @@ mpHighlighter.prototype.draw = function (annotation) {
         // draw MP claim
 
         for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-            var r = reanchorRange(annotation.argues.ranges[i], this.element);
-
-            if (r !== null) {
-                //normedRanges.push(r);
-                dataRangesL.push(new DataRange(r, "claim", 0));
-            } else {
-                console.log("[ERROR] range failed to reanchor");
-                console.log(r);
+            //check if this range in this pageNumber
+            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                var r = reanchorRange(annotation.argues.ranges[i], this.element);
+                if (r !== null) {
+                    //normedRanges.push(r);
+                    dataRangesL.push(new DataRange(r, "claim", 0));
+                } else {
+                    console.log("[ERROR] range failed to reanchor");
+                    console.log(r);
+                }
             }
         }
 
@@ -176,29 +179,41 @@ mpHighlighter.prototype.draw = function (annotation) {
 
                 if (data.auc.ranges != null) {
                     for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.auc.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
+                        //check if this range in this pageNumber
+                        if (pageNumber == undefined || data.auc.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                            var r = reanchorRange(data.auc.ranges[i], this.element);   
+                            if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
+                        }
                     }
                 }
 
                 if (data.cmax.ranges != null) {
                     for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.cmax.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
+                        //check if this range in this pageNumber
+                        if (pageNumber == undefined || data.cmax.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                            var r = reanchorRange(data.cmax.ranges[i], this.element);   
+                            if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
+                        }
                     }
                 }
 
                 if (data.clearance.ranges != null) {
                     for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.clearance.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
+                        //check if this range in this pageNumber
+                        if (pageNumber == undefined || data.clearance.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                            var r = reanchorRange(data.clearance.ranges[i], this.element);   
+                            if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
+                        }
                     }
                 }            
 
                 if (data.halflife.ranges != null) {
                     for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
-                        var r = reanchorRange(data.halflife.ranges[i], this.element);   
-                        if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
+                        //check if this range in this pageNumber
+                        if (pageNumber == undefined || data.halflife.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                            var r = reanchorRange(data.halflife.ranges[i], this.element);   
+                            if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
+                        }
                     }
                 }
                 
@@ -208,22 +223,30 @@ mpHighlighter.prototype.draw = function (annotation) {
                     
                     if (material.participants.ranges != null) {
                         for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(material.participants.ranges[i], this.element);
-                            //if (r !== null) normedRanges.push(r);  
-                            if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));  
+                            //check if this range in this pageNumber
+                            if (pageNumber == undefined || material.participants.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                                var r = reanchorRange(material.participants.ranges[i], this.element);
+                                if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));
+                            }
                         }                      
                     }
                     
                     if (material.drug1Dose.ranges != null) {
                         for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
-                            if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
+                            //check if this range in this pageNumber
+                            if (pageNumber == undefined || material.drug1Dose.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                                var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
+                                if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
+                            }
                         }
                     }
                     if (material.drug2Dose.ranges != null) {
                         for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
-                            var r = reanchorRange(material.drug2Dose.ranges[i], this.element);   
-                            if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
+                            //check if this range in this pageNumber
+                            if (pageNumber == undefined || material.drug2Dose.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                                var r = reanchorRange(material.drug2Dose.ranges[i], this.element);   
+                                if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
+                            }
                         }
                     }
                     

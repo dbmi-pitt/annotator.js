@@ -5,7 +5,7 @@ var util = require('../util');
 var xUtil = require('../xutil');
 var textselector = require('./textselector');
 var crpgadder = require('./../mpPlugin/crosspageadder');
-
+var cancelcrpgadder = require('./../mpPlugin/cancelcrosspageadder');
 // mp
 var mpadder = require('./../mpPlugin/adder');
 var mphighlighter = require('./../mpPlugin/highlighter');
@@ -270,6 +270,7 @@ function main(options) {
         // multi select adder (will not create annotation)
         s.crpgadder = new crpgadder.Adder({
             onCreate: function (ann) {
+                console.log("multi select adder >>");
                 console.log(ann);
                 console.log(currAnnotation);
                 undrawCurrhighlighter();
@@ -281,6 +282,20 @@ function main(options) {
             }
         });
         s.crpgadder.attach();
+
+        // cancel multi select adder (will not create annotation)
+        s.cancelcrpgadder = new cancelcrpgadder.Adder({
+            onCreate: function (ann) {
+                console.log("cancel multi select adder >>");
+                console.log(multiSelected);
+                console.log(currAnnotation);
+                //app.annotations.create(ann);
+            },
+            onUpdate: function (ann) {
+                //app.annotations.update(ann);
+            }
+        });
+        s.cancelcrpgadder.attach();
 
         // mp editor
         s.mpeditor = new mpeditor.mpEditor({
@@ -325,12 +340,18 @@ function main(options) {
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
                     if (sourceURL.indexOf(".pdf") != -1) {
                         s.crpgadder.load(hlAnnotation, s.interactionPoint);
+                        s.cancelcrpgadder.load(hlAnnotation, s.interactionPoint);
                     }
                     console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
                     s.crpgadder.hide();
+                    s.cancelcrpgadder.hide();
+                    console.log("hide point >>");
+                    /*if (currAnnotation == "undefined") {
+                        s.cancelcrpgadder.hide();
+                    }*///TODO
                 }
             }
         });
@@ -420,6 +441,7 @@ function main(options) {
         },
 
         annotationsLoaded: function (anns, pageNumber) {
+            //highlight existed annotations
             if(pageNumber != undefined) {
                 //load by page
                 console.log("[load page " + pageNumber + "]");
@@ -428,7 +450,7 @@ function main(options) {
                     var ranges = anns[i].argues.ranges;
                     var flag = false;
                     for (var j = 0; j < ranges.length; j++) {
-                        if (ranges[j].start.substring(47, 48) == pageNumber) {
+                        if (ranges[j].start.substring(47, 49).replace("]", "") == pageNumber) {
                             annsByPage.push(anns[i]);
                             flag = true;
                             break;
@@ -441,33 +463,34 @@ function main(options) {
                         var data = anns[i].argues.supportsBy;
                         for (var j = 0; j < data.length; j++) {
                             if (typeof data[j].auc.ranges != "undefined" &&
-                                (data[j].auc.ranges[0].start.substring(47, 48) == pageNumber || data[j].auc.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].auc.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             } else if (typeof data[j].cmax.ranges != "undefined" &&
-                                (data[j].cmax.ranges[0].start.substring(47, 48) == pageNumber || data[j].cmax.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].cmax.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             } else if (typeof data[j].halflife.ranges != "undefined" &&
-                                (data[j].halflife.ranges[0].start.substring(47, 48) == pageNumber || data[j].halflife.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].halflife.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             } else if (typeof data[j].clearance.ranges != "undefined" &&
-                                (data[j].clearance.ranges[0].start.substring(47, 48) == pageNumber || data[j].clearance.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].clearance.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug1Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug2Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.participants.ranges[0].end.substring(47, 48) == pageNumber)) {
+                                (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
                                 annsByPage.push(anns[i]);
                             }
                         }
                     }
                 }
-                console.log("[num of annotations: " + annsByPage.length + "]")
-                s.hlhighlighter.drawAll(annsByPage);
-                s.mphighlighter.drawAll(annsByPage);
+                console.log("[num of annotations: " + annsByPage.length + "]");
+                console.log(annsByPage);
+                s.hlhighlighter.drawAll(annsByPage, pageNumber);
+                s.mphighlighter.drawAll(annsByPage, pageNumber);
             } else {
                 //load one time
                 s.hlhighlighter.drawAll(anns);
@@ -530,11 +553,20 @@ function main(options) {
                 console.log("mpmain - beforeAnnotationUpdated");
                 if (!adderClick || hlAnnotation == undefined) {
                     //edit claim or data of current annotation
-                    s.currhighlighter.draw(annotation, "edit");
+                    console.log("[test-annotation ] "+ multiSelected + adderClick + hlAnnotation);
+                    console.log(currAnnotation);
+                    if (multiSelected) {
+                        s.currhighlighter.draw(currAnnotation, "add");
+                    } else {
+                        s.currhighlighter.draw(annotation, "edit");
+                    }
                 } else {
                     //add new data to current annotation
+                    console.log("[test-hlAnnotation ] "+ multiSelected);
+                    console.log(currAnnotation);
                     s.currhighlighter.draw(hlAnnotation, "add");
                 }
+                multiSelected = false; //TODO
                 adderClick = false;
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);

@@ -160,9 +160,10 @@ Highlighter.prototype.destroy = function () {
 // Public: Draw highlights for all the given annotations
 //
 // annotations - An Array of annotation Objects for which to draw highlights.
+// pageNumber - only in PDF, highlight sections which in this pageNumber, avoid duplicates
 //
 // Returns nothing.
-Highlighter.prototype.drawAll = function (annotations) {
+Highlighter.prototype.drawAll = function (annotations, pageNumber) {
     var self = this;
 
     //alert("[INFO] hlhighlighter drawAll called")
@@ -174,10 +175,9 @@ Highlighter.prototype.drawAll = function (annotations) {
             if (typeof annList === 'undefined' || annList === null) {
                 annList = [];
             }
-
             var now = annList.splice(0, self.options.chunkSize);
             for (var i = 0, len = now.length; i < len; i++) {
-                highlights = highlights.concat(self.draw(now[i]));
+                highlights = highlights.concat(self.draw(now[i]), pageNumber);
             }
 
             // If there are more to do, do them after a delay
@@ -202,7 +202,7 @@ Highlighter.prototype.drawAll = function (annotations) {
 // annotation - An annotation Object for which to draw highlights.
 //
 // Returns an Array of drawn highlight elements.
-Highlighter.prototype.draw = function (annotation) {
+Highlighter.prototype.draw = function (annotation, pageNumber) {
 
     if (annotation.annotationType != "DrugMention")
         return null;
@@ -211,11 +211,14 @@ Highlighter.prototype.draw = function (annotation) {
     var oaAnnotations = [];
 
     for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-        var r = reanchorRange(annotation.argues.ranges[i], this.element);
-        if (r !== null) { // xpath reanchored by range
-            normedRanges.push(r);
-        } else { // use OA prefix suffix approach
-            oaAnnotations.push(annotation);
+        //check if this range in this pageNumber
+        if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+            var r = reanchorRange(annotation.argues.ranges[i], this.element);
+            if (r !== null) { // xpath reanchored by range
+                normedRanges.push(r);
+            } else { // use OA prefix suffix approach
+                oaAnnotations.push(annotation);
+            }
         }
     }
 

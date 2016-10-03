@@ -35,6 +35,11 @@
 	background-repeat: no-repeat;
 }
 
+.annotator-addercancel {
+	background-image: url(../img/annotator-icon-spriteCancel.png?embed);
+	background-repeat: no-repeat;
+}
+
 .annotator-adderhl {
 	background-image: url(../img/annotator-icon-spriteDrug.png?embed);
 	background-repeat: no-repeat;
@@ -175,10 +180,14 @@ span[name="annotator-mp"] {
        you should update setupDynamicStyle() in annotator.ui.main */
 .annotator-adderhl,
 .annotator-adderselect,
-.annotator-addermp,
+.annotator-addercancel,
 .annotator-outer,
 .annotator-notice {
 	z-index: 1020;
+}
+
+.annotator-addermp {
+	z-index: 1050;
 }
 
 .annotator-filter {
@@ -186,6 +195,7 @@ span[name="annotator-mp"] {
 }
 .annotator-adderhl,
 .annotator-adderselect,
+.annotator-addercancel,
 .annotator-addermp,
 .annotator-outer,
 .annotator-widget,
@@ -204,7 +214,8 @@ span[name="annotator-mp"] {
 /* Annotator Adder
 -------------------------------------------------------------------- */
 .annotator-adderhl,
-.annotator-adderselect {
+.annotator-adderselect,
+.annotator-addercancel {
 	margin-top: -48px;
 	margin-left: -24px;
 	width: 48px;
@@ -225,6 +236,9 @@ span[name="annotator-mp"] {
 .annotator-adderselect:hover {
 	background-position: center top;
 }
+.annotator-addercancel:hover {
+	background-position: center top;
+}
 .annotator-addermp:hover {
 	background-position: center top;
 }
@@ -233,6 +247,9 @@ span[name="annotator-mp"] {
 	background-position: center right;
 }
 .annotator-adderselect:active {
+	background-position: center right;
+}
+.annotator-addercancel:active {
 	background-position: center right;
 }
 .annotator-addermp:active {
@@ -252,6 +269,17 @@ span[name="annotator-mp"] {
 }
 
 .annotator-adderselect button {
+	display: block;
+	width: 36px;
+	height: 41px;
+	margin: 0 auto;
+	border: none;
+	background: none;
+	text-indent: -999em;
+	cursor: pointer;
+}
+
+.annotator-addercancel button {
 	display: block;
 	width: 36px;
 	height: 41px;

@@ -83,7 +83,7 @@ var Adder = Widget.extend({
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
                 top: position.top,
-                left: position.left
+                right: 0
             });
         }
         Widget.prototype.show.call(this);
@@ -150,8 +150,8 @@ var Adder = Widget.extend({
 
         this.ignoreMouseup = false;
 
-        // Create a new annotation
-        if (this.annotation !== null && typeof this.onCreate === 'function') {
+        // Create a new annotation || add a new data
+        if ((this.annotation !== null && typeof this.onCreate === 'function') || (editorType != "claim" && typeof this.onUpdate === 'function')) {
             this.annotation.annotationType = "MP";
 
             //multi select test code
@@ -160,11 +160,14 @@ var Adder = Widget.extend({
                 console.log(currAnnotation);
             } else {
                 var newRange = this.annotation.argues.ranges[0];
-                console.log(newRange);
+                var newExact = this.annotation.argues.hasTarget.hasSelector.exact;
+                currAnnotation.argues.hasTarget.hasSelector.exact += " / " + newExact;
                 currAnnotation.argues.ranges.push(newRange);
+
                 console.log(currAnnotation);
             }
             multiSelected = true;
+            console.log("before oncreate");
             this.onCreate(this.annotation, event);
         }
     }
@@ -174,7 +177,7 @@ Adder.template = [
 
     '<div class="annotator-adderselect annotator-hide">',
 
-    '  <button class="hl-adder-btn" type="button" title="Highlight">' + _t('Annotate') + '</button>',
+    '  <button class="hl-adder-btn" type="button" title="Add Highlight">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 
