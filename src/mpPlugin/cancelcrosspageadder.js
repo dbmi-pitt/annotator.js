@@ -141,32 +141,50 @@ var Adder = Widget.extend({
         console.log("[DEBUG] hladder - hide hl and ddi");
 
         // Hide the adder
-        this.hide();
+        if (currAnnotation == undefined || !multiSelected) {
+            this.hide();
+        }
         // Hide drug mention, mp and ddi adder
         // $('.annotator-adderddi').hide();
         $('.annotator-addermp').removeClass().addClass('annotator-addermp annotator-hide');
         $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
-        //$('.annotator-adderddi').removeClass().addClass('annotator-adderhl annotator-hide');
+        $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
 
         this.ignoreMouseup = false;
 
         // Create a new annotation || add a new data
-        if ((this.annotation !== null && typeof this.onCreate === 'function') || (editorType != "claim" && typeof this.onUpdate === 'function')) {
-            this.annotation.annotationType = "MP";
+        //if ((this.annotation !== null && typeof this.onCreate === 'function') || (editorType != "claim" && typeof this.onUpdate === 'function')) {
+            //this.annotation.annotationType = "MP";
 
             //cancel multi select test code
-            if (currAnnotation == undefined || multiSelected == false) {
+            console.log(currAnnotation.argues.ranges.length);
+            if (currAnnotation == undefined || multiSelected == false || currAnnotation.argues.ranges.length == 0) {
+
                 console.log("nothing can be deleted from multiSelected highlights");
             } else {
+                //deselect browser's highlight
+                /*if ( document.selection ) {
+                    document.selection.empty();
+                } else if ( window.getSelection ) {
+                    window.getSelection().removeAllRanges();
+                } else {
+                    currAnnotation.argues.ranges.pop();
+                }*/
+                currAnnotation.argues.ranges.pop();
+                if (currAnnotation.argues.ranges.length == 0) {
+                    currAnnotation = undefined;
+                    multiSelected = false;
+                }
                 //var newRange = this.annotation.argues.ranges[0];
                 //var newExact = this.annotation.argues.hasTarget.hasSelector.exact;
-                //currAnnotation.aruges.hasTarget.hasSelector.exact += " / " + exact;
+                //currAnnotation.argues.hasTarget.hasSelector.exact += " / " + exact;
                 //currAnnotation.argues.ranges.push(newRange);
 
                 console.log(currAnnotation);
             }
-            multiSelected = true;
-        }
+            this.onCreate(event);
+            //multiSelected = true;
+        //}
     }
 });
 

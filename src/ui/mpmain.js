@@ -275,6 +275,9 @@ function main(options) {
                 console.log(currAnnotation);
                 undrawCurrhighlighter();
                 s.currhighlighter.draw(currAnnotation, "add");
+                if (currAnnotation != undefined && multiSelected) {
+                    s.cancelcrpgadder.show(s.interactionPoint);
+                }
                 //app.annotations.create(ann);
             },
             onUpdate: function (ann) {
@@ -285,7 +288,13 @@ function main(options) {
 
         // cancel multi select adder (will not create annotation)
         s.cancelcrpgadder = new cancelcrpgadder.Adder({
-            onCreate: function (ann) {
+            onCreate: function () {
+                undrawCurrhighlighter();
+                if (currAnnotation == undefined || !multiSelected) {
+                    s.cancelcrpgadder.hide();
+                } else {
+                    s.currhighlighter.draw(currAnnotation, "add");
+                }
                 console.log("cancel multi select adder >>");
                 console.log(multiSelected);
                 console.log(currAnnotation);
@@ -340,18 +349,18 @@ function main(options) {
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
                     if (sourceURL.indexOf(".pdf") != -1) {
                         s.crpgadder.load(hlAnnotation, s.interactionPoint);
-                        s.cancelcrpgadder.load(hlAnnotation, s.interactionPoint);
+                        if (currAnnotation != undefined && multiSelected) {
+                            s.cancelcrpgadder.show(s.interactionPoint); //duplicate show, but this can update adder position
+                        }
                     }
                     console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
                     s.crpgadder.hide();
-                    s.cancelcrpgadder.hide();
-                    console.log("hide point >>");
-                    /*if (currAnnotation == "undefined") {
+                    if (currAnnotation == undefined || !multiSelected) {
                         s.cancelcrpgadder.hide();
-                    }*///TODO
+                    }
                 }
             }
         });
@@ -511,6 +520,7 @@ function main(options) {
 		    annotation.email = options.email;
             annotation.childNodes = rangeChildNodes;
             // call different editor based on annotation type
+            s.cancelcrpgadder.hide();
             if (annotation.annotationType == "MP"){
                 s.currhighlighter.draw(annotation, "add");
                 adderClick = false;
@@ -566,6 +576,7 @@ function main(options) {
                     console.log(currAnnotation);
                     s.currhighlighter.draw(hlAnnotation, "add");
                 }
+                s.cancelcrpgadder.hide();
                 multiSelected = false; //TODO
                 adderClick = false;
                 hlAnnotation = undefined; //clean cached textSelected ranges
