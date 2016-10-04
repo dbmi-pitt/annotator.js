@@ -269,9 +269,8 @@ function main(options) {
 
         // multi select adder (will not create annotation)
         s.crpgadder = new crpgadder.Adder({
-            onCreate: function (ann) {
-                console.log(ann);
-                console.log(currAnnotation);
+            onCreate: function (ann) {               
+                //console.log(currAnnotation);
                 undrawCurrhighlighter();
                 s.currhighlighter.draw(currAnnotation, "add");
                 //app.annotations.create(ann);
@@ -330,7 +329,7 @@ function main(options) {
                     if (sourceURL.indexOf(".pdf") != -1) {
                         s.crpgadder.load(hlAnnotation, s.interactionPoint);
                     }
-                    console.log(currAnnotation);
+                    //console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
@@ -543,7 +542,7 @@ function main(options) {
                     hlAnnotation: a dummy annotation, used to store textSelected ranges
                 */
                 console.log("mpmain - beforeAnnotationUpdated");
-                console.log(annotation);
+                //console.log(annotation);
 
                 if (!adderClick || hlAnnotation == undefined) {
                     //edit claim or data of current annotation

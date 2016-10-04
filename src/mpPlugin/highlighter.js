@@ -187,11 +187,12 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
                 console.log("[Error]: draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
-
-        //console.log("mphighlighter - drawField - use oaSelector");
+        // && obj.qualifiedBy.drug1 == "rifampin"
+        console.log("mphighlighter - drawField - use oaSelector");
 
         var oaselector = obj.hasTarget.hasSelector;
         var listP = document.getElementsByTagName("p"); // highlight within all p tag
+
         for (var i=0; i < listP.length; i++) {
             var instance = new Mark(listP[i]);
             instance.mark(oaselector.exact, markOptions(field, idx, hldivL));
