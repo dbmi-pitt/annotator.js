@@ -7,6 +7,11 @@ var util = require('../util');
 var $ = util.$;
 var Promise = util.Promise;
 
+
+// DS for highlight div information and xpath ranges
+// range - xpath range
+// field - field name for claim or data (ex. auc, cmax, etc)
+// dataNum - the index of data for specific claim (begin with 0) 
 function DataRange(range, field, dataNum) {
     this.range = range;
     this.field = field;
@@ -20,7 +25,7 @@ function DataRange(range, field, dataNum) {
 //
 // normedRange - A NormalizedRange to be highlighted.
 // cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
-//
+// dataRange - DS for range, div field information and data index
 // Returns an array of highlight Elements.
 function highlightRange(normedRange, cssClass, dataRange) {
     if (typeof cssClass === 'undefined' || cssClass === null) {
@@ -58,8 +63,11 @@ function highlightRange(normedRange, cssClass, dataRange) {
 // for those ranges which are not reanchorable in the current document.
 function reanchorRange(range, rootElement) {
     try {
+
+        //console.log("reanchorRange");
         return Range.sniff(range).normalize(rootElement);
     } catch (e) {
+
         if (!(e instanceof Range.RangeError)) {
             // Oh Javascript, why you so crap? This will lose the traceback.
             throw(e);
@@ -136,165 +144,174 @@ mpHighlighter.prototype.drawAll = function (annotations, pageNumber) {
     return p;
 };
 
+// Return customized options for mark.js highlight 
+// fieldType - claim or data field name
+// dataNum - data index
+// hldivL - list for holding span wrapped text nodes
+function markOptions(fieldType, dataNum, hldivL) {
+    return {
+        "element": "span",
+        "className": "annotator-hl",
+        "separateWordSearch": false,
+        "acrossElements": true,
+        "accuracy": "partially",
+        "caseSensitive": true, 
+        "each": function(elem) {
+            
+            $(elem).attr('name', "annotator-mp");
+            $(elem).attr('fieldname', fieldType);
+            $(elem).attr('datanum', dataNum);     
+            $(elem).attr('data-markjs', false);  
+            hldivL.push($(elem)[0]);
+        }                
+    };
+}
+
+// Private: Draw single field for mp claim, data or material. Use xpath range to draw first, oa selector as 2nd option. 
+// obj - field block with attributes ranges and hasTarget 
+// field - name of specific field for claim, data or material (ex auc, cmax, etc)  
+// idx - data index (0 if it's claim)
+// dataRanges - list of xpath ranges
+// hldivL - list of span text nodes   
+mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL, pageNumber) {
+
+    //console.log("mphighlighter - drawField - called");
+    //console.log(obj);
+
+    if (obj.ranges.length > 0) { // draw by xpath range
+        for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
+
+            // when pdf.js render pdf doc, the page num represents in xpath range in offset (47 - 49)
+            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                var r = reanchorRange(obj.ranges[i], this.element);   
+                if (r !== null) { 
+                    dataRangesL.push(new DataRange(r, field, idx));                
+                } else 
+                    console.log("[Error]: draw by xpath failed: " + field);
+            }
+        }
+        // from PDF draw()
+        // for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
+        //     //check if this range in this pageNumber
+        //     if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+        //         var r = reanchorRange(annotation.argues.ranges[i], this.element);
+        //         if (r !== null) {
+        //             //normedRanges.push(r);
+        //             dataRangesL.push(new DataRange(r, "claim", 0));
+        //         } else {
+        //             console.log("[ERROR] range failed to reanchor");
+        //             console.log(r);
+        //         }
+        //     }
+        // }
+
+    } else if (obj.hasTarget != null) { // draw by oa selector
+        // && obj.qualifiedBy.drug1 == "rifampin"
+        console.log("mphighlighter - drawField - use oaSelector");
+
+        var oaselector = obj.hasTarget.hasSelector;
+        var listP = document.getElementsByTagName("p"); // highlight within all p tag
+
+        for (var i=0; i < listP.length; i++) {
+            var instance = new Mark(listP[i]);
+            instance.mark(oaselector.exact, markOptions(field, idx, hldivL));
+        }
+
+        //console.log("draw by oaselector: " + field);
+    } else {
+        console.log("[Warning]: draw failed on field: " + field);
+        console.log(obj);
+    }
+
+}
+
+
 // Public: Draw highlights for the MP annotation.
 // Including: claim, [{data, method, material}, {..}]
 // annotation - An annotation Object for which to draw highlights.
 //
 // Returns an Array of drawn highlight elements.
+
 mpHighlighter.prototype.draw = function (annotation, pageNumber) {
+
+    var self = this;
 
     if(annotation.annotationType!=undefined) {
         if (annotation.annotationType != "MP")
             return null;
     }
-    //var normedRanges = [];
+
+    var hldivL = [];
     var dataRangesL = [];
 
-    try {
-        // draw MP claim
+    try {       
+        console.log("mphighlighter - draw");
 
-        for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-            //check if this range in this pageNumber
-            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                var r = reanchorRange(annotation.argues.ranges[i], this.element);
-                if (r !== null) {
-                    //normedRanges.push(r);
-                    dataRangesL.push(new DataRange(r, "claim", 0));
-                } else {
-                    console.log("[ERROR] range failed to reanchor");
-                    console.log(r);
-                }
-            }
-        }
+        // draw MP claim        
+        self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL, pageNumber);
 
         // draw MP data
-        if (annotation.argues.supportsBy.length != 0){
-            
-            // draw MP data
+        if (annotation.argues.supportsBy.length != 0){            
             var dataL = annotation.argues.supportsBy;
-
-
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
 
-                if (data.auc.ranges != null) {
-                    for (var i = 0, ilen = data.auc.ranges.length; i < ilen; i++) {
-                        //check if this range in this pageNumber
-                        if (pageNumber == undefined || data.auc.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                            var r = reanchorRange(data.auc.ranges[i], this.element);   
-                            if (r !== null) dataRangesL.push(new DataRange(r, "auc", idx));
-                        }
-                    }
-                }
-
-                if (data.cmax.ranges != null) {
-                    for (var i = 0, ilen = data.cmax.ranges.length; i < ilen; i++) {
-                        //check if this range in this pageNumber
-                        if (pageNumber == undefined || data.cmax.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                            var r = reanchorRange(data.cmax.ranges[i], this.element);   
-                            if (r !== null) dataRangesL.push(new DataRange(r, "cmax", idx));
-                        }
-                    }
-                }
-
-                if (data.clearance.ranges != null) {
-                    for (var i = 0, ilen = data.clearance.ranges.length; i < ilen; i++) {
-                        //check if this range in this pageNumber
-                        if (pageNumber == undefined || data.clearance.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                            var r = reanchorRange(data.clearance.ranges[i], this.element);   
-                            if (r !== null) dataRangesL.push(new DataRange(r, "clearance", idx));
-                        }
-                    }
-                }            
-
-                if (data.halflife.ranges != null) {
-                    for (var i = 0, ilen = data.halflife.ranges.length; i < ilen; i++) {
-                        //check if this range in this pageNumber
-                        if (pageNumber == undefined || data.halflife.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                            var r = reanchorRange(data.halflife.ranges[i], this.element);   
-                            if (r !== null) dataRangesL.push(new DataRange(r, "halflife", idx));
-                        }
-                    }
-                }
-                
+                if (data.auc.ranges != null || data.auc.hasTarget != null) 
+                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL, pageNumber);     
+                if (data.cmax.ranges != null || data.cmax.hasTarget != null) 
+                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL, pageNumber);                
+                if (data.clearance.ranges != null || data.clearance.hasTarget != null)
+                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL, pageNumber);                
+                if (data.halflife.ranges != null || data.halflife.hasTarget !=null) 
+                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL, pageNumber);                                
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
-                if (material != null){
-                    
-                    if (material.participants.ranges != null) {
-                        for (var i = 0, ilen = material.participants.ranges.length; i < ilen; i++) {
-                            //check if this range in this pageNumber
-                            if (pageNumber == undefined || material.participants.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                                var r = reanchorRange(material.participants.ranges[i], this.element);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "participants", idx));
-                            }
-                        }                      
-                    }
-                    
-                    if (material.drug1Dose.ranges != null) {
-                        for (var i = 0, ilen = material.drug1Dose.ranges.length; i < ilen; i++) {
-                            //check if this range in this pageNumber
-                            if (pageNumber == undefined || material.drug1Dose.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                                var r = reanchorRange(material.drug1Dose.ranges[i], this.element);
-                                if (r !== null) dataRangesL.push(new DataRange(r, "dose1", idx));
-                            }
-                        }
-                    }
-                    if (material.drug2Dose.ranges != null) {
-                        for (var i = 0, ilen = material.drug2Dose.ranges.length; i < ilen; i++) {
-                            //check if this range in this pageNumber
-                            if (pageNumber == undefined || material.drug2Dose.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-                                var r = reanchorRange(material.drug2Dose.ranges[i], this.element);   
-                                if (r !== null) dataRangesL.push(new DataRange(r, "dose2", idx));
-                            }
-                        }
-                    }
-                    
+
+                if (material != null){                    
+
+                    if (material.participants.ranges != null || material.participants.hasTarget != null)
+                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL, pageNumber);                    
+                    if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) 
+                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL, pageNumber);                    
+                    if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) 
+                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL, pageNumber);                    
                 }
             }
         }
-        //console.log(dataRangesL);
     } catch (err) {
         console.log(err);
     }
         
-
 
     var hasLocal = (typeof annotation._local !== 'undefined' && annotation._local !== null);
 
     if (!hasLocal) {
         annotation._local = {};
     }
-    var hasHighlights = (typeof annotation._local.highlights !== 'undefined' &&
-
-    annotation._local.highlights === null);
+    var hasHighlights = (typeof annotation._local.highlights !== 'undefined' && annotation._local.highlights === null);
 
     if (!hasHighlights) {
         annotation._local.highlights = [];
     }
 
-    // for (var j = 0, jlen = normedRanges.length; j < jlen; j++) {
-    //     var normed = normedRanges[j];
-    //     $.merge(
-    //         annotation._local.highlights,
-    //         highlightRange(normed, this.options.highlightClass)
-    //     );
-    // }
+    // add span divs from oaselector to annotation._local
+    $.merge(annotation._local.highlights, hldivL);    
 
+    // add span divs from xpath to annotation._local
     for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
         var dataNormed = dataRangesL[j];
         $.merge(
             annotation._local.highlights,
             highlightRange(dataNormed.range, this.options.highlightClass, dataNormed));
     }
-
-    // Save the annotation data on each highlighter element.
+    
+    //Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);
 
-    // Add a data attribute for annotation id if the annotation has one
-    // if (typeof annotation.id !== 'undefined' && annotation.id !== null) {
-    //     $(annotation._local.highlights).attr('id', annotation.id);
-    // }
+    //Add a data attribute for annotation id if the annotation has one
+    if (typeof annotation.id !== 'undefined' && annotation.id !== null) {
+        $(annotation._local.highlights).attr('id', annotation.id);
+    }
     if (typeof annotation.id !== 'undefined' && annotation.id !== null) {
         for (var p =0; p < annotation._local.highlights.length; p++) {
             var fieldName = annotation._local.highlights[p].getAttribute("fieldName");
@@ -322,9 +339,11 @@ mpHighlighter.prototype.undraw = function (annotation) {
 
         for (i = 0; i < localhighlights.length; i++){
             var mpSpan = localhighlights[i];
+
             if (mpSpan.parentNode !== null) 
                 $(mpSpan).replaceWith(mpSpan.childNodes);
         }
+
     } else {        
 
         for (var i = 0, len = annotation._local.highlights.length; i < len; i++) 

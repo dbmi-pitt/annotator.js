@@ -8,6 +8,7 @@ var Promise = util.Promise;
 var HttpStorage = require('./../storage').HttpStorage;
 var annhost = config.annotator.host;
 
+
 // highlightRange wraps the DOM Nodes within the provided range with a highlight
 // element of the specified class and returns the highlight Elements.
 //
@@ -45,75 +46,6 @@ function highlightRange(normedRange, cssClass) {
         }
     }
     return results;
-}
-
-
-function highlightOA(annotation, cssClass, storage){
-    console.log("[INFO] begin xpath fixing by OA selector");
-    var oaSelector = annotation.argues.hasTarget.hasSelector;
-    var prefix = oaSelector.prefix, suffix = oaSelector.suffix, exact = oaSelector.exact;
-    try{
-        var isFixed = false;
-        var nodes = $("p:contains('" + exact + "')" );
-        for (var n = 0, nlen = nodes.length; n < nlen; n++){
-            var node = nodes[n];
-            
-            var fullTxt = node.textContent.replace(/\s/g, " ");
-	        var re = new RegExp(exact,"g");
-            var res;
-            
-	        while (res = re.exec(fullTxt)){
-                var index = res["index"];
-                var prefixSub, suffixSub;
-                
-                prefixSub = fullTxt.substring(0,index);
-                suffixSub = fullTxt.substring(index + oaSelector.exact.length);
-                
-                var b0 = (prefixSub.length > 0 || suffixSub.length > 0); 
-                var b1 = (prefixSub.indexOf(prefix) >= 0) || (prefix.indexOf(prefixSub) >= 0);
-                var b2 = (suffixSub.indexOf(suffix) >= 0) || (suffix.indexOf(suffixSub) >= 0);
-
-                // if (prefix.indexOf("Potent inhibitors of CYP2D6 may increase")>=0) {
-                //     console.log(b1 + "|" + b2);
-                //     console.log(node);
-                //     console.log("oaSelector:" + prefix + "|" + suffix);
-                //     console.log("node hasn't been found:" + prefixSub + "|" + suffixSub);
-                //     //console.log(suffix.indexOf("40 mg twice daily with fluvox"));  
-                // }
-                
-                if (b0 && b1 && b2) {
-                    
-                    console.log("oaSelector:" + prefix + "|" + suffix);
-                    console.log("node been found:" + prefixSub + "|" + suffixSub);
-
-                    isFixed = true;
-                    var path = xpath.fromNode($(node), $(document))[0];
-                    path = path.replace("/html[1]/body[1]/article[1]/div[5]/div[1]/div[1]","");
-                    
-                    if (annotation.argues.ranges[0].start != path)
-                        annotation.argues.ranges[0].start = path;
-                    if (annotation.argues.ranges[0].end != path)
-                        annotation.argues.ranges[0].end = path;
-                    if (annotation.argues.ranges[0].startOffset != index)
-                        annotation.argues.ranges[0].startOffset = index;
-                    if (annotation.argues.ranges[0].endOffset != index + exact.length)
-                        annotation.argues.ranges[0].endOffset = index + exact.length;
-                
-                    storage.update(annotation);
-                    //this.redraw(annotation);
-                    console.log("[INFO] xpath fixing completed!");
-                }
-            }
-        }
-        if (!isFixed) {
-            console.log("[WARN] xpath fixing failed, oa selecter doesn't matched in document!");
-            console.log("oaSelector:" + prefix + "|" + exact + "|" + suffix + "|");
-            storage.delete({id : annotation.id});
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
 }
 
 
@@ -202,22 +134,68 @@ Highlighter.prototype.drawAll = function (annotations, pageNumber) {
 // annotation - An annotation Object for which to draw highlights.
 //
 // Returns an Array of drawn highlight elements.
+
 Highlighter.prototype.draw = function (annotation, pageNumber) {
+
+    // if oa selector is avaliable, use oa information to draw. Otherwise, use xpath apporach
+    // console.log("draw drug");
+    // console.log(annotation);
 
     if (annotation.annotationType != "DrugMention")
         return null;
 
-    var normedRanges = [];
     var oaAnnotations = [];
+    var hldivL = [];
+    var normedRanges = [];          
 
-    for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-        //check if this range in this pageNumber
-        if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-            var r = reanchorRange(annotation.argues.ranges[i], this.element);
-            if (r !== null) { // xpath reanchored by range
+
+    var drugMention = annotation.argues;
+
+    console.log("drughighlighter - called");
+
+    if (drugMention.hasTarget !=null) { // draw by oa selector
+        var drugName = drugMention.hasTarget.hasSelector.exact;
+
+        console.log("drug highlighter - drug: " + drugName);
+
+        // mark context
+        var options = {
+            "element": "span",
+            "className": "annotator-hl",
+            "separateWordSearch": false,
+            "acrossElements": true,
+            "caseSensitive": true, 
+            "accuracy": "partially",
+            "each": function(elem) {            
+                $(elem).attr('name', "annotator-hl");                
+                //$(elem).attr('data-markjs', true); //on show once for drug highlight
+                $(elem).attr('data-markjs', false); 
+                hldivL.push($(elem)[0]);
+            }                
+        };
+
+        try {
+            //console.log("mphighlighter - drawField - use oaSelector");
+
+            var listP = document.getElementsByTagName("p"); // highlight within all p tag
+            for (var i=0; i < listP.length; i++) {
+                var instance = new Mark(listP[i]);
+                instance.mark(drugName, options);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+
+    } else if (drugMention.ranges.length > 0) { // draw by ranges
+        for (var i = 0, ilen = drugMention.ranges.length; i < ilen; i++) {
+
+            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+                var r = reanchorRange(drugMention.ranges[i], this.element);   
+                if (r !== null) { 
                 normedRanges.push(r);
-            } else { // use OA prefix suffix approach
-                oaAnnotations.push(annotation);
+                //console.log("draw drug by xpath: " + drugName);
+            } else 
+                console.log("[Error]: draw by xpath failed: " + field);
             }
         }
     }
@@ -243,19 +221,8 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
         );
     }
 
-    // fix xpath by OA prefix suffix selector
-    if (oaAnnotations.length > 0){
-
-        if (!storage){
-	        var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + annhost + '/annotatorstore","urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search"}}';
-	        var queryOptions = JSON.parse(queryOptStr);
-            var storage = new HttpStorage(queryOptions);
-        }
-
-        for (var m = 0, mlen = oaAnnotations.length; m < mlen; m++) {
-            highlightOA(oaAnnotations[m], this.options.highlightClass, storage);
-        }
-    }
+    // add highlight divs to list for editing or deleting
+    $.merge(annotation._local.highlights, hldivL);    
 
     // Save the annotation data on each highlighter element.
     $(annotation._local.highlights).data('annotation', annotation);
@@ -267,7 +234,6 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
         $(annotation._local.highlights)
             .attr('id', annotation.id);
     }
-
     return annotation._local.highlights;
 };
 
