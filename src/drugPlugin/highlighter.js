@@ -175,13 +175,20 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
         };
 
         try {
-            //console.log("mphighlighter - drawField - use oaSelector");
+            console.log("mphighlighter - drawField - use oaSelector");
 
-            var listP = document.getElementsByTagName("p"); // highlight within all p tag
-            for (var i=0; i < listP.length; i++) {
-                var instance = new Mark(listP[i]);
-                instance.mark(drugName, options);
-            }
+            // draw in pdf
+            var context = document.querySelector("#subcontent");
+            var instance = new Mark(context);
+            instance.mark(drugName, options);
+
+            // draw in Dailymed SPL or PMC article
+            // var listP = document.getElementsByTagName("p"); 
+            // for (var i=0; i < listP.length; i++) {
+            //     var instance = new Mark(listP[i]);
+            //     instance.mark(drugName, options);
+            // }
+
         } catch (err) {
             console.log(err);
         }
