@@ -109,7 +109,7 @@ Highlighter.prototype.drawAll = function (annotations, pageNumber) {
             }
             var now = annList.splice(0, self.options.chunkSize);
             for (var i = 0, len = now.length; i < len; i++) {
-                highlights = highlights.concat(self.draw(now[i]), pageNumber);
+                highlights = highlights.concat(self.draw(now[i], pageNumber));
             }
 
             // If there are more to do, do them after a delay
@@ -176,18 +176,21 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
 
         try {
             console.log("mphighlighter - drawField - use oaSelector");
-
-            // draw in pdf
-            var context = document.querySelector("#subcontent");
-            var instance = new Mark(context);
-            instance.mark(drugName, options);
-
-            // draw in Dailymed SPL or PMC article
-            // var listP = document.getElementsByTagName("p"); 
-            // for (var i=0; i < listP.length; i++) {
-            //     var instance = new Mark(listP[i]);
-            //     instance.mark(drugName, options);
-            // }
+            
+            if (sourceURL.indexOf(".pdf") != -1) {
+                // draw in pdf
+                var currPageContainer = "#pageContainer" + pageNumber;
+                var context = document.querySelector(currPageContainer);
+                var instance = new Mark(context);
+                instance.mark(drugName, options);
+            } else {
+                // draw in Dailymed SPL or PMC article
+                var listP = document.getElementsByTagName("p"); 
+                for (var i=0; i < listP.length; i++) {
+                    var instance = new Mark(listP[i]);
+                    instance.mark(drugName, options);
+                }
+            }
 
         } catch (err) {
             console.log(err);
@@ -196,7 +199,7 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
     } else if (drugMention.ranges.length > 0) { // draw by ranges
         for (var i = 0, ilen = drugMention.ranges.length; i < ilen; i++) {
 
-            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(19, 21).replace("]", "") == pageNumber) {
                 var r = reanchorRange(drugMention.ranges[i], this.element);   
                 if (r !== null) { 
                 normedRanges.push(r);

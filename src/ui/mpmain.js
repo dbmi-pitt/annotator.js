@@ -458,48 +458,53 @@ function main(options) {
                 console.log("[load page " + pageNumber + "]");
                 var annsByPage = [];
                 for (var i = 0; i < anns.length; i++) {
-                    var ranges = anns[i].argues.ranges;
-                    var flag = false;
-                    for (var j = 0; j < ranges.length; j++) {
-                        if (ranges[j].start.substring(47, 49).replace("]", "") == pageNumber) {
-                            annsByPage.push(anns[i]);
-                            flag = true;
-                            break;
-                        }
-                    }
 
-                    //data(not claim) in this annotation may appear in different pages
-                    //In order to load them successfully, check them every time
-                    if (!flag && anns[i].argues.supportsBy.length != 0) {
-                        var data = anns[i].argues.supportsBy;
-                        for (var j = 0; j < data.length; j++) {
-                            if (typeof data[j].auc.ranges != "undefined" &&
-                                (data[j].auc.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
+                    if (anns[i].annotationType == "DrugMention") {
+                        annsByPage.push(anns[i]);
+                    } else {
+                        var ranges = anns[i].argues.ranges;
+                        var flag = false;
+                        for (var j = 0; j < ranges.length; j++) {
+                            if (ranges[j].start.substring(19, 21).replace("]", "") == pageNumber) {
                                 annsByPage.push(anns[i]);
-                            } else if (typeof data[j].cmax.ranges != "undefined" &&
-                                (data[j].cmax.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].halflife.ranges != "undefined" &&
-                                (data[j].halflife.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].clearance.ranges != "undefined" &&
-                                (data[j].clearance.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(47, 49).replace("]", "") == pageNumber)) {
-                                annsByPage.push(anns[i]);
+                                flag = true;
+                                break;
+                            }
+                        }
+
+                        //data(not claim) in this annotation may appear in different pages
+                        //In order to load them successfully, check them every time
+                        if (!flag && anns[i].argues.supportsBy.length != 0) {
+                            var data = anns[i].argues.supportsBy;
+                            for (var j = 0; j < data.length; j++) {
+                                if (typeof data[j].auc.ranges != "undefined" &&
+                                    (data[j].auc.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].cmax.ranges != "undefined" &&
+                                    (data[j].cmax.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].halflife.ranges != "undefined" &&
+                                    (data[j].halflife.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].clearance.ranges != "undefined" &&
+                                    (data[j].clearance.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
+                                    (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
+                                    (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
+                                    (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                }
                             }
                         }
                     }
                 }
                 console.log("[num of annotations: " + annsByPage.length + "]");
-                console.log(annsByPage);
+                //console.log(annsByPage);
                 s.hlhighlighter.drawAll(annsByPage, pageNumber);
                 s.mphighlighter.drawAll(annsByPage, pageNumber);
             } else {

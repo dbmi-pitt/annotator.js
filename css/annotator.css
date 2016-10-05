@@ -21,7 +21,6 @@
 	color: rgb(28, 33, 33);
 }
 
-
 /* Images
 -------------------------------------------------------------------- */
 
@@ -338,7 +337,7 @@ span[name="annotator-mp"] {
 	padding: 0;
 	bottom: 15px;
 	left: -18px;
-	min-width: 400px;
+	min-width: 360px;
 	background-color: #FBFBFB;
 	background-color: rgba(251, 251, 251, 0.98);
 	border: 1px solid #7A7A7A;

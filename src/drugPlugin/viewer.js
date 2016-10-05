@@ -200,12 +200,16 @@ var Viewer = exports.Viewer = Widget.extend({
     // Returns nothing.
     show: function (position) {
         if (typeof position !== 'undefined' && position !== null) {
+            //adjust based on window size, avoid cutting the viewer
+            var width = window.innerWidth;
+            var left = position.left;
+            if ((left + 360) > width) {
+                left = width - 360;
+            }
+
             this.element.css({
-                //top: position.top,
-                left: position.left,
-                top:position.top
-                //left:200,
-                //width:200px
+                left: left,
+                top: position.top
             });
         }
 

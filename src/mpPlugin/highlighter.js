@@ -120,7 +120,6 @@ mpHighlighter.prototype.drawAll = function (annotations, pageNumber) {
             if (typeof annList === 'undefined' || annList === null) {
                 annList = [];
             }
-            console.log("[test] " + pageNumber);
             var now = annList.splice(0, self.options.chunkSize);
             for (var i = 0, len = now.length; i < len; i++) {
                 if (now[i].annotationType == "MP")
@@ -182,7 +181,7 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
         for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
 
             // when pdf.js render pdf doc, the page num represents in xpath range in offset (47 - 49)
-            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
+            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(19, 21).replace("]", "") == pageNumber) {
                 var r = reanchorRange(obj.ranges[i], this.element);   
                 if (r !== null) { 
                     dataRangesL.push(new DataRange(r, field, idx));                
@@ -190,21 +189,7 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
                     console.log("[Error]: draw by xpath failed: " + field);
             }
         }
-        // from PDF draw()
-        // for (var i = 0, ilen = annotation.argues.ranges.length; i < ilen; i++) {
-        //     //check if this range in this pageNumber
-        //     if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(47, 49).replace("]", "") == pageNumber) {
-        //         var r = reanchorRange(annotation.argues.ranges[i], this.element);
-        //         if (r !== null) {
-        //             //normedRanges.push(r);
-        //             dataRangesL.push(new DataRange(r, "claim", 0));
-        //         } else {
-        //             console.log("[ERROR] range failed to reanchor");
-        //             console.log(r);
-        //         }
-        //     }
-        // }
-
+        
     } else if (obj.hasTarget != null) { // draw by oa selector
         // && obj.qualifiedBy.drug1 == "rifampin"
         console.log("mphighlighter - drawField - use oaSelector");
