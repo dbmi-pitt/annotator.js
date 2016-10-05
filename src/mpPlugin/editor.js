@@ -1108,7 +1108,7 @@ function loadDataItemFromAnnotation(loadData) {
     $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
     $("#drug1Formulation > option").each(function () {
         if (this.value === loadData.supportsBy.supportsBy.drug1Dose.formulation) {
-            $(this).prop('selected', true);                                                  
+            $(this).prop('selected', true);                                       
         }
     });
     $("#drug1Regimens > option").each(function () {

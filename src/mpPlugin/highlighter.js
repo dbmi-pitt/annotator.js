@@ -188,7 +188,7 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
         // && obj.qualifiedBy.drug1 == "rifampin"
-        console.log("mphighlighter - drawField - use oaSelector");
+        // console.log("mphighlighter - drawField - use oaSelector");
 
         var oaselector = obj.hasTarget.hasSelector;
         var listP = document.getElementsByTagName("p"); // highlight within all p tag
@@ -224,7 +224,6 @@ mpHighlighter.prototype.draw = function (annotation) {
     var dataRangesL = [];
 
     try {       
-        console.log("mphighlighter - draw");
 
         // draw MP claim        
         self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL);

@@ -150,12 +150,12 @@ Highlighter.prototype.draw = function (annotation) {
 
     var drugMention = annotation.argues;
 
-    console.log("drughighlighter - called");
+    //console.log("drughighlighter - called");
 
     if (drugMention.hasTarget !=null) { // draw by oa selector
         var drugName = drugMention.hasTarget.hasSelector.exact;
 
-        console.log("drug highlighter - drug: " + drugName);
+        //console.log("drug highlighter - drug: " + drugName);
 
         // mark context
         var options = {

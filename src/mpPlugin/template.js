@@ -206,14 +206,14 @@ var context5 = {
             type:"dropdown",
             name:"Type: ",
             id:"aucType",
-            options:["UNK","percent","fold"],
+            options:["UNK","Percent","Fold"],
             optionsID:[]
         },
         {
             type:"dropdown",
             name:"Direction: ",
             id:"aucDirection",
-            options:["UNK","increase","decrease"],
+            options:["UNK","Increase","Decrease"],
             optionsID:[]
         }
     ]
@@ -244,14 +244,14 @@ var context6 = {
             type:"dropdown",
             name:"Type: ",
             id:"cmaxType",
-            options:["UNK","percent","fold"],
+            options:["UNK","Percent","Fold"],
             optionsID:[]
         },
         {
             type:"dropdown",
             name:"Direction: ",
             id:"cmaxDirection",
-            options:["UNK","increase","decrease"],
+            options:["UNK","Increase","Decrease"],
             optionsID:[]
         }
     ]
@@ -283,14 +283,14 @@ var context7 = {
             type:"dropdown",
             name:"Type: ",
             id:"clearanceType",
-            options:["UNK","percent","fold"],
+            options:["UNK","Percent","Fold"],
             optionsID:[]
         },
         {
             type:"dropdown",
             name:"Direction: ",
             id:"clearanceDirection",
-            options:["UNK","increase","decrease"],
+            options:["UNK","Increase","Decrease"],
             optionsID:[]
         }
     ]
@@ -323,14 +323,14 @@ var context8 = {
             type:"dropdown",
             name:"Type: ",
             id:"halflifeType",
-            options:["UNK","percent","fold"],
+            options:["UNK","Percent","Fold"],
             optionsID:[]
         },
         {
             type:"dropdown",
             name:"Direction: ",
             id:"halflifeDirection",
-            options:["UNK","increase","decrease"],
+            options:["UNK","Increase","Decrease"],
             optionsID:[]
         }
     ]
