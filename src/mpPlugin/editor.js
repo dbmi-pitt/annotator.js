@@ -96,16 +96,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         for (var i = 0, len = anns.length; i < len; i++) {
                             if (anns[i].annotationType == "DrugMention") {
-                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
+                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact.toLowerCase());
                             }
                         }
+                        //check if drug in store (all in lowercase)
                         for(var i=0;i<list.length;i++) {
-                            if(allHighlightedDrug.indexOf(list[i].trim())==-1) {
+                            if(allHighlightedDrug.indexOf(list[i].trim().toLowerCase())==-1) {
                                 list.splice(i, 1);
                                 listid.splice(i,1);
                             }
                         }
-                        //console.log(allHighlightedDrug);
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
                             // avoid replacing span itself add to dropdown box
