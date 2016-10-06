@@ -209,7 +209,7 @@ var Viewer = exports.Viewer = Widget.extend({
 
             this.element.css({
                 left: left,
-                top: position.top
+                top: position.top + 10
             });
         }
 

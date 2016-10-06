@@ -175,11 +175,15 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
         };
 
         try {
-            console.log("mphighlighter - drawField - use oaSelector");
-            
+            //console.log("drughighlighter - drawField - use oaSelector");
             if (sourceURL.indexOf(".pdf") != -1) {
                 // draw in pdf
-                var currPageContainer = "#pageContainer" + pageNumber;
+                var currPageContainer;
+                if (pageNumber == undefined) {
+                    currPageContainer = "#subcontent";
+                } else {
+                    currPageContainer = "#pageContainer" + pageNumber;
+                }
                 var context = document.querySelector(currPageContainer);
                 var instance = new Mark(context);
                 instance.mark(drugName, options);
