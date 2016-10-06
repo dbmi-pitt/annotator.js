@@ -424,14 +424,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             else {
                                 mpData.clearance.value = clearanceValue;
                                 mpData.clearance.type = clearanceType;
-                                mpData.clearance.direction = clearanceDirection;      
+                                mpData.clearance.direction = clearanceDirection; 
                             }
 
-                            if (mpData.clearnace.ranges == null) {
-                                mpData.clearnace.ranges = cachedOARanges;
+                            if (mpData.clearance.ranges == null) {
+                                mpData.clearance.ranges = cachedOARanges;
                             }
-                            if (mpData.clearnace.hasTarget == null) {
-                                mpData.clearnace.hasTarget = cachedOATarget;
+                            if (mpData.clearance.hasTarget == null) {
+                                mpData.clearance.hasTarget = cachedOATarget;
                             }                                  
                         } else {
                             console.log("[WARNING] clearance required fields not filled!");
