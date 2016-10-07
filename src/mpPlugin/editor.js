@@ -263,13 +263,42 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // MP method - keep with claim
                         annotation.argues.method = $('#method option:selected').text();                        
                         // MP argues claim, claim qualified by ?s ?p ?o
-                        if (annotation.argues.qualifiedBy != null)
+                        if (annotation.argues.qualifiedBy != null) {
                             var qualifiedBy = annotation.argues.qualifiedBy;
-                        else
+                            //dose info needs to follow drug, if users make a switch in the claim editor
+                            var supportsBys = annotation.argues.supportsBy;
+                            var allrelationOfDose = [];
+                            for (var i = 0; i < supportsBys.length; i++) {
+                                var relationOfDose = {};
+                                var supportsBy = supportsBys[i].supportsBy.supportsBy;
+                                if (supportsBy.drug1Dose != null) {
+                                    relationOfDose[qualifiedBy.drug1] = supportsBy.drug1Dose;
+                                }
+                                if (supportsBy.drug2Dose != null) {
+                                    relationOfDose[qualifiedBy.drug2] = supportsBy.drug2Dose;
+                                }
+                                allrelationOfDose.push(relationOfDose);
+                            }
+                        } else {
                             var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
-
+                        }
                         qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                         qualifiedBy.drug2 = $('#Drug2 option:selected').text();
+                        //relation of drug and drugDose
+                        if (annotation.argues.supportsBy.length != 0) {  //has data or material
+                            for (var i = 0; i < allrelationOfDose.length; i++) {
+                                if (qualifiedBy.drug1 in allrelationOfDose[i]) {
+                                    supportsBys[i].supportsBy.supportsBy.drug1Dose = allrelationOfDose[i][qualifiedBy.drug1];
+                                } else {
+                                    supportsBys[i].supportsBy.supportsBy.drug1Dose = {};
+                                }
+                                if (qualifiedBy.drug2 in allrelationOfDose[i]) {
+                                    supportsBys[i].supportsBy.supportsBy.drug2Dose = allrelationOfDose[i][qualifiedBy.drug2];
+                                } else {
+                                    supportsBys[i].supportsBy.supportsBy.drug2Dose = {};
+                                }
+                            }
+                        }
                         qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
                         qualifiedBy.drug2ID = $('#Drug2 option:selected').val();
                         qualifiedBy.relationship = $('#relationship option:selected').text();
