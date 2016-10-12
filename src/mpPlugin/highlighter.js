@@ -171,8 +171,10 @@ function markOptions(fieldType, dataNum, hldivL) {
 // field - name of specific field for claim, data or material (ex auc, cmax, etc)  
 // idx - data index (0 if it's claim)
 // dataRanges - list of xpath ranges
-// hldivL - list of span text nodes   
-mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
+// hldivL - list of span text nodes
+// mode: (1) regular: apply mark.js for whole article, (2) dailymed: apply for each section by find p tag with className First 
+  
+mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL, mode) {
 
     //console.log("mphighlighter - drawField - called");
     //console.log(obj);
@@ -187,17 +189,19 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
                 console.log("[Error]: draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
-        // && obj.qualifiedBy.drug1 == "rifampin"
-        // console.log("mphighlighter - drawField - use oaSelector");
-
         var oaselector = obj.hasTarget.hasSelector;
-        var listP = document.getElementsByTagName("p"); // highlight within all p tag
 
-        for (var i=0; i < listP.length; i++) {
-            var instance = new Mark(listP[i]);
-            instance.mark(oaselector.exact, markOptions(field, idx, hldivL));
+        if (mode == "regular") {
+            var instance = new Mark($("#subcontent"));   
+            instance.mark(oaselector.exact, markOptions(field, idx, hldivL));  
+        } else if (mode == "dailymed") {
+        var listP =  $("p.First");
+            for (var i=0; i < listP.length; i++) {
+                var section = listP[i].parentElement;
+                var instance = new Mark(section);
+                instance.mark(oaselector.exact, markOptions(field, idx, hldivL));  
+            }
         }
-
         //console.log("draw by oaselector: " + field);
     } else {
         console.log("[Warning]: draw failed on field: " + field);
@@ -224,9 +228,12 @@ mpHighlighter.prototype.draw = function (annotation) {
     var dataRangesL = [];
 
     try {       
-
+        var mode = "regular";  
+        if (annotation.rawurl.indexOf("/DDI-labels/") > 0) 
+            mode = "dailymed"; // dailymed labels in 'DDI-labels' directory
+        
         // draw MP claim        
-        self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL);
+        self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL, mode);
 
         // draw MP data
         if (annotation.argues.supportsBy.length != 0){            
@@ -234,28 +241,25 @@ mpHighlighter.prototype.draw = function (annotation) {
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
 
-
                 if (data.auc.ranges != null || data.auc.hasTarget != null) 
-                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL);     
-
+                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL, mode);   
                 if (data.cmax.ranges != null || data.cmax.hasTarget != null) 
-                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL);
-                
+                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL, mode);            
                 if (data.clearance.ranges != null || data.clearance.hasTarget != null)
-                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);                
+                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL, mode);                
                 if (data.halflife.ranges != null || data.halflife.hasTarget !=null) 
-                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);                                
+                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL, mode);                                
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
 
                 if (material != null){                    
 
                     if (material.participants.ranges != null || material.participants.hasTarget != null)
-                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL, mode);                    
                     if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) 
-                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL, mode);                    
                     if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) 
-                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL, mode);                    
                 }
             }
         }
