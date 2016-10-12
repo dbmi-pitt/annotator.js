@@ -122,7 +122,8 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
 // idx - data index (0 if it's claim)
 // dataRanges - list of xpath ranges
 // hldivL - list of span text nodes   
-currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
+// mode: (1) regular: apply mark.js for whole article, (2) dailymed: apply for each section by find p tag with className First 
+currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL, mode) {
 
     if (obj.ranges.length > 0) { // draw by xpath range
         for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
@@ -135,17 +136,19 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
 
-        // mark context
-        var context = document.querySelector("#subcontent");          
-        var markObj = new Mark(context);
-
         var oaselector = obj.hasTarget.hasSelector;
-        var listP = document.getElementsByTagName("p"); // highlight within all p tag
-        for (var i=0; i < listP.length; i++) {
-            var instance = new Mark(listP[i]);
-            instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));
-        }
 
+        if (mode == "regular") {
+            var instance = new Mark($("#subcontent"));   
+            instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));  
+        } else if (mode == "dailymed") {
+            var listP =  $("p.First");
+            for (var i=0; i < listP.length; i++) {
+                var section = listP[i].parentElement;
+                var instance = new Mark(section);
+                instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));
+            }
+        }
         //console.log("temp draw by oaselector: " + field);
     } else {
         console.log("[Warning]: temp draw failed on field: " + field);
@@ -172,13 +175,15 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
     var dataRangesL = [];
 
     try {
-
-        console.log("temphighlighter.js - field: " + currFormType);
+        //console.log("temphighlighter.js - field: " + currFormType);
+        var mode = "regular";  
+        if (annotation.rawurl.indexOf("/DDI-labels/") > 0) 
+            mode = "dailymed"; // dailymed labels in 'DDI-labels' directory
 
         if(currFormType == "claim" || inputType == "add") {            
 
             // draw MP claim       
-            self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL);
+            self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL, mode);
         } else {
             // draw MP data
             if (annotation.argues.supportsBy.length != 0) {
@@ -187,27 +192,27 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                 var data = dataL[currDataNum];
 
                 if (currFormType == "auc" && (data.auc.ranges != null || data.auc.hasTarget != null)) 
-                    self.drawField(data.auc, "auc", currDataNum, dataRangesL, hldivL);
+                    self.drawField(data.auc, "auc", currDataNum, dataRangesL, hldivL, mode);
 
                 if (currFormType == "cmax" && (data.cmax.ranges != null || data.cmax.hasTarget != null)) 
-                    self.drawField(data.cmax, "cmax", currDataNum, dataRangesL, hldivL);
+                    self.drawField(data.cmax, "cmax", currDataNum, dataRangesL, hldivL, mode);
 
                 if (currFormType == "clearance" && (data.clearance.ranges != null || data.clearance.hasTarget != null)) 
-                    self.drawField(data.clearance, "clearance", currDataNum, dataRangesL, hldivL);
+                    self.drawField(data.clearance, "clearance", currDataNum, dataRangesL, hldivL, mode);
                 if (currFormType == "halflife" && (data.halflife.ranges != null || data.halflife.hasTarget != null)) 
-                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL);               
+                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL, mode);               
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
                 if (material != null){                    
 
                     if (currFormType == "participants" && (material.participants.ranges != null || material.participants.hasTarget != null)) 
-                        self.drawField(material.participants, "participants", currDataNum, dataRangesL, hldivL);
+                        self.drawField(material.participants, "participants", currDataNum, dataRangesL, hldivL, mode);
                     
                     if (currFormType == "dose1" && (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null)) 
-                        self.drawField(material.drug1Dose, "dose1", currDataNum, dataRangesL, hldivL);
+                        self.drawField(material.drug1Dose, "dose1", currDataNum, dataRangesL, hldivL, mode);
                     
                     if (currFormType == "dose2" && (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null)) 
-                        self.drawField(material.drug2Dose, "dose2", currDataNum, dataRangesL, hldivL);                                                
+                        self.drawField(material.drug2Dose, "dose2", currDataNum, dataRangesL, hldivL, mode);                                                
                 }                                
             }
         }
