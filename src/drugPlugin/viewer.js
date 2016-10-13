@@ -86,8 +86,8 @@ var Viewer = exports.Viewer = Widget.extend({
             if (annotation.annotationType == "DrugMention" && annotation.created) {
                 var returnText = "<div class='annotator-ddi'>By " + annotation.email + " on " + annotation.updated + "</div>" +
                     annotation.annotationType +
-                    ": <span class='annotator-ddi-active'>" + annotation.argues.hasTarget.hasSelector.exact + "</span>"
-
+                    ": <span class='annotator-ddi-active'>" + annotation.argues.hasTarget.hasSelector.exact + "</span>" + 
+                    "<button style= type='button' class='annotator-edit'>" + _t('redraw') + "</button>";
                 return returnText;
             } else {
                 return null;
@@ -173,7 +173,9 @@ var Viewer = exports.Viewer = Widget.extend({
                 self._clearHideTimer();
             })
             .on("mouseleave." + NS, function () {
-                self._startHideTimer();
+                if (!redrawDrug) {
+                    self._startHideTimer();
+                }
             });
     },
 
@@ -360,7 +362,9 @@ var Viewer = exports.Viewer = Widget.extend({
         var item = $(event.target)
             .parents('.annotator-annotation')
             .data('annotation');
-        this.hide();
+        //this.hide();
+        //redrawDrug = true;
+        console.log("[[[" + redrawDrug + "]]]");
         this.options.onEdit(item);
     },
 
@@ -498,7 +502,7 @@ Viewer.itemTemplate = [
     '    <a href="#"',
     '       title="' + _t('View as webpage') + '"',
     '       class="annotator-link">' + _t('View as webpage') + '</a>',
-    '    <button style="display:none" type="button"',
+    '    <button style="display: none" type="button"',
     '            title="' + _t('Edit') + '"',
     '            class="annotator-edit">' + _t('Edit') + '</button>',
     '    <button type="button"',

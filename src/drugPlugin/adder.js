@@ -155,12 +155,15 @@ var Adder = Widget.extend({
         if (this.annotation !== null && typeof this.onCreate === 'function') {
             if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
                 var newRange = this.annotation.argues.ranges[0];
+                var exact = this.annotation.argues.hasTarget.hasSelector.exact;
                 console.log(newRange);
                 currAnnotation.argues.ranges.push(newRange);
+                currAnnotation.argues.hasTarget.hasSelector.exact += exact;
                 console.log(currAnnotation);
                 this.annotation = currAnnotation;
                 multiSelected = false;
             }
+            console.log("new combined drug: " + this.annotation);
             this.annotation.annotationType = "DrugMention";
             this.onCreate(this.annotation, event);
         }

@@ -181,7 +181,7 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
         for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
 
             // when pdf.js render pdf doc, the page num represents in xpath range in offset (47 - 49)
-            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(19, 21).replace("]", "") == pageNumber) {
+            if (pageNumber == undefined || obj.ranges[i].start.substring(19, 21).replace("]", "") == pageNumber) {
                 var r = reanchorRange(obj.ranges[i], this.element);   
                 if (r !== null) { 
                     dataRangesL.push(new DataRange(r, field, idx));                
@@ -230,13 +230,14 @@ mpHighlighter.prototype.draw = function (annotation, pageNumber) {
     var dataRangesL = [];
 
     try {       
-        console.log("mphighlighter - draw");
+        //console.log("mphighlighter - draw");
 
         // draw MP claim        
         self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL, pageNumber);
 
         // draw MP data
-        if (annotation.argues.supportsBy.length != 0){            
+        if (annotation.argues.supportsBy.length != 0){
+           
             var dataL = annotation.argues.supportsBy;
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];

@@ -50,7 +50,6 @@ function annotationFactory(contextEl, ignoreSelector) {
             serializedRanges.push(serializedRange);
         }
 
-
         var prefix = "", suffix = "";
         prefix = getTxtFromNode(ranges[0].start, false, ignoreSelector, 50);
         suffix = getTxtFromNode(ranges[0].end, true, ignoreSelector, 50);
@@ -349,7 +348,7 @@ function main(options) {
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
-                    if (sourceURL.indexOf(".pdf") != -1) {
+                    if (sourceURL.match(/\.pdf/g)) {
                         s.crpgadder.load(hlAnnotation, s.interactionPoint);
                         if (currAnnotation != undefined && multiSelected) {
                             s.cancelcrpgadder.show(s.interactionPoint); //duplicate show, but this can update adder position
@@ -602,6 +601,9 @@ function main(options) {
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else {
+                //console.log(annotation);
+                //s.hlhighlighter.undraw(annotation);
+                //console.log(hlAnnotation);
                 return null;
             }
         },

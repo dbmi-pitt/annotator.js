@@ -138,7 +138,7 @@ Highlighter.prototype.drawAll = function (annotations, pageNumber) {
 Highlighter.prototype.draw = function (annotation, pageNumber) {
 
     // if oa selector is avaliable, use oa information to draw. Otherwise, use xpath apporach
-    // console.log("draw drug");
+    // console.log("drughighlighter - called");
     // console.log(annotation);
 
     if (annotation.annotationType != "DrugMention")
@@ -151,12 +151,10 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
 
     var drugMention = annotation.argues;
 
-    console.log("drughighlighter - called");
-
-    if (drugMention.hasTarget !=null) { // draw by oa selector
+    if (drugMention.hasTarget !=null && drugMention.ranges.length <= 1) { // draw by oa selector
         var drugName = drugMention.hasTarget.hasSelector.exact;
 
-        console.log("drug highlighter - drug: " + drugName);
+        //console.log("drug highlighter - drug: " + drugName);
 
         // mark context
         var options = {
