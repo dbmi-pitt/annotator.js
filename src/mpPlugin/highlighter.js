@@ -192,10 +192,11 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
         var oaselector = obj.hasTarget.hasSelector;
 
         if (mode == "regular") {
-            var instance = new Mark($("#subcontent"));   
+            var context = $("#subcontent");
+            var instance = new Mark(context[0]);   
             instance.mark(oaselector.exact, markOptions(field, idx, hldivL));  
         } else if (mode == "dailymed") {
-        var listP =  $("p.First");
+            var listP =  $("p.First");
             for (var i=0; i < listP.length; i++) {
                 var section = listP[i].parentElement;
                 var instance = new Mark(section);

@@ -139,7 +139,8 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
         var oaselector = obj.hasTarget.hasSelector;
 
         if (mode == "regular") {
-            var instance = new Mark($("#subcontent"));   
+            var context = $("#subcontent");
+            var instance = new Mark(context[0]);   
             instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));  
         } else if (mode == "dailymed") {
             var listP =  $("p.First");
