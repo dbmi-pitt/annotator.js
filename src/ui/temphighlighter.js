@@ -165,6 +165,8 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
 //
 // Returns an Array of drawn highlight elements.
 currHighlighter.prototype.draw = function (annotation, inputType) {
+    //undraw all previous currhighlight
+    undrawCurrhighlighter();
     self = this;
 
     if(annotation.annotationType!=undefined) {
