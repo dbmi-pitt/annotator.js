@@ -139,9 +139,14 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
         var oaselector = obj.hasTarget.hasSelector;
 
         if (mode == "regular") {
-            var context = $("#subcontent");
-            var instance = new Mark(context[0]);   
-            instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));  
+            try {
+                var context = $("#content");
+                console.log(context);
+                if (context[0] != null) {
+                    var instance = new Mark(context[0]);
+                    instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));  
+                }
+            } catch (err) {console.log(err);}
         } else if (mode == "dailymed") {
             var listP =  $("p.First");
             for (var i=0; i < listP.length; i++) {
