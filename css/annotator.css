@@ -82,6 +82,10 @@
 	background-color: #d1d1d1;
 }
 
+#quotearea {
+	font-size: 10px !important;
+}
+
 .highlightdrug {
 	background-color: rgba(255, 23, 11, 0.42);
 	color: rgb(0, 0, 0);
@@ -445,6 +449,14 @@ span[name="annotator-mp"] {
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	color:#000000;
+}
+
+.annotator-editor-form select {
+	width: 120px !important;
+}
+
+.annotator-editor-form input[type="checkbox"], input[type="radio"] {
+	width: 30px !important;
 }
 
 .annotator-editor-form { 
@@ -1353,7 +1365,7 @@ input[type="radio"] {
 .dialog-background {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    z-index: 100; /* Sit on top */
     padding-top: 200px; /* Location of the box */
     left: 0;
     top: 0;
@@ -1422,7 +1434,12 @@ input[type="radio"] {
 
 .modal-body {
     padding: 2px 16px;
-    font-size: 13px;
+    font-size: 13px !important;
+}
+
+.modal-body strong {
+	font-weight: 800 !important;
+    font-size: 13px !important;
 }
 
 /* .modal-footer { */
