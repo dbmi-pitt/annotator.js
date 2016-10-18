@@ -105,7 +105,7 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
         "separateWordSearch": false,
         "acrossElements": true,
         "accuracy": "partially",
-        "exclude": ["table", "tr", "td", "img"],
+        "exclude": ["table","tr","td","img","script","style","meta","title","button"],
         "each": function(elem) {
             $(elem).attr('name', "annotator-currhl");
             $(elem).attr('fieldname', fieldType);
@@ -140,7 +140,7 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
 
         if (mode == "regular") {
             try {
-                var context = $("#content");
+                var context = $("#subcontent");
                 console.log(context);
                 if (context[0] != null) {
                     var instance = new Mark(context[0]);
