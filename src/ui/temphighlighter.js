@@ -105,8 +105,8 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
         "separateWordSearch": false,
         "acrossElements": true,
         "accuracy": "partially",
+        "exclude": ["table", "tr", "td", "img"],
         "each": function(elem) {
-
             $(elem).attr('name', "annotator-currhl");
             $(elem).attr('fieldname', fieldType);
             $(elem).attr('datanum', dataNum);        
@@ -148,9 +148,10 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
                 }
             } catch (err) {console.log(err);}
         } else if (mode == "dailymed") {
-            var listP =  $("p.First");
+
+            var listP = $("[class=Section]");
             for (var i=0; i < listP.length; i++) {
-                var section = listP[i].parentElement;
+                var section = listP[i];
                 var instance = new Mark(section);
                 instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));
             }

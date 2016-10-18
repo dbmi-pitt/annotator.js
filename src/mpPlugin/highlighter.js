@@ -154,9 +154,8 @@ function markOptions(fieldType, dataNum, hldivL) {
         "separateWordSearch": false,
         "acrossElements": true,
         "accuracy": "partially",
-        "caseSensitive": true, 
-        "each": function(elem) {
-            
+        "exclude": ["table", "tr", "td", "img"],
+        "each": function(elem) {            
             $(elem).attr('name', "annotator-mp");
             $(elem).attr('fieldname', fieldType);
             $(elem).attr('datanum', dataNum);     
@@ -196,14 +195,16 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
             var instance = new Mark(context[0]);   
             instance.mark(oaselector.exact, markOptions(field, idx, hldivL));  
         } else if (mode == "dailymed") {
-            var listP =  $("p.First");
+
+            var listP = $("[class=Section]");
+            //console.log(listP);
+
             for (var i=0; i < listP.length; i++) {
-                var section = listP[i].parentElement;
+                var section = listP[i];
                 var instance = new Mark(section);
                 instance.mark(oaselector.exact, markOptions(field, idx, hldivL));  
             }
         }
-        //console.log("draw by oaselector: " + field);
     } else {
         console.log("[Warning]: draw failed on field: " + field);
         console.log(obj);
