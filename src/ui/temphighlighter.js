@@ -149,7 +149,7 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
             } catch (err) {console.log(err);}
         } else if (mode == "dailymed") {
 
-            var listP = $("[class=Section]");
+            var listP = $("[class='Section\ toggle-content\ closed']");
             for (var i=0; i < listP.length; i++) {
                 var section = listP[i];
                 var instance = new Mark(section);

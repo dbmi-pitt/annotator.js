@@ -196,7 +196,7 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
             instance.mark(oaselector.exact, markOptions(field, idx, hldivL));  
         } else if (mode == "dailymed") {
 
-            var listP = $("[class=Section]");
+            var listP = $("[class='Section\ toggle-content\ closed']");
             //console.log(listP);
 
             for (var i=0; i < listP.length; i++) {
