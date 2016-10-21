@@ -314,7 +314,7 @@ function main(options) {
         // select text, then load normed ranges to adder
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
-                console.log("mpmain - textselector - onSelection");
+                //console.log("mpmain - textselector - onSelection");
 
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
