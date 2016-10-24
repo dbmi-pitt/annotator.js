@@ -105,6 +105,7 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
         "separateWordSearch": false,
         "acrossElements": true,
         "accuracy": "partially",
+        "caseSensitive": true,
         "exclude": ["table","tr","td","img","script","style","meta","title","button"],
         "each": function(elem) {
             $(elem).attr('name', "annotator-currhl");
