@@ -184,7 +184,9 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
     var dataRangesL = [];
 
     try {
-        //console.log("temphighlighter.js - field: " + currFormType);
+        console.log("temphighlighter.js - field: " + currFormType);
+        console.log(annotation);
+
         var mode = "regular";  
         if (annotation.rawurl.indexOf("/DDI-labels/") > 0) 
             mode = "dailymed"; // dailymed labels in 'DDI-labels' directory

@@ -66,7 +66,8 @@ function annotationFactory(contextEl, ignoreSelector) {
                     }
                 },
                 supportsBy : []
-            }
+            },
+            rawurl: sourceURL
         };
     };
 }
