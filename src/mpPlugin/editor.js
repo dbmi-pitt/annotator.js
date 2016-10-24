@@ -1373,33 +1373,33 @@ function cleanClaimForm() {
 
 // clean all value of data form
 function cleanDataForm() {
-    $("#participants").empty();
-    $("#drug1Dose").empty();
-    $("#drug1Duration").empty();
+    $("#participants").val('');
+    $("#drug1Dose").val('');
+    $("#drug1Duration").val('');
     $("#drug1Formulation")[0].selectedIndex = -1;
     $("#drug1Regimens")[0].selectedIndex = -1;
-    $("#drug2Dose").empty();
-    $("#drug2Duration").empty();
+    $("#drug2Dose").val('');
+    $("#drug2Duration").val('');
     $("#drug2Formulation")[0].selectedIndex = -1;
-    $("#drug2Regimens")[0].selectedIndex = -1;   
-    
+    $("#drug2Regimens")[0].selectedIndex = -1;       
+
     // clean data : auc, cmax, cl, half life
-    $("#auc").empty();
+    $("#auc").val('');
     $("#aucType")[0].selectedIndex = -1;
     $("#aucDirection")[0].selectedIndex = -1;
     $('#auc-unchanged-checkbox').attr('checked',false);
 
-    $("#cmax").empty();
+    $("#cmax").val('');
     $("#cmaxType")[0].selectedIndex = -1;
     $("#cmaxDirection")[0].selectedIndex = -1;
     $('#cmax-unchanged-checkbox').attr('checked',false);
     
-    $("#clearance").empty();
+    $("#clearance").val('');
     $("#clearanceType")[0].selectedIndex = -1;
     $("#clearanceDirection")[0].selectedIndex = -1;
     $('#clearance-unchanged-checkbox').attr('checked',false);
     
-    $("#halflife").empty();
+    $("#halflife").val('');
     $("#halflifeType")[0].selectedIndex = -1;
     $("#halflifeDirection")[0].selectedIndex = -1;
     $('#halflife-unchanged-checkbox').attr('checked',false);
