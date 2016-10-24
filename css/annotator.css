@@ -1222,14 +1222,14 @@ body {
 	border-collapse: collapse;
 }
 
+.viewertable tr, .viewertable td{
+	background-color: white !important;
+}
+
 /* editor table and viewer */
 
 /*
 .editortable, tr, td {
-	border: 1px solid black;
-}
-
-.viewertable, tr, td{
 	border: 1px solid black;
 }
 */
@@ -1475,6 +1475,7 @@ input[type="radio"] {
 	border: none;
 	font-family:  "Myriad Web",Verdana,Helvetica,Arial,sans-serif;
 }
+
 
 
 /* Annotation import panel dialog content
