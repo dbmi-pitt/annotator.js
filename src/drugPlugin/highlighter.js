@@ -163,7 +163,7 @@ Highlighter.prototype.draw = function (annotation) {
             "className": "annotator-hl",
             "separateWordSearch": false,
             "acrossElements": true,
-            "caseSensitive": true, 
+            "caseSensitive": false, 
             "accuracy": "partially",
             "each": function(elem) {            
                 $(elem).attr('name', "annotator-hl");                
