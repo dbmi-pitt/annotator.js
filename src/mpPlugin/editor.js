@@ -250,6 +250,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     if (currFormType == "claim"){
 
+                        console.log("mpeditor submit claim");
+
                         // MP Claim
                         if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
                             unsaved = false;
@@ -319,7 +321,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     } else if (currFormType != "claim" && currAnnotationId != null && annotation.argues.supportsBy.length > 0) { 
 
-                        // console.log("mpeditor update data & material - num: " + currDataNum);
+                        console.log("mpeditor update data & material - num: " + currDataNum);
+
                         var mpData = annotation.argues.supportsBy[currDataNum];
                         // Evidence relationship
                         mpData.evRelationship = $("input[name=evRelationship]:checked").val();
@@ -388,6 +391,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var aucValue = $('#auc').val().trim();
                         var aucType = $('#aucType option:selected').text();
                         var aucDirection = $('#aucDirection option:selected').text();
+
+                        console.log("DEBUG - auc submit");
+                        console.log(aucValue);
+                        console.log(aucType);
+                        console.log(aucDirection);
 
                         if (aucUnchanged || (aucValue != "" && aucType != "" && aucDirection != "")) {
                             if (aucUnchanged) {
@@ -634,7 +642,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
             field.submit(field.element, this.annotation);
         }
-        console.log("submit success");
+
         // clean cached text selection
         isTextSelected = false;
         cachedOATarget = "";

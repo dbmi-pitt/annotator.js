@@ -745,6 +745,7 @@ function addClaimDataDialog(ann) {
         cachedOATarget = ann.argues.hasTarget;
         cachedOARanges = ann.argues.ranges;                    
         addDataCellByEditor("participants", 0);                    
+        //addDataCellByEditor("auc", 0);                    
     }
     
     addClaimBtn.onclick = function() {
