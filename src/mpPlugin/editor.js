@@ -598,15 +598,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
             this.cancel();
         }
         
-        var annotations;
+        var annotations = [];
         if(getURLParameter("sourceURL")==null)
             var sourceURL = getURLParameter("file").trim();
         else
             var sourceURL = getURLParameter("sourceURL").trim();
         var source = sourceURL.replace(/[\/\\\-\:\.]/g, "")
-        var email = getURLParameter("email");
 
-        var queryObj = JSON.parse('{"uri":"'+source+'","email":"'+email+'"}');
+        var queryObj = JSON.parse('{"uri":"'+source+'"}');
 
         var annhost = config.annotator.host;
 
@@ -616,7 +615,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
         var self = this;
         storage.query(queryObj)
             .then(function(data){
-                annotations = data.results;
+                //filter druglist by selected userEmails
+                for (var i = 0; i < data.results.length; i++) {
+                    var ann = data.results[i];
+                    if (userEmails.has(ann.email)) {
+                        annotations.push(ann);
+                    }
+                }
+
                 for (var i = 0, len = self.fields.length; i < len; i++) {
                     var field = self.fields[i];
                     field.load(field.element, self.annotation,annotations);
