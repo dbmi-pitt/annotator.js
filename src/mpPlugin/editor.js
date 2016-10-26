@@ -319,8 +319,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         if (annotation.argues.supportsBy == null)
                             annotation.argues.supportsBy = [];                  
 
-                    } else if (currFormType != "claim" && currAnnotationId != null && annotation.argues.supportsBy.length > 0) { 
-
+                    } else if (currFormType != "claim" && currAnnotationId != null) { 
+                        if (annotation.argues.supportsBy.length == 0) {
+                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose : {}}}, grouprandom: "", parallelgroup: ""};
+                            annotation.argues.supportsBy.push(data);
+                        }
+                        
                         console.log("mpeditor update data & material - num: " + currDataNum);
 
                         var mpData = annotation.argues.supportsBy[currDataNum];
@@ -391,11 +395,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var aucValue = $('#auc').val().trim();
                         var aucType = $('#aucType option:selected').text();
                         var aucDirection = $('#aucDirection option:selected').text();
-
-                        console.log("DEBUG - auc submit");
-                        console.log(aucValue);
-                        console.log(aucType);
-                        console.log(aucDirection);
 
                         if (aucUnchanged || (aucValue != "" && aucType != "" && aucDirection != "")) {
                             if (aucUnchanged) {
