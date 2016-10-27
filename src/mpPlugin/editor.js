@@ -219,8 +219,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // load MP list of data 
                         if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                     
                             var loadData = annotation.argues.supportsBy[currDataNum];
-                            
-                            // clean material : participants, dose1, dose2
+
+                            // clean material : participants, dose1, dose2...
                             cleanDataForm();
                             loadDataItemFromAnnotation(loadData);
                             
@@ -239,7 +239,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             $("#drug1Dose-label").html(drug1doseLabel);
                             $("#drug2Dose-label").html(drug2doseLabel);
                             $("#claim-label-data-editor").html("<strong>Claim: </strong>" + claim.label.replace(/\_/g,' '));
-                            
+                            loadUnchangedMode();
                             postDataForm(currFormType);
                         }
                     }                     
@@ -324,7 +324,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose : {}}}, grouprandom: "", parallelgroup: ""};
                             annotation.argues.supportsBy.push(data);
                         }
-                        
+
                         console.log("mpeditor update data & material - num: " + currDataNum);
 
                         var mpData = annotation.argues.supportsBy[currDataNum];
@@ -1317,7 +1317,11 @@ function loadDataItemFromAnnotation(loadData) {
 
 
 
-// post process data form (1.show current data form and hide others. 2.show delete button if there are value been load. 3.hide nav list for ev relationship and study type data form)
+/** post process data form (
+    1.show current data form and hide others. 
+    2.show delete button if there are value been load. 
+    3.hide nav list for ev relationship and study type data form)
+**/
 function postDataForm(targetField) {
 
     console.log("mpeditor - postDataForm: " + targetField);
@@ -1331,7 +1335,6 @@ function postDataForm(targetField) {
     for (var field in fieldM) {       
         var dataid = "mp-data-form-"+field;
         var fieldVal = "";
-
         if (field === targetField) {
             $("#"+dataid).show();  // show specific data form 
             // inspect that is target form has value filled 
@@ -1359,6 +1362,23 @@ function postDataForm(targetField) {
         else {
             cleanFocusOnDataField(field);
             $("#"+dataid).hide();
+        }
+    }
+}
+
+//initial load unchanged mode
+//fields allowed: auc, cmax, clearance, halflife
+function loadUnchangedMode() {
+    var fields = ["auc", "cmax", "clearance", "halflife"];
+    for (var i = 0; i < fields.length; i++) {
+        if ($('#' + fields[i] + '-unchanged-checkbox').is(':checked')) {
+            $('#'+fields[i]).attr('disabled', true);
+            $('#'+fields[i]+'Type').attr('disabled', true);
+            $('#'+fields[i]+'Direction').attr('disabled', true);  
+        } else {
+            $('#'+fields[i]).attr('disabled', false);
+            $('#'+fields[i]+'Type').attr('disabled', false);
+            $('#'+fields[i]+'Direction').attr('disabled', false);  
         }
     }
 }
