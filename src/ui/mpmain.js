@@ -536,6 +536,9 @@ function main(options) {
             }
         },
         beforeAnnotationUpdated: function (annotation) {
+            console.log(">>>>>>currAnnotationId<<<<<" + currAnnotationId);
+            currAnnotationId = annotation.id;
+            currAnnotation = annotation;
 
             if (annotation.annotationType == "MP"){
                 /*Parameters:

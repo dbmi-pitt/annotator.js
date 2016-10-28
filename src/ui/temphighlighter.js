@@ -57,6 +57,9 @@ function highlightRange(normedRange, cssClass, dataRange) {
 // for those ranges which are not reanchorable in the current document.
 function reanchorRange(range, rootElement) {
     try {
+        console.log("reanchorRange");
+        console.log(range);
+        console.log(rootElement);
         return Range.sniff(range).normalize(rootElement);
     } catch (e) {
         if (!(e instanceof Range.RangeError)) {
@@ -116,6 +119,22 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
     };
 }
 
+//helper function of drawField: drawRanges()
+currHighlighter.prototype.drawRanges = function (ranges) {
+    var result = [];
+    for (var i = 0, ilen = ranges.length; i < ilen; i++) {
+        var r = reanchorRange(ranges[i], this.element);  
+        if (r !== null) { 
+            result.push(new DataRange(r, "", ""));
+        } else 
+            console.log("[Error]: temp draw by xpath failed: cachedOARanges");
+    }
+    for (var j = 0, jlen = result.length; j < jlen; j++) {
+        var dataNormed = result[j];
+        highlightRange(dataNormed.range, this.options.highlightClass, dataNormed);
+    }
+}
+
 
 // Private: Draw single field for mp claim, data or material. Use xpath range to draw first, oa selector as 2nd option. 
 // obj - field block with attributes ranges and hasTarget 
@@ -131,9 +150,9 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
             var r = reanchorRange(obj.ranges[i], this.element);   
             if (r !== null) { 
                 dataRangesL.push(new DataRange(r, field, idx));
-                //console.log("temp draw by xpath: " + field);
+                //console.log("draw by xpath: " + field);
             } else 
-                console.log("[Error]: temp draw by xpath failed: " + field);
+                console.log("[Error]: draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
 
@@ -172,7 +191,8 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
 //
 // Returns an Array of drawn highlight elements.
 currHighlighter.prototype.draw = function (annotation, inputType) {
-    //undraw all previous currhighlight
+
+    // all previous currhighlight
     undrawCurrhighlighter();
     self = this;
 
@@ -232,9 +252,15 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
         console.log(err);
     }
 
+    if (dataRangesL.length == 0 && cachedOARanges != "" && cachedOARanges.length > 0) {
+        self.drawRanges(cachedOARanges);
+        return;
+    }
+
     for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
         var dataNormed = dataRangesL[j];
-
+        console.log(">>>>draw currHighlighter<<<<<<");
+        console.log(dataNormed);
         highlightRange(dataNormed.range, this.options.highlightClass, dataNormed);
     }
 
