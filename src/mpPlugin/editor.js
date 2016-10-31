@@ -51,7 +51,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
             this.addField({
                 load: function (field, annotation, annotations) {               
-                    
+                    console.log(">>>>>>>load editor<<<<<<<");
                     var claim = annotation.argues;
 
                     // load MP Claim
@@ -514,12 +514,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                 self._onFormSubmit(e);
             })
             .on("click." + NS, '.annotator-save', function (e) {
-                self._onSaveClick(e);
-
+                if (self._onFormValid(e)) {
+                    self._onSaveClick(e);
+                }
             })
             .on("click." + NS, '.annotator-save-close', function (e) {
-                self._onSaveCloseClick(e);
-                self.hide();
+                if (self._onFormValid(e)) {
+                    self._onSaveCloseClick(e);
+                    self.hide();
+                }
             })
             .on("click." + NS, '.annotator-delete', function (e) {
                 self._onDeleteClick(e);
@@ -791,6 +794,59 @@ var mpEditor = exports.mpEditor = Widget.extend({
          }*/
 
         return this;
+    },
+
+    /**
+    Form Validation: check the field is not empty
+    Event callback: called when a user clicks the editor's save button
+    Returns noting
+    **/
+    _onFormValid: function (event) {
+        preventEventDefault(event);
+
+        //valid data form
+        var fields = $("#mp-data-form-" + currFormType).children();
+        console.log(">>>>>>>form validation<<<<<<<<");
+        //data form validation rule
+        var valid = true;
+        for(var i = 0; i < fields.length; i++) {
+            var ns = fields[i].tagName;
+            //unchanged checkbox
+            if (fields[i].type == "checkbox") {
+                if ($(fields[i]).is(":checked")) {
+                    return valid;
+                }
+            //input box
+            } else if (ns == "INPUT") {
+                if (fields[i].value.trim() == "") {
+                    $(fields[i]).css("background-color", "#f9dcd9");
+                    //$("#" + fields[i].id + "-label").css("color", "red");
+                    valid = false;
+                } else {
+                    $(fields[i]).css("background-color", "");
+                    //$("#" + fields[i].id + "-label").css("color", "black");
+                }
+            //select box
+            } else if (ns == "SELECT") {
+                if (fields[i].selectedIndex == -1) {
+                    $(fields[i]).css("background-color", "#f9dcd9");
+                    //$("#" + fields[i].id + "-label").css("color", "red");
+                    valid = false;
+                } else {
+                    $(fields[i]).css("background-color", "");
+                    //$("#" + fields[i].id + "-label").css("color", "black");
+                }
+            }
+        }
+
+        // reset unsave status
+        unsaved = false;
+        if(!valid) {
+            $('.form-validation-alert').show();
+        } else {
+            $('.form-validation-alert').hide();
+        }
+        return valid;
     },
 
     // Event callback: called when a user clicks the editor form (by pressing
@@ -1406,6 +1462,13 @@ function cleanClaimForm() {
 
 // clean all value of data form
 function cleanDataForm() {
+    //clean form validation format
+    $(".form-validation-alert").hide();
+    var allDataFields = ["#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
+    for (var i = 0; i < allDataFields.length; i++) {
+        $(allDataFields[i]).css("background-color", "");
+    }
+
     $("#participants").val('');
     $("#drug1Dose").val('');
     $("#drug1Duration").val('');

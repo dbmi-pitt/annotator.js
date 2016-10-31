@@ -5,6 +5,7 @@ var extend = require('backbone-extend-standalone');
 var Template = function(){console.log("success");};
 var $ = require('jquery');
 
+
 // JSON fields configuration
 // Claim form
 var context1 = {
@@ -499,7 +500,6 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
     return out;
 });
 
-
 // Claim
 var source = "{{#buildFormClaim questions}}{{/buildFormClaim}}";
 var template = Handlebars.compile(source);
@@ -550,7 +550,6 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var form10 = template(context10);
 
-
 Template.content = [
 
     // '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
@@ -576,7 +575,6 @@ Template.content = [
     '<button id="nav-clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
     '<button id="nav-halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
     '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
-
     '</div>',
 
     // Claim form
@@ -638,7 +636,10 @@ Template.content = [
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
     '     <button class="annotator-save annotator-focus">Save</button>',
     '     <button class="annotator-save-close" id="annotator-save-close">Save and Close</button>',
-  '    </div>',
+    '    </div>',
+    '<div class="form-validation-alert" style="display: none;">',
+    '   <strong>Error submitting the form!</strong> Please complete all the red fields.',
+    '</div>',
     '  </form>',
     // '</div>'
 ].join('\n');

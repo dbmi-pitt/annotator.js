@@ -1519,3 +1519,14 @@ input[type="radio"] {
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 	z-index: 1000 !important;
 }
+
+.form-validation-alert {
+    padding: 10px;
+    background-color: #f44336;
+    font-size: 14px;
+    color: white;
+    opacity: 1;
+    transition: opacity 0.6s;
+    margin-bottom: 15px;
+    margin-right: 120px;
+}
