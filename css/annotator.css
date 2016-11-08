@@ -1429,15 +1429,15 @@ input[type="radio"] {
 }
 
 /* The Close Button */
-.close {
+.annotator-close {
+	float: right !important;
     color: white;
-    float: right;
     font-size: 20px;
     font-weight: bold;
 }
 
-.close:hover,
-.close:focus {
+.annotator-close:hover,
+.annotator-close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
