@@ -72,25 +72,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var list = []; //store drug name in this quote
                         var listid = []; //store corresponding drug index in this quote
 
-                        var divP = generateQuoteArea(childrenInQuote, list, listid); // create current highlight contents
-
-                        $(quoteobject).append(divP);
-
-                        var quotecontent = $(quoteobject).html();
-
-                        while(quotecontent.indexOf("annotator-currhl")!=-1) {
-                            quotecontent = quotecontent.split("annotator-currhl").join("");
-                        }
-                        while(quotecontent.indexOf("annotator-mp")!=-1) {
-                            quotecontent = quotecontent.split("class=\"annotator-hl\" name=\"annotator-mp\"").join("");
-                            quotecontent = quotecontent.split("name=\"annotator-mp\" class=\"annotator-hl\"").join("");
-                        }
-                        while(quotecontent.indexOf(" name=\"annotator-hl\"")!=-1) {
-                            quotecontent = quotecontent.split(" name=\"annotator-hl\"").join("");
-                        }
-                        $(quoteobject).html(quotecontent);
-                        $('#quote').append(quoteobject);
-
                         //----------------generate drug dropdown list---------------
                         var flag = 0;
                         //check drug list
@@ -102,6 +83,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact.toLowerCase());
                             }
                         }
+
+                        var quoteDiv = generateQuote(annotation.argues.hasTarget.hasSelector.exact, allHighlightedDrug, list, listid);
+                        $(quoteobject).append(quoteDiv);
+                        var quotecontent = $(quoteobject).html();
+                        $('#quote').append(quoteobject);
+
                         //check if drug in store (all in lowercase)
                         for(var i=0;i<list.length;i++) {
                             if(allHighlightedDrug.indexOf(list[i].trim().toLowerCase())==-1) {
@@ -168,10 +155,42 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var drug1ID = $('#Drug1 option:selected').val();
                         var drug2ID = $('#Drug2 option:selected').val();
 
-                        quotecontent = quotecontent.split("class=\"annotator-hl\" id=\""+drug1ID+"\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
-                        quotecontent = quotecontent.split("class=\"annotator-hl\" id=\""+drug2ID+"\"").join("class=\"highlightdrug\" id=\""+drug2ID+"\"");
-                        quotecontent = quotecontent.split("id=\""+drug1ID+"\" class=\"annotator-hl\"").join("class=\"highlightdrug\" id=\""+drug1ID+"\"");
-                        quotecontent = quotecontent.split("id=\""+drug2ID+"\" class=\"annotator-hl\"").join("class=\"highlightdrug\" id=\""+drug2ID+"\"");
+                        //initial & load: add currHighlight to quote
+                        var drug1Index = parseInt(drug1ID.split("_")[1]);
+                        var drug2Index = parseInt(drug2ID.split("_")[1]);
+                        function findIndex(string, old, no) {
+                            var i = 0;
+                            var pos = -1;
+                            while(i <= no && (pos = string.indexOf(old, pos + 1)) != -1) {
+                                i++;
+                            }
+                            return pos;
+                        }
+                        function replaceIndex(string, at, old, repl) {
+                            return string.replace(new RegExp(old, 'g'), function(match, i) {
+                                if( i === at ) return repl;
+                                return match;
+                            });
+                        }
+                        drug1Index = findIndex(quotecontent, drug1, drug1Index);
+                        drug2Index = findIndex(quotecontent, drug2, drug2Index);
+                        var drug1End = drug1Index + drug1.length;
+                        var drug2End = drug2Index + drug2.length;
+                        if ((drug1Index <= drug2Index && drug1End >= drug2Index) || (drug2Index <= drug1Index && drug2End >= drug1Index)) {
+                            var end = Math.max(drug1End, drug2End);
+                            var start = Math.min(drug1Index, drug2Index);
+                            quotecontent = quotecontent.substring(0, start) + "<span class=\"highlightdrug\">" + quotecontent.substring(start, end) + "</span>" + quotecontent.substring(end, quotecontent.length);
+                        } else {
+                            if (drug1Index <= drug2Index) {
+                                quotecontent = quotecontent.substring(0, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
+                                                quotecontent.substring(drug1End, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
+                                                quotecontent.substring(drug2End, quotecontent.length);
+                            } else {
+                                quotecontent = quotecontent.substring(0, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
+                                                quotecontent.substring(drug2End, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
+                                                quotecontent.substring(drug1End, quotecontent.length);
+                            }
+                        }
                         //console.log(quotecontent);
                         $(quoteobject).html(quotecontent);
                         $('#quote').append(quoteobject);
@@ -1531,44 +1550,73 @@ function moveToChildNode(parent) {
     return parent;
 }
 
+// inputs: text of current highlights
+// return quote content as list of DOM node, drugList, drugListID
+function generateQuote(highlightText, drugList, list, listid) {
+    var drugIndexList = []; // use to store drug entries
+    var processedText = ""; // use to store highlightText with added span
 
-// inputs: nodes in current highlights
-// return quote content as list of DOM node 
-function generateQuoteArea(childrenInQuote, list, listid) {
+    //DrugEntry class
+    function DrugEntry (drugName, drugStart, drugNo) {
+        this.drugName = drugName;
+        this.drugStart = drugStart; //indexOf(), start offset of first character
+        this.drugEnd = drugStart + drugName.length - 1; //end offset of last character
+        this.drugNo = drugNo; //No. of drug(1, 2, 3..)
+    }
+    //build drug index array
+    for (var i = 0; i < drugList.length; i++) {
+        var index = -1;
+        var no = 0;
+        while((index = highlightText.indexOf(drugList[i], index + 1)) != -1) {
+            drugIndexList.push(new DrugEntry(drugList[i], index, no++));
+        }
+    }
+    //sort drugIndexList by drugStart offset
+    drugIndexList.sort(function(a, b) {
+        return a.drugStart - b.drugStart;
+    });
+
+    //generate items in drop down list
+    for (var i = 0; i < drugIndexList.length; i++) {
+        list.push(drugIndexList[i].drugName);
+        listid.push(drugIndexList[i].drugNo);
+    }
+
+    //generate highlight span intervals
+    var intervals = [];
+    for (var i = 0; i < drugIndexList.length; i++) {
+        var start = drugIndexList[i].drugStart;
+        var end = drugIndexList[i].drugEnd;
+        while (i + 1 < drugIndexList.length && drugIndexList[i+1].drugStart < end) { //nextStart < currEnd --> has overlap
+            //end = max(currEnd, nextEnd)
+            end = Math.max(end, drugIndexList[i+1].drugEnd);
+            i++;
+        }
+        //console.log(start + ":" + end);
+        intervals.push({
+            start: start,
+            end: end
+        });
+    }
+
+    //add span to text
+    var pos = 0;
+    for (var i = 0; i < intervals.length; i++) {
+        //plain text
+        var temp = highlightText.substring(pos, intervals[i].start);
+        processedText += temp;
+        //add span
+        temp += "<span class='annotator-hl' >";
+        temp += highlightText.substring(intervals[i].start, intervals[i].end + 1);
+        temp += "</span>";
+        processedText += temp;
+        pos = intervals[i].end + 1;
+    }
+    if (pos < highlightText.length) {
+        processedText += highlightText.substring(pos, highlightText.length);
+    }
     var p = document.createElement("p");
-    var prevNode = null; 
-    var goodChild; // good child means drug highlights with new parent node
-    var indexDict = {}; //hashmap<drugName, drugIndex>
+    p.innerHTML = processedText;
     
-    for (var qi = 0; qi < childrenInQuote.length; qi++) { 
-        var tempContent = $(childrenInQuote[qi]).text();
-        
-        // if parent node is hl or currhl, then move up to parent
-        while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
-            childrenInQuote[qi]= childrenInQuote[qi].parentNode;
-        }
-        // if previous node and current node having the same parent, then skip. else, add current node to quote                             
-        if(!childrenInQuote[qi].isEqualNode(prevNode)) {
-            prevNode = childrenInQuote[qi];
-            goodChild = prevNode.cloneNode(true);
-            goodChild.innerHTML = tempContent;
-
-            //change drugMention elements' id to "drugName-drugIndex", e.g. terazosin-0
-            if (goodChild.getAttribute("name") == "annotator-hl") {
-                if (tempContent in indexDict) {
-                    indexDict[tempContent] = indexDict[tempContent] + 1;
-                    goodChild.id = tempContent + "_" + indexDict[tempContent];
-                    list.push(tempContent);
-                    listid.push(indexDict[tempContent]);
-                } else {
-                    indexDict[tempContent] = 0;
-                    goodChild.id = tempContent + "_" + indexDict[tempContent];
-                    list.push(tempContent);
-                    listid.push(indexDict[tempContent]);
-                }
-            }
-            p.appendChild(goodChild);
-        }
-    }                       
     return p;
 }
