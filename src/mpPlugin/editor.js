@@ -80,7 +80,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         for (var i = 0, len = anns.length; i < len; i++) {
                             if (anns[i].annotationType == "DrugMention") {
-                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact.toLowerCase());
+                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
                             }
                         }
 
@@ -89,9 +89,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var quotecontent = $(quoteobject).html();
                         $('#quote').append(quoteobject);
 
-                        //check if drug in store (all in lowercase)
+                        //check if drug in store (case sensitive)
                         for(var i=0;i<list.length;i++) {
-                            if(allHighlightedDrug.indexOf(list[i].trim().toLowerCase())==-1) {
+                            if(allHighlightedDrug.indexOf(list[i].trim())==-1) {
                                 list.splice(i, 1);
                                 listid.splice(i,1);
                             }
