@@ -437,9 +437,10 @@ span[name="annotator-mp"] {
 	margin-top:10px;
 	padding: 0;
 	margin-bottom: 10px;
-    margin-left: 90px;
-	margin-right: 10px;
-	width: 1200px;
+    margin-left: 8% !important;
+	margin-right: 8% !important;
+	width: 82%;
+	min-width: 1100px;
 	/* height:180px; */
 	overflow-y: hidden;
 	background-color: #FFFFFF;
@@ -1241,11 +1242,6 @@ body {
 	font-color:#000000;
 }
 
-/*#quote {
-	width:80%;
-
-}*/
-
 hr.style14 {
 	border: 0;
 	height: 1px;
@@ -1529,4 +1525,9 @@ input[type="radio"] {
     transition: opacity 0.6s;
     margin-bottom: 15px;
     margin-right: 120px;
+}
+
+.mpeditorsection,
+#mp-annotation-tb {
+	justify-content: center;
 }
