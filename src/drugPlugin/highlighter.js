@@ -174,13 +174,10 @@ Highlighter.prototype.draw = function (annotation) {
         };
 
         try {
-            //console.log("mphighlighter - drawField - use oaSelector");
+            // console.log("mphighlighter - drawField - use oaSelector");
+            var instance = new Mark($("#subcontent")[0]);   
+            instance.mark(drugName, options);  
 
-            var listP = document.getElementsByTagName("p"); // highlight within all p tag
-            for (var i=0; i < listP.length; i++) {
-                var instance = new Mark(listP[i]);
-                instance.mark(drugName, options);
-            }
         } catch (err) {
             console.log(err);
         }
