@@ -457,7 +457,7 @@ span[name="annotator-mp"] {
 }
 
 .annotator-editor-form input[type="checkbox"], input[type="radio"] {
-	width: 30px !important;
+	width: 15px !important;
 }
 
 .annotator-editor-form { 
