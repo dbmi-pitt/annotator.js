@@ -221,20 +221,47 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     }
                                 });
 
-                                $('input[type=radio][name=precipitant]').hide();
-                                $('.precipitantLabel').hide();
+                                $('input[type=radio][name=precipitant]').parent().hide();
+                                $('.precipitantLabel').parent().hide();
                                 
                             } else if (claim.qualifiedBy.relationship == "interact with") {                                     
-                                $('input[type=radio][name=precipitant]').show();
-                                $('.precipitantLabel').show();
+                                $('input[type=radio][name=precipitant]').parent().show();
+                                $('.precipitantLabel').parent().show();
                                 if (claim.qualifiedBy.precipitant == "drug1")
                                     $('input[name=precipitant][id=drug1precipitant]').prop('checked', true);
                                 else if (claim.qualifiedBy.precipitant == "drug2")
                                     $('input[name=precipitant][id=drug2precipitant]').prop('checked', true);      
                                 else 
                                     console.log("precipitant information not avaliable");
-                            }                      
+                            }                     
                         }
+
+                        //show reject reason when reject checked
+                            if (annotation.rejected == null || annotation.rejected == undefined) {
+                                $('#reject-reason').hide();
+                                $('#reject-reason-comment').hide();
+                                $('#reject-reason-1').hide();
+                                $('#reject-reason-comment-1').hide();
+                            } else {
+                                $('#rejected-evidence').prop('checked', true);
+                                $('#reject-reason').show();
+                                $('#reject-reason-1').show();
+                                $('#reject-reason-comment').show();
+                                $('#reject-reason-comment-1').show();
+                                var comment = true;
+                                $('#reject-reason > option').each(function () {
+                                    if (this.value == annotation.rejected.reason) {
+                                        $(this).prop('selected', true);
+                                        comment = false;
+                                    } else {
+                                        $(this).prop('selected', false);
+                                    }
+                                });
+                                console.log(annotation.rejected.reason);
+                                if(comment) {
+                                    $('#reject-reason-comment').val(annotation.rejected.reason);
+                                }
+                            } 
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
 
@@ -338,6 +365,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.type = "mp:claim";
                         annotation.argues.label = claimStatement;
                         
+                        var rejectedEvidence = $('#rejected-evidence').is(':checked');
+                        var rejectReason  = ($('#reject-reason-comment').val() == "" ? $('#reject-reason').val() : $('#reject-reason-comment').val());
+                        console.log(rejectReason);
+                        if (rejectedEvidence) {
+                            annotation.rejected = {reason: rejectReason};
+                        } else {
+                            annotation.rejected = null;
+                        }
+
                         if (annotation.argues.supportsBy == null)
                             annotation.argues.supportsBy = [];                  
 
@@ -1480,6 +1516,9 @@ function cleanClaimForm() {
     $('#Drug1 option').remove();
     $('#Drug2 option').remove();
 
+    $('#rejected-evidence').prop('checked', false);
+    $('#reject-reason-comment').val('');
+    $('#reject-reason')[0].selectedIndex = 0;
 }
 
 // clean all value of data form

@@ -85,6 +85,27 @@ var context1 = {
             type:"space",
             html: "table",
             name:""
+        },
+        {
+            type:"checkbox",
+            name:"Rejected Evidence",
+            id:"rejected-evidence",
+            html: "table",
+            value: "rejectedevidence"
+        },
+        {
+            type:"dropdown",
+            name:"Reject Reason: ",
+            id:"reject-reason",
+            html: "table",
+            options:["UNK","DIPS score is too low (less than 5)","Poor Methodology", "Non-relevant evidence item"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Comment: ",
+            id: "reject-reason-comment",
+            html: "table"
         }
     ]
 };
@@ -408,9 +429,12 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             if (items[i].id == "enzyme") 
                 out += "<td><strong id='enzymesection1'>" + items[i].name +"</strong></td><td>";
             else if (items[i].id == "drug1precipitant" || items[i].id == "drug2precipitant") 
-                out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>"
-            else 
-                out = out + "<td><strong>" + items[i].name +"</strong></td><td>";
+                out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>";
+            else if (items[i].id == "rejected-evidence") {
+                out += "<td><input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input></td>";
+                out += "<td><strong>" + items[i].name + "</strong></td>";
+            } else 
+                out = out + "<td><strong id = '" + items[i].id + "-1'>" + items[i].name +"</strong></td><td>";
             // add field element
             if (items[i].type=="radiobutton") {
                 if (items[i].classname == "precipitant") { // precipitant radio button (in different row)
@@ -433,6 +457,9 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             } 
             else if (items[i].type=="textarea") {
             out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
+            }
+            else if(items[i].type=="input") {
+                out += "<input style='width:120px;height=11px;' type='text' id='"+items[i].id+"'>";
             }
             
             out = out + "</td>";
