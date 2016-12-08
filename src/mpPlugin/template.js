@@ -48,7 +48,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["DDI clinical trial"],
+            options:["DDI clinical trial", "Statement"],
             optionsID:[]
         },
         {
@@ -77,9 +77,13 @@ var context1 = {
             optionsID:[]
         },
         {
-            type:"space",
+            type:"radiobutton",
+            name:"Negation: ",
+            classname: "negation",
+            id:"negation",
             html: "table",
-            name:""
+            options:["supports","refutes"],
+            optionsID:[]
         },
         {
             type:"space",
@@ -372,14 +376,6 @@ var context10 = {
             newline: "no",
             options:["yes","no"],
         },
-        // {
-        //     type:"radiobutton",
-        //     name:"Did the study focus on pharmacokinetic processes?",
-        //     classname: "pkprocess",
-        //     id:"pkprocess",
-        //     newline: "no",
-        //     options:["yes","no"],
-        // },
         {
             type:"button",
             name:"clear",
@@ -410,15 +406,18 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             else if (items[i].id == "drug1precipitant" || items[i].id == "drug2precipitant") 
                 out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>"
             else 
-                out = out + "<td><strong>" + items[i].name +"</strong></td><td>";
+                out = out + "<td><strong id='"+ items[i].classname +"label'>" + items[i].name +"</strong></td><td>";
+
             // add field element
             if (items[i].type=="radiobutton") {
                 if (items[i].classname == "precipitant") { // precipitant radio button (in different row)
                     for (var j = 0, sl = items[i].options.length; j < sl; j++)
                         out = out + "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'></input>";            
                 } else { // normal radio button
+                    out += "<div id='"+items[i].classname+"div'>";
                     for (var j = 0, sl = items[i].options.length; j < sl; j++)
-                        out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
+                        out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";
+                    out += "</div>";
                 }
             } 
             else if (items[i].type=="dropdown") {
@@ -440,17 +439,8 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             if(((i+1)%5==0))
                 out = out + "</tr>";
         } 
-        // else if (items[i].html == "div") {
-        //     if (items[i].type=="radiobutton") {
-        //         divHtml += "<div style='display: inline'><strong>" + items[i].name +"</strong>";
-        //         for (var j = 0, sl = items[i].options.length; j < sl; j++)
-        //             divHtml += "<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";  
-        //         divHtml += "</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        //     }
-        // }
     }
     out +="</table>";
-    //out += divHtml;
     
     return out;
 });
