@@ -234,7 +234,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
 
                             // Claim statement and negation
-                            if (claim.method == "Statement") {
+                            if (claim.method == "statement") {
                                 $('#negationlabel').show();
                                 $('#negationdiv').show();
 
@@ -300,7 +300,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.method = $('#method option:selected').text();   
 
                         // When method is statement, submit negation
-                        if (annotation.argues.method == "Statement") {
+                        if (annotation.argues.method == "statement") {
                             var negationVal = $("input[name=negation]:checked").val();
                             annotation.argues.negation = negationVal;
                         }
