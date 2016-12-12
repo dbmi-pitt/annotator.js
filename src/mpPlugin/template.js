@@ -48,7 +48,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["DDI clinical trial"],
+            options:["DDI clinical trial", "Phenotype Clinical Study", "Case Report", "Statement"],
             optionsID:[]
         },
         {
@@ -198,6 +198,65 @@ var context4 = {
             id:"drug2Regimens",
             options:["UNK","SD","QD","BID", "TID", "QID", "Q22", "Q8", "Q6", "Daily"],
             optionsID:[]
+        },
+
+    ]
+};
+
+// Data - Phenotype form 
+//(when method is phenotype and relationship is inhibits or substrate of)
+var context4b = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"phenotypequote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Type: ",
+            classname: "phenotypeType",
+            id:"phenotypeType",
+            options:["Drug Phenotype", "Genotype"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Gene Family: ",
+            id:"geneFamily",
+            options:["UNK","ALK","BAFF/TNFSF13B","BCR/ABL1","BRAF","CCR5","CFTR","CYB5R1-4","CYP1A2","CYP2C19","CYP2C9","CYP2D6",
+            "del (5q)","DPYD","EGFR","ERBB2","ESR1","ESR1, PGR","F2","F5","FIP1L1/PDGFRA","G6PD","GBA","HLA-A","HLA-B",
+            "HPRT1","IFNL3","IL2RA","KIT","KRAS","LDLR","MS4A1","NAGS","NAGS, CPS1, ASS1, OTC, ASL, ABL2","NAT1-2","PDGFRB",
+            "Ph Chromosome","PML/RARA","POLG","SERPINC1","TNFRSF8","TPMT","UGT1A1","VKORC1"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Marker Drug: ",
+            id:"markerDrug",
+            options:["UNK"],
+            optionsID:[],
+            newline:"yes"
+        },
+        {
+            type:"radiobutton",
+            name:"Metabolizer: ",
+            classname: "phenotypeMetabolizer",
+            id:"phenotypeMetabolizer",
+            options:["Poor Metabolizer","Extensive Metabolizer", "Ultrarapid Metabolizer"],
+            optionsID:[],
+            newline:"yes"
+        },
+        {
+            type:"radiobutton",
+            name:"Population: ",
+            classname: "phenotypePopulation",
+            id:"phenotypePopulation",
+            options:["Asian","African","Caucasian","Native American"],
+            optionsID:[],
+            newline:"yes"
         }
     ]
 };
@@ -481,6 +540,33 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
     
     return out;
 });
+/*
+Handlebars.registerHelper('buildFormDataPheno', function(items, options) {
+    var out = "";
+    for(var i=0, l=items.length; i<l; i++) {
+        if (items[i].type == "quote") {
+            out += "<div id='" + items[i].id + "' class='dataquoteborder'></div><table>";
+        }
+        else {
+            out += "<tr>";
+            if (items[i].type != "button")
+                out += "<td><strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong></td>";
+            if (items[i].type=="radiobutton") {
+                for (var j = 0, sl = items[i].options.length; j < sl; j++) {
+                    out = out + "<td><input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input></td>";
+                }
+                if (items[i].newline == "yes")
+                    out += "<br>";
+                else if (items[i].newline == "no")
+                    out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            } 
+            out += "</tr>";
+        }
+    }
+    out += "</table>"
+    return out;
+});
+*/
 
 Handlebars.registerHelper('buildFormData', function(items, options) {
     var out = "";
@@ -489,8 +575,13 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             out += "<div id='" + items[i].id + "' class='dataquoteborder'></div>";
         }
         else {
-            if (items[i].type != "button")
-                out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+            if (items[i].type != "button") {
+                if (items[i].type == "radiobutton") {
+                    out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+                } else {
+                    out += "&nbsp;&nbsp;<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+                }
+            }
 
             if(items[i].type=="text")
                 out += "<strong id='"+items[i].id+"'></strong><br>";
@@ -508,12 +599,8 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             }
             else if (items[i].type=="radiobutton") {
                 for (var j = 0, sl = items[i].options.length; j < sl; j++) {
-                    out = out + "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";
+                    out += "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";
                 }
-                if (items[i].newline == "yes")
-                    out += "<br>";
-                else if (items[i].newline == "no")
-                    out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             } 
             else if (items[i].type=="checkbox") {
                 out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
@@ -522,6 +609,10 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 if (items[i].id == "study-type-qs-clear")
                     out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";                
             }
+            if (items[i].newline == "yes")
+                    out += "<br>";
+            else if (items[i].newline == "no")
+                out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         }
     }
     return out;
@@ -546,6 +637,11 @@ var form3 = template(context3);
 source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var form4 = template(context4);
+
+// Data - phenotype
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var form4b = template(context4b);
 
 // Data - auc
 source = "{{#buildFormData questions}}{{/buildFormData}}";
@@ -596,7 +692,8 @@ Template.content = [
     '<button id="nav-evRelationship-btn" type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
     '<button id="nav-participants-btn" type="button" onclick="switchDataForm(\'participants\')" >Participants</button> &nbsp;->&nbsp;',
     '<button id="nav-dose1-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
-    '<button id="nav-dose2-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',    
+    '<button id="nav-dose2-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button>&nbsp;->&nbsp;',
+    '<button id="nav-phenotype-btn" type="button" onclick="switchDataForm(\'phenotype\')" >Phenotype</button>&nbsp;->&nbsp;',
     '<button id="nav-auc-btn" type="button" onclick="switchDataForm(\'auc\')" >Auc ratio</button> &nbsp;->&nbsp;',
     '<button id="nav-cmax-btn" type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button id="nav-clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
@@ -622,6 +719,11 @@ Template.content = [
     // Data & material - Drug2 Dosage
     '<div id="mp-data-form-dose2" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form4,
+    '</div>',
+
+    // Data & material - phenotype
+    '<div id="mp-data-form-phenotype" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    form4b,
     '</div>',
 
     // Data & material - AUC

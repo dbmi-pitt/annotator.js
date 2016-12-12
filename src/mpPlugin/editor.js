@@ -157,7 +157,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //initial & load: add currHighlight to quote
                         var drug1Index = parseInt(drug1ID.split("_")[1]);
-                        var drug2Index = parseInt(drug2ID.split("_")[1]);
+                        var drug2Index = drug2ID == undefined ? 0 : parseInt(drug2ID.split("_")[1]);
                         function findIndex(string, old, no) {
                             var i = 0;
                             var pos = -1;
@@ -197,7 +197,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         // highlight drug selections on text quote
                         if (claim.qualifiedBy != null) {
-
+                            console.log(claim.qualifiedBy.relationship);
                             $('#relationship > option').each(function () {
                                 if (this.value == claim.qualifiedBy.relationship) {
                                     $(this).prop('selected', true);
@@ -210,6 +210,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             // show precipitant if relationship is interact with 
                             if(claim.qualifiedBy.relationship == "inhibits" || claim.qualifiedBy.relationship == "substrate of")
                             {
+                                if (claim.method == "Phenotype Clinical Study") {
+                                    $("#Drug1-1").html("Drug: ");
+                                    $("#Drug2-1").parent().hide();
+                                    $("#Drug2").parent().hide();
+                                }
                                 $("#enzyme").show();
                                 $("#enzymesection1").show();
 
@@ -224,7 +229,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 $('input[type=radio][name=precipitant]').parent().hide();
                                 $('.precipitantLabel').parent().hide();
                                 
-                            } else if (claim.qualifiedBy.relationship == "interact with") {                                     
+                            } else if (claim.qualifiedBy.relationship == "interact with") {                                    
                                 $('input[type=radio][name=precipitant]').parent().show();
                                 $('.precipitantLabel').parent().show();
                                 if (claim.qualifiedBy.precipitant == "drug1")
@@ -264,6 +269,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             } 
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
+                        //extract highlight drug from text
+                        var allHighlightedDrug = [];
+                        var anns = annotations.slice();
+                        for (var i = 0, len = anns.length; i < len; i++) {
+                            if (anns[i].annotationType == "DrugMention") {
+                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
+                            }
+                        }
 
                         // load MP list of data 
                         if (annotation.argues.supportsBy.length > 0 && currDataNum !== "") {                     
@@ -271,7 +284,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                             // clean material : participants, dose1, dose2...
                             cleanDataForm();
-                            loadDataItemFromAnnotation(loadData);
+                            loadDataItemFromAnnotation(loadData, allHighlightedDrug);
                             
                             var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
                             var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
@@ -302,11 +315,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         console.log("mpeditor submit claim");
 
                         // MP Claim
-                        if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
-                            unsaved = false;
-                            alert("Should highlight two different drugs.");
-                            editorSelf.cancel();                            
-                            $('.btn-success').click();
+                        var methodTemp = $('#method option:selected').text();
+                        var relationTemp = $('#relationship option:selected').text();
+                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && methodTemp == 'Phenotype Clinical Study')) {
+                            if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
+                                unsaved = false;
+                                alert("Should highlight two different drugs.");
+                                editorSelf.cancel();                            
+                                $('.btn-success').click();
+                            }
                         }
                         
                         annotation.annotationType = "MP";
@@ -333,8 +350,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         } else {
                             var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
                         }
-                        qualifiedBy.drug1 = $('#Drug1 option:selected').text();
-                        qualifiedBy.drug2 = $('#Drug2 option:selected').text();
+                        qualifiedBy.relationship = $('#relationship option:selected').text();
+
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype Clinical Study")) {
+                            qualifiedBy.drug1 = $('#Drug1 option:selected').text();
+                            qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
+                            qualifiedBy.drug2 = "";
+                            qualifiedBy.drug2ID = "";
+                        } else {
+                            qualifiedBy.drug1 = $('#Drug1 option:selected').text();
+                            qualifiedBy.drug2 = $('#Drug2 option:selected').text();
+                            qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
+                            qualifiedBy.drug2ID = $('#Drug2 option:selected').val();
+                        }
                         //relation of drug and drugDose
                         if (annotation.argues.supportsBy.length != 0) {  //has data or material
                             for (var i = 0; i < allrelationOfDose.length; i++) {
@@ -350,15 +378,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 }
                             }
                         }
-                        qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
-                        qualifiedBy.drug2ID = $('#Drug2 option:selected').val();
-                        qualifiedBy.relationship = $('#relationship option:selected').text();
-                        var claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;
                         
                         if(qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") {
                             qualifiedBy.enzyme = $('#enzyme option:selected').text();
                         }  else if (qualifiedBy.relationship == "interact with") {                           
                             qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
+                        }
+
+                        var claimStatement = "";
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype Clinical Study")) {
+                            claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
+                        } else {
+                            claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;
                         }
 
                         annotation.argues.qualifiedBy = qualifiedBy;
@@ -379,7 +410,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     } else if (currFormType != "claim" && currAnnotationId != null) { 
                         if (annotation.argues.supportsBy.length == 0) {
-                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose : {}}}, grouprandom: "", parallelgroup: ""};
+                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
                             annotation.argues.supportsBy.push(data);
                         }
 
@@ -424,6 +455,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             mpData.supportsBy.supportsBy.drug1Dose = dose1Tmp;    
                         }
 
+                        //material: dose2
                         var dose2Tmp = mpData.supportsBy.supportsBy.drug2Dose;
                         var drug2V = $('#drug2Dose').val();
                         var drug2F = $('#drug2Formulation option:selected').text();
@@ -443,6 +475,25 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 dose2Tmp.hasTarget = cachedOATarget;
                             }
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
+                        }
+
+                        //material: phenotype
+                        var phenotypeTmp = mpData.supportsBy.supportsBy.phenotype;
+                        console.log(mpData);
+                        var type = $("input[name=phenotypeType]:checked").val();
+                        if (type != "" && type != undefined) {
+                            if (type == "Genotype") {
+                                console.log($('#geneFamily option:selected').text());
+                                console.log($('#markerDrug option:selected').text());
+                                console.log(phenotypeTmp);
+                                phenotypeTmp.typeVal = $('#geneFamily option:selected').text();
+                            } else {
+                                phenotypeTmp.typeVal = $('#markerDrug option:selected').text();
+                            }
+                            phenotypeTmp.type = type;
+                            phenotypeTmp.metabolizer = $("input[name=phenotypeMetabolizer]:checked").val();
+                            phenotypeTmp.population = $("input[name=phenotypePopulation]:checked").val
+                            mpData.supportsBy.supportsBy.phenotype = phenotypeTmp;
                         }
 
 
@@ -705,7 +756,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
         for (var i = 0, len = this.fields.length; i < len; i++) {
             var field = this.fields[i];
-
+            console.log(this.annotation);
             field.submit(field.element, this.annotation);
         }
 
@@ -1246,7 +1297,7 @@ var mover = exports.mover = function mover(element, handle) {
 
 
 // load one data item from mp annotation
-function loadDataItemFromAnnotation(loadData) {
+function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
 
     // load mp material field  
     $("#participants").val(loadData.supportsBy.supportsBy.participants.value);  
@@ -1281,7 +1332,7 @@ function loadDataItemFromAnnotation(loadData) {
         else
             $('#dose1quote').html('');
     }
-    
+    //data - dose2
     $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
     $("#drug2Duration").val(loadData.supportsBy.supportsBy.drug2Dose.duration);
     $("#drug2Formulation > option").each(function () {
@@ -1303,6 +1354,62 @@ function loadDataItemFromAnnotation(loadData) {
         else 
             $('#dose2quote').html('');                      
     }  
+    //data - phenotype
+    if (loadData.supportsBy.supportsBy.phenotype != null) {
+
+        var phenotypeType = loadData.supportsBy.supportsBy.phenotype.type;
+        //load value
+        //widget show or hide
+        if (phenotypeType == "Genotype") {
+            $("#geneFamily > option").each(function () {
+                if (this.value === loadData.supportsBy.supportsBy.phenotype.typeVal) {
+                    $(this).prop('selected', true);                                                  
+                }
+            });
+            $('#geneFamily').show();
+            $('#geneFamily-label').show();
+            $('#markerDrug').hide();
+            $('#markerDrug-label').hide();
+        } else if (phenotypeType == "Drug Phenotype") {
+            $("#markerDrug > option").each(function () {
+                if (this.value === loadData.supportsBy.supportsBy.phenotype.typeVal) {
+                    $(this).prop('selected', true);                                                  
+                }
+            });
+            $('#markerDrug option:selected').text();
+            $('#geneFamily').hide();
+            $('#geneFamily-label').hide();
+            $('#markerDrug').show();
+            $('#markerDrug-label').show();
+        } else {
+            $('#geneFamily').hide();
+            $('#geneFamily-label').hide();
+            $('#markerDrug').hide();
+            $('#markerDrug-label').hide();
+        }
+    }
+    //load quote
+    var exact = '';
+    if (loadData.supportsBy.supportsBy.phenotype != null && loadData.supportsBy.supportsBy.phenotype.hasTarget != null) {
+        exact = (loadData.supportsBy.supportsBy.phenotype.hasTarget.hasSelector.exact || '');
+    } else if (cachedOATarget.hasSelector != null) {
+        exact = (cachedOATarget.hasSelector.exact || '');                        
+    } 
+    $('#phenotypequote').html(exact); 
+    //generate maker drug dropdown list
+    var markerDrugList = [];
+    for (var i = 0; i < allHighlightedDrug.length; i++) {
+        if (exact.indexOf(allHighlightedDrug[i]) != -1) {
+            markerDrugList.push(allHighlightedDrug[i]);
+        }
+    }
+    for (var i = 0; i < markerDrugList.length; i++) {
+        $('#markerDrug').append($('<option>', {
+            value: markerDrugList[i],
+            text: markerDrugList[i]
+        }));
+    }
+
 
     // load mp data fields
 
@@ -1442,7 +1549,7 @@ function postDataForm(targetField) {
     $("#mp-claim-form").hide();
 
     // field name and actual div id mapping
-    var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype"};
+    var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype"};
 
     var showDeleteBtn = false;
 
@@ -1515,6 +1622,10 @@ function cleanClaimForm() {
     
     $('#Drug1 option').remove();
     $('#Drug2 option').remove();
+
+    $("#Drug1-1").html("Drug1: ");
+    $("#Drug2-1").parent().show();
+    $("#Drug2").parent().show(); 
 
     $('#rejected-evidence').prop('checked', false);
     $('#reject-reason-comment').val('');
