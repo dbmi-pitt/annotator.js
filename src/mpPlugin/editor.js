@@ -13,8 +13,6 @@ var NS = "annotator-editor";
 var HttpStorage = require('../storage').HttpStorage;
 
 // storage query options 
-// var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + config.apache2.host + '/annotatorstore","urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search"}}';
-
 var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + config.apache2.host + ':' + config.apache2.port + '/annotatorstore","urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search"}}';
 
 // id returns an identifier unique within this session
@@ -198,6 +196,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // highlight drug selections on text quote
                         if (claim.qualifiedBy != null) {
                             console.log(claim.qualifiedBy.relationship);
+                            // Claim relationship, precipitant and enzyme
                             $('#relationship > option').each(function () {
                                 if (this.value == claim.qualifiedBy.relationship) {
                                     $(this).prop('selected', true);
@@ -211,8 +210,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if(claim.qualifiedBy.relationship == "inhibits" || claim.qualifiedBy.relationship == "substrate of")
                             {
                                 if (claim.method == "Phenotype Clinical Study") {
-                                    $("#Drug1-1").html("Drug: ");
-                                    $("#Drug2-1").parent().hide();
+                                    $("#Drug1-label").html("Drug: ");
+                                    $("#Drug2-label").parent().hide();
                                     $("#Drug2").parent().hide();
                                 }
                                 $("#enzyme").show();
@@ -238,7 +237,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $('input[name=precipitant][id=drug2precipitant]').prop('checked', true);      
                                 else 
                                     console.log("precipitant information not avaliable");
-                            }                     
+                            }
+
+                            // Claim statement and negation
+                            if (claim.method == "statement") {
+                                $('#negationlabel').show();
+                                $('#negationdiv').show();
+
+                                if (claim.negation == "supports")
+                                    $('input[name=negation][value=supports]').prop('checked', true);                                   
+                                else if (claim.negation == "refutes")
+                                    $('input[name=negation][value=refutes]').prop('checked', true);
+                                
+                            }
+
                         }
 
                         //show reject reason when reject checked
@@ -329,7 +341,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.annotationType = "MP";
 
                         // MP method - keep with claim
-                        annotation.argues.method = $('#method option:selected').text();                        
+                        annotation.argues.method = $('#method option:selected').text();   
+
+                        // When method is statement, submit negation
+                        if (annotation.argues.method == "statement") {
+                            var negationVal = $("input[name=negation]:checked").val();
+                            annotation.argues.negation = negationVal;
+                        }
+                     
                         // MP argues claim, claim qualified by ?s ?p ?o
                         if (annotation.argues.qualifiedBy != null) {
                             var qualifiedBy = annotation.argues.qualifiedBy;
@@ -1608,7 +1627,7 @@ function loadUnchangedMode() {
 function cleanClaimForm() {
 
     $("#quote").empty();
-    $("#method")[0].selectedIndex = 0;
+    $("#method")[0].selectedIndex = -1;
     $("#relationship")[0].selectedIndex = 0;
     
     $("#enzyme")[0].selectedIndex = 0;
@@ -1619,12 +1638,17 @@ function cleanClaimForm() {
     $('.precipitantLabel').show();
     $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
     $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
+
+    $('#negationdiv').hide();
+    $('#negationlabel').hide();
+    $('input[name=negation]').prop('checked', false);
+
     
     $('#Drug1 option').remove();
     $('#Drug2 option').remove();
 
-    $("#Drug1-1").html("Drug1: ");
-    $("#Drug2-1").parent().show();
+    $("#Drug1-label").html("Drug1: ");
+    $("#Drug2-label").parent().show();
     $("#Drug2").parent().show(); 
 
     $('#rejected-evidence').prop('checked', false);
