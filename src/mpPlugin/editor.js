@@ -419,7 +419,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
 
                         var claimStatement = "";
-                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study")) {
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study" || annotation.argues.method == "statement")) {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
                         } else {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;

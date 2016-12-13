@@ -48,7 +48,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "statement"],
+            options:["DDI clinical trial", "Phenotype clinical study", "statement"],
             optionsID:[]
         },
         {
