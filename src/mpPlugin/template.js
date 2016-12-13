@@ -48,7 +48,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["DDI clinical trial", "Phenotype clinical study", "statement"],
+            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "statement"],
             optionsID:[]
         },
         {
@@ -421,7 +421,6 @@ var context8 = {
     ]
 };
 
-
 // Data - evidence supports or refutes
 var context9 = {
     questions: [
@@ -461,6 +460,195 @@ var context10 = {
             name:"clear",
             classname: "",
             id:"study-type-qs-clear",
+        }
+    ]
+};
+
+//DIPS score reviewer
+var reviewer = {
+    questions: [
+        {
+            type:"radiobutton",
+            name:"Reviewer: ",
+            classname: "dips-reviewer",
+            id:"dips-reviewer",
+            newline: "no",
+            options:["Author","External"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Date: ",
+            id: "datepicker",
+            newline: "yes"
+        },
+        {
+            type:"checkbox",
+            name:"Question scores not provided",
+            id:"author-lackscore",
+            html: "table",
+            value: "author-lackscore",
+            newline: "no"
+        },
+        {
+            type: "input",
+            name: "Total Score: ",
+            id: "author-total",
+            newline: "yes"
+        }
+    ]
+};
+
+//DIPS score questions:
+var questionList = {
+    questions: [
+        {
+            type:"radiobutton",
+            name:"Q1. Are there previous credible reports in humans?",
+            hint: [
+                   "If there are case reports or prospective studies that clearly provide evidence supporting the interaction, answer YES. For case reports, at least one case should have a “possible” DIPS rating (score of 2 or higher). ",
+                   "If a study appropriately designed to test for the interaction shows no evidence of an interaction, answer NO.",
+                   "If no other studies or case reports exist, answer NA (not applicable)."
+            ],
+            classname: "dips-q1",
+            id:"dips-q1",
+            newline: "yes",
+            options:["Yes","No","NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q2. Is the interaction consistent with known interactive properties of the precipitant drug?",
+            hint: [
+                    "Assess the mechanism of the interaction and know the properties of the precipitant drug to properly answer this question.",
+                    "If the interaction is consistent with known properties of the precipitant drug, answer YES.",
+                    "For example, there are data that support that the precipitant drug is an inhibitor of a metabolic pathway responsible for the metabolism of the object drug.",
+                    "Although lists of enzyme inhibitors are now common, caution is necessary when evaluating in vitro evidence of enzyme inhibition due to the potential differences in precipitant drug concentrations compared with in vivo values.",
+                    "If the interaction is inconsistent with known properties of the precipitant drug, answer NO",
+                    "If you are unsure of the precipitant drug properties or data are insufficient to evaluate whether the interaction is consistent with the precipitant properties, answer Unk."
+            ],
+            classname: "dips-q2",
+            id:"dips-q2",
+            newline: "yes",
+            options:["Yes","No","UNK"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q3. Is the interaction consistent with known interactive properties of the object drug?",
+            hint: [
+                    "You need to understand the pharmacokinetic and pharmacologic properties of the object drug to adequately answer this question.",
+                    "Pharmacokinetic properties to consider are routes of elimination, percentage of total metabolism via each elimination pathway, transporting proteins involved, extent of first-pass metabolism, genetic polymorphism that affects the disposition and pharmacodynamic response, physiological events (e.g., inflammatory responses) that affect the activities of the primary enzyme/transport protein,",
+                    "Pharmacologic properties to consider are receptor polymorphism and potential effects of concurrent diseases.",
+                    "Answering this question based on an incomplete understanding of the object drug can lead to incorrect assessment of causation. Adverse reactions occurring with drugs whose pharmacodynamic responses are affected by many factors (eg, warfarin) are more likely to be mislabeled as interactions. If the potential interaction is not consistent with known properties of the object drug, answer the question NO.",
+                    "If unsure of the object drug properties or data are insufficient to evaluate whether the interaction is consistent with the object drug properties and known possible effects of the precipitant drug, answer Unk or NA. The case evaluator must know the properties of the object drug to properly answer this question."
+            ],
+            classname: "dips-q3",
+            id:"dips-q3",
+            newline: "yes",
+            options:["Yes","No","UNK/NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q4. Is the event consistent with the known or reasonable time course of the interaction (onset and/or offset)?",
+            hint: [
+                    "The time course of drug interactions is usually quite predictable.",
+                    "The half-life of the precipitant drug will provide an estimate of the length of time for maximum inhibition to occur, and the inhibited half-life of the object drug will indicate when the maximum change in object drug concentration can be expected. If the time to the onset of the interaction does not fit with the properties of the drugs, one should look for an alternative reason for the interaction. If the interaction time course is inconsistent with what would be expected, answer NO.",
+                    "If unable to estimate expected time course or insufficient data are available to assess the time course, answer Unk or NA."
+            ],
+            classname: "dips-q4",
+            id:"dips-q4",
+            newline: "yes",
+            options:["Yes","No","UNK/NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q5. Did the interaction remit upon de-challenge of the precipitant drug with no change in the object drug?  (if no de-challenge, use Unknown or NA and skip Question 6)",
+            hint: [
+                    "Stopping the precipitant drug should bring about resolution of the interaction, even if the object drug is continued without change. Often, the response to a potential interaction is the discontinuation of both the object and precipitant drugs. While the clinical situation may demand such action, changing the dosage of the object drug limits the ability to assess the potential role of the precipitant drug. However, a positive dechallenge of the precipitant drug is an important indication that the interaction was related to the administration of the precipitant drug. If precipitant drug dechallenge without change in object drug produces no change in the interaction, alternative causes for the alteration in the object drug are likely. The evaluator should also consider changes in other factors including disease activity, diet, or other drugs that may occur simultaneously with dechallenge of the precipitant drug and affect the object drug. If the doses of both medications are changed, dechallenge cannot be assessed.",
+                    "If dechallenge of the precipitant drug without a change in object drug did not result in remission of the interaction, answer NO.",
+                    "If no dechallenge occurred, the doses of both drugs were altered, or no information on dechallenge is provided, answer NA."
+            ],
+            classname: "dips-q5",
+            id:"dips-q5",
+            newline: "yes",
+            options:["Yes","No","NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q6. Did the interaction reappear when the precipitant drug was re-administered with continued use of object drug?",
+            hint: [
+                    "A positive rechallenge with the precipitant drug is a strong indicator of causation. Concerns for patient safety often preclude rechallenge, but occasional reports of deliberate or inadvertent rechallenge have appeared.",
+                    "Rechallenges done with appropriate patient monitoring will be unlikely to result in adverse outcomes. If the precipitant drug was readministered in the presence of the object drug and no interaction occurred, answer NO.",
+                    "If no rechallenge with the precipitant drug was attempted or no data were provided, answer Unk or NA."
+            ],
+            classname: "dips-q6",
+            id:"dips-q6",
+            newline: "yes",
+            options:["Yes","No","UNK/NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q7. Are there reasonable alternative causes?",
+            hint: [
+                    "Consider clinical conditions, other interacting drugs, lack of adhrence, risk factor. A NO answer presumes that enough information was presented so that one would expect any alternative causes to be mentioned. When in doubt, use Unknown or NA.",
+                    "This is perhaps the most difficult question in the DIPS to answer. Assessing alternative causes requires knowledge of the object and precipitant drugs, other agents the patient may be taking, the potential influence of disease states, adherence to drug regimens, and the presence of other risk factors that might alter drug pharmacokinetics or pharmacodynamics. Failure to assess alternative causes for observed effects is one of the most common shortcomings of drug interaction evaluations. It occurs frequently in the clinical setting and can often be detected in published case reports. Limited drug knowledge, combined with a preconceived notion of the cause of a potential interaction, merge to prevent adequate assessment of alternative explanations for the observed outcome.",
+                    "Answer this question NO only if you are confident that no other reasonable causes exist.",
+                    "If unsure, answer Unk or NA."
+            ],
+            classname: "dips-q7",
+            id:"dips-q7",
+            newline: "yes",
+            options:["Yes","No","UNK/NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q8. Was the object drug detected in the blood or other fluids in concentrations consistent with the interaction?",
+            hint: [
+                    "This question assesses the relationship between the expected outcome of the interaction and measured outcomes. For example, if one suspects an inhibition of object drug metabolism, measured concentrations should reflect decreased clearance.",
+                    "If object drug concentrations are not consistent with the interaction, answer NO.",
+                    "If object drug concentrations are not measured, answer NA. Pharmacodynamic drug interactions generally do not involve a change in object drug concentrations, so the response to this question would be NA for such interactions."
+            ],
+            classname: "dips-q8",
+            id:"dips-q8",
+            newline: "yes",
+            options:["Yes","No","UNK/NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q9. Was the drug interaction confirmed by objective evidence consistent with the effects on the object drug (other than from question 8)?",
+            hint: [
+                    "Objective evidence of the interaction could be clinical evidence such as changed physiological parameters or an adverse reaction that is consistent with the known pharmacology of the object drug. The answer to this question may reflect the magnitude of the interaction, since drugs with broad therapeutic windows may not demonstrate easily measured changes in patient response in the presence of altered plasma concentrations.",
+                    "Assessment of pharmacodynamics interactions will occur here.",
+                    "If response to the object drug was assessed but no changed was observed, answer NO.",
+                    "If no assessment was made or reported, answer NA."
+            ],
+            classname: "dips-q9",
+            id:"dips-q9",
+            newline: "yes",
+            options:["Yes","No","NA"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Q10. Was the interaction greater when the precipitant drug dose was increased or less when the precipitant drug dose was decreased?",
+            hint: [
+                    "This question simply assesses the effect of the precipitant drug dose on the magnitude of the interaction.",
+                    "While data are not often available to answer this question, when the dose–response relationship can be assessed, it provides important insight to causation. This is particularly important for inhibitors that exhibit variable inhibitory properties at different doses/serum concentration.",
+                    "Answer NO if precipitant drug doses are changed without a change in object drug response.",
+                    "If the effect of precipitant drug dose changes on the object drug was not assessed, answer NA."
+            ],
+            classname: "dips-q10",
+            id:"dips-q10",
+            newline: "yes",
+            options:["Yes","No","NA"],
+            optionsID:[]
         }
     ]
 };
@@ -608,6 +796,21 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
     return out;
 });
 
+Handlebars.registerHelper('buildFormDIPS', function(items, options) {
+    var out = "";
+    for(var i=0, l=items.length; i<l; i++) {
+        out += '<div id="mp-data-form-q' + (i+1) + '" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">';
+        //radio button
+        out += "<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+        for (var j = 0, sl = items[i].options.length; j < sl; j++) {
+            out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];
+            out += "</input>";
+        }
+        out += '</div>';
+    }
+    return out;
+});
+
 // Claim
 var source = "{{#buildFormClaim questions}}{{/buildFormClaim}}";
 var template = Handlebars.compile(source);
@@ -662,6 +865,16 @@ var form9 = template(context9);
 source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var form10 = template(context10);
+
+// DIPS - reviewer
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formReviewer = template(reviewer);
+
+//DIPS - questionList
+source = "{{#buildFormDIPS questions}}{{/buildFormDIPS}}";
+template = Handlebars.compile(source);
+var formQuestion = template(questionList);
 
 Template.content = [
 
@@ -745,6 +958,15 @@ Template.content = [
     '<div id="mp-data-form-studytype" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     form10,
     '</div>',
+
+    // DIPS - reviewer
+    '<div id="mp-data-form-reviewer" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formReviewer,
+    '</div>',
+
+    // DIPS - question
+    formQuestion,
+
     
     '</div>',
     '</div>',

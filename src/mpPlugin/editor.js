@@ -247,11 +247,21 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     console.log("precipitant information not avaliable");
                             }
 
-                            //Method: (phenotype: substrate of, inhibit; case report: interact with)
+                            //Method: (phenotype: substrate of, inhibit)
                             if (claim.method == "Phenotype clinical study") {
                                 $("#relationship option[value = 'interact with']").attr('disabled', 'disabled');
                                 $("#relationship option[value = 'interact with']").hide();
                                 if ($("#relationship option:selected").text() == "interact with") {
+                                    $("#relationship option:selected").prop("selected", false);
+                                }
+                            }
+                            //Method: (case report: interact with)
+                            if (claim.method == "Case Report") {
+                                $("#relationship option[value = 'inhibits']").attr('disabled', 'disabled');
+                                $("#relationship option[value = 'inhibits']").hide();
+                                $("#relationship option[value = 'substrate of']").attr('disabled', 'disabled');
+                                $("#relationship option[value = 'substrate of']").hide();
+                                if ($("#relationship option:selected").text() == "inhibits" || $("#relationship option:selected").text() == "substrate of") {
                                     $("#relationship option:selected").prop("selected", false);
                                 }
                             }
@@ -442,7 +452,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     } else if (currFormType != "claim" && currAnnotationId != null) { 
                         if (annotation.argues.supportsBy.length == 0) {
-                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
+                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, reviewer: {}, dips: {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
                             annotation.argues.supportsBy.push(data);
                         }
 
@@ -1594,6 +1604,14 @@ function postDataForm(targetField) {
 
     var showDeleteBtn = false;
 
+    var questionList = ["reviewer", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"];
+    if (questionList.includes(targetField)){
+        console.log("show dips editor" + dataField);
+        var dataField = "#mp-data-form-"+targetField;
+        console.log("show dips editor" + dataField);
+        $(dataField).show();
+    } else {
+
     for (var field in fieldM) {       
         var dataid = "mp-data-form-"+field;
         var fieldVal = "";
@@ -1625,6 +1643,7 @@ function postDataForm(targetField) {
             cleanFocusOnDataField(field);
             $("#"+dataid).hide();
         }
+    }
     }
 }
 
