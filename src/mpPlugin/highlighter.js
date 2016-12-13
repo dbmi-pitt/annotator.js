@@ -249,7 +249,9 @@ mpHighlighter.prototype.draw = function (annotation) {
                     if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) 
                         self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);                    
                     if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) 
-                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL); 
+                    if (material.phenotype.ranges != null || material.phenotype.hasTarget != null) 
+                        self.drawField(material.phenotype, "phenotype", idx, dataRangesL, hldivL);                    
                 }
             }
         }

@@ -151,11 +151,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var drug1 = $('#Drug1 option:selected').text();
                         var drug2 = $('#Drug2 option:selected').text();
                         var drug1ID = $('#Drug1 option:selected').val();
-                        var drug2ID = $('#Drug2 option:selected').val();
 
                         //initial & load: add currHighlight to quote
                         var drug1Index = parseInt(drug1ID.split("_")[1]);
-                        var drug2Index = drug2ID == undefined ? 0 : parseInt(drug2ID.split("_")[1]);
+                        var drug2ID;
+                        var drug2Index;
+
+                        if ($("#Drug2")[0].selectedIndex != -1) {
+                            drug2ID = $('#Drug2 option:selected').val();
+                            drug2Index = drug2ID == undefined ? 0 : parseInt(drug2ID.split("_")[1]);
+                        } else {
+                            drug2 = "";
+                        }
+
                         function findIndex(string, old, no) {
                             var i = 0;
                             var pos = -1;
@@ -171,7 +179,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             });
                         }
                         drug1Index = findIndex(quotecontent, drug1, drug1Index);
-                        drug2Index = findIndex(quotecontent, drug2, drug2Index);
+                        drug2Index = drug2 == "" ? drug1Index : findIndex(quotecontent, drug2, drug2Index);
                         var drug1End = drug1Index + drug1.length;
                         var drug2End = drug2Index + drug2.length;
                         if ((drug1Index <= drug2Index && drug1End >= drug2Index) || (drug2Index <= drug1Index && drug2End >= drug1Index)) {
@@ -209,7 +217,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             // show precipitant if relationship is interact with 
                             if(claim.qualifiedBy.relationship == "inhibits" || claim.qualifiedBy.relationship == "substrate of")
                             {
-                                if (claim.method == "Phenotype Clinical Study") {
+                                if (claim.method == "Phenotype clinical study" || claim.method == "statement") {
                                     $("#Drug1-label").html("Drug: ");
                                     $("#Drug2-label").parent().hide();
                                     $("#Drug2").parent().hide();
@@ -239,9 +247,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     console.log("precipitant information not avaliable");
                             }
 
+                            //Method: (phenotype: substrate of, inhibit; case report: interact with)
+                            if (claim.method == "Phenotype clinical study") {
+                                $("#relationship option[value = 'interact with']").attr('disabled', 'disabled');
+                                $("#relationship option[value = 'interact with']").hide();
+                                if ($("#relationship option:selected").text() == "interact with") {
+                                    $("#relationship option:selected").prop("selected", false);
+                                }
+                            }
+
                             // Claim statement and negation
                             if (claim.method == "statement") {
-                                $('#negationlabel').show();
+                                $('#negation-label').show();
                                 $('#negationdiv').show();
 
                                 if (claim.negation == "supports")
@@ -257,27 +274,24 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (annotation.rejected == null || annotation.rejected == undefined) {
                                 $('#reject-reason').hide();
                                 $('#reject-reason-comment').hide();
-                                $('#reject-reason-1').hide();
-                                $('#reject-reason-comment-1').hide();
+                                $('#reject-reason-label').hide();
+                                $('#reject-reason-comment-label').hide();
                             } else {
                                 $('#rejected-evidence').prop('checked', true);
                                 $('#reject-reason').show();
-                                $('#reject-reason-1').show();
+                                $('#reject-reason-label').show();
                                 $('#reject-reason-comment').show();
-                                $('#reject-reason-comment-1').show();
+                                $('#reject-reason-comment-label').show();
                                 var comment = true;
+                                var rejectReason = annotation.rejected.reason.split('|');
                                 $('#reject-reason > option').each(function () {
-                                    if (this.value == annotation.rejected.reason) {
+                                    if (this.value == rejectReason[0]) {
                                         $(this).prop('selected', true);
-                                        comment = false;
                                     } else {
                                         $(this).prop('selected', false);
                                     }
                                 });
-                                console.log(annotation.rejected.reason);
-                                if(comment) {
-                                    $('#reject-reason-comment').val(annotation.rejected.reason);
-                                }
+                                $('#reject-reason-comment').val(rejectReason[1]);
                             } 
                         
                     } else { // if editing data, then update claim label and drug names to data fields nav
@@ -329,7 +343,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // MP Claim
                         var methodTemp = $('#method option:selected').text();
                         var relationTemp = $('#relationship option:selected').text();
-                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && methodTemp == 'Phenotype Clinical Study')) {
+                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && methodTemp == 'Phenotype clinical study')) {
                             if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
                                 unsaved = false;
                                 alert("Should highlight two different drugs.");
@@ -371,7 +385,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         qualifiedBy.relationship = $('#relationship option:selected').text();
 
-                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype Clinical Study")) {
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study")) {
                             qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                             qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
                             qualifiedBy.drug2 = "";
@@ -405,7 +419,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
 
                         var claimStatement = "";
-                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype Clinical Study")) {
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study")) {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
                         } else {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;
@@ -416,8 +430,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.label = claimStatement;
                         
                         var rejectedEvidence = $('#rejected-evidence').is(':checked');
-                        var rejectReason  = ($('#reject-reason-comment').val() == "" ? $('#reject-reason').val() : $('#reject-reason-comment').val());
-                        console.log(rejectReason);
+                        var rejectReason  = $('#reject-reason').val() + "|" + $('#reject-reason-comment').val();
                         if (rejectedEvidence) {
                             annotation.rejected = {reason: rejectReason};
                         } else {
@@ -476,6 +489,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //material: dose2
                         var dose2Tmp = mpData.supportsBy.supportsBy.drug2Dose;
+                        console.log(dose2Tmp);
                         var drug2V = $('#drug2Dose').val();
                         var drug2F = $('#drug2Formulation option:selected').text();
                         var drug2D = $('#drug2Duration').val();
@@ -498,20 +512,22 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //material: phenotype
                         var phenotypeTmp = mpData.supportsBy.supportsBy.phenotype;
-                        console.log(mpData);
-                        var type = $("input[name=phenotypeType]:checked").val();
+                        var type = $("input[name=phenotypeGenre]:checked").val();
                         if (type != "" && type != undefined) {
                             if (type == "Genotype") {
-                                console.log($('#geneFamily option:selected').text());
-                                console.log($('#markerDrug option:selected').text());
-                                console.log(phenotypeTmp);
                                 phenotypeTmp.typeVal = $('#geneFamily option:selected').text();
                             } else {
                                 phenotypeTmp.typeVal = $('#markerDrug option:selected').text();
                             }
                             phenotypeTmp.type = type;
                             phenotypeTmp.metabolizer = $("input[name=phenotypeMetabolizer]:checked").val();
-                            phenotypeTmp.population = $("input[name=phenotypePopulation]:checked").val
+                            phenotypeTmp.population = $("input[name=phenotypePopulation]:checked").val();
+                            if (phenotypeTmp.ranges == null) {
+                                phenotypeTmp.ranges = cachedOARanges;
+                            }
+                            if (phenotypeTmp.hasTarget == null) {
+                                phenotypeTmp.hasTarget = cachedOATarget;
+                            }
                             mpData.supportsBy.supportsBy.phenotype = phenotypeTmp;
                         }
 
@@ -1374,39 +1390,6 @@ function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
             $('#dose2quote').html('');                      
     }  
     //data - phenotype
-    if (loadData.supportsBy.supportsBy.phenotype != null) {
-
-        var phenotypeType = loadData.supportsBy.supportsBy.phenotype.type;
-        //load value
-        //widget show or hide
-        if (phenotypeType == "Genotype") {
-            $("#geneFamily > option").each(function () {
-                if (this.value === loadData.supportsBy.supportsBy.phenotype.typeVal) {
-                    $(this).prop('selected', true);                                                  
-                }
-            });
-            $('#geneFamily').show();
-            $('#geneFamily-label').show();
-            $('#markerDrug').hide();
-            $('#markerDrug-label').hide();
-        } else if (phenotypeType == "Drug Phenotype") {
-            $("#markerDrug > option").each(function () {
-                if (this.value === loadData.supportsBy.supportsBy.phenotype.typeVal) {
-                    $(this).prop('selected', true);                                                  
-                }
-            });
-            $('#markerDrug option:selected').text();
-            $('#geneFamily').hide();
-            $('#geneFamily-label').hide();
-            $('#markerDrug').show();
-            $('#markerDrug-label').show();
-        } else {
-            $('#geneFamily').hide();
-            $('#geneFamily-label').hide();
-            $('#markerDrug').hide();
-            $('#markerDrug-label').hide();
-        }
-    }
     //load quote
     var exact = '';
     if (loadData.supportsBy.supportsBy.phenotype != null && loadData.supportsBy.supportsBy.phenotype.hasTarget != null) {
@@ -1422,11 +1405,50 @@ function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
             markerDrugList.push(allHighlightedDrug[i]);
         }
     }
+    $('#markerDrug').append($('<option>', {
+        value: 'UNK',
+        text: 'UNK'
+    }));
     for (var i = 0; i < markerDrugList.length; i++) {
         $('#markerDrug').append($('<option>', {
             value: markerDrugList[i],
             text: markerDrugList[i]
         }));
+    }
+    if (loadData.supportsBy.supportsBy.phenotype != null) {
+
+        var phenotypeType = loadData.supportsBy.supportsBy.phenotype;
+        //load value
+        //widget show or hide
+        $('input[name=phenotypeGenre][value="'+ phenotypeType.type +'"]').prop('checked', true);
+        if (phenotypeType.type == "Genotype") {
+            $("#geneFamily > option").each(function () {
+                if (this.value === loadData.supportsBy.supportsBy.phenotype.typeVal) {
+                    $(this).prop('selected', true);                                                  
+                }
+            });
+            $('#geneFamily').show();
+            $('#geneFamily-label').show();
+            $('#markerDrug').hide();
+            $('#markerDrug-label').hide();
+        } else if (phenotypeType.type == "Drug Phenotype"){
+            $("#markerDrug > option").each(function () {
+                if (this.value === loadData.supportsBy.supportsBy.phenotype.typeVal) {
+                    $(this).prop('selected', true);                                                  
+                }
+            });
+            $('#geneFamily').hide();
+            $('#geneFamily-label').hide();
+            $('#markerDrug').show();
+            $('#markerDrug-label').show();
+        } else {
+            $('#geneFamily').hide();
+            $('#geneFamily-label').hide();
+            $('#markerDrug').hide();
+            $('#markerDrug-label').hide();
+        }
+        $('input[name=phenotypeMetabolizer][value="'+ phenotypeType.metabolizer +'"]').prop('checked', true);
+        $('input[name=phenotypePopulation][value="'+ phenotypeType.population +'"]').prop('checked', true);
     }
 
 
@@ -1627,7 +1649,9 @@ function loadUnchangedMode() {
 function cleanClaimForm() {
 
     $("#quote").empty();
-    $("#method")[0].selectedIndex = -1;
+    $("#method")[0].selectedIndex = 0;
+    $("#relationship option[value = 'interact with']").removeAttr('disabled');
+    $("#relationship option[value = 'interact with']").show();
     $("#relationship")[0].selectedIndex = 0;
     
     $("#enzyme")[0].selectedIndex = 0;
@@ -1640,7 +1664,7 @@ function cleanClaimForm() {
     $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
 
     $('#negationdiv').hide();
-    $('#negationlabel').hide();
+    $('#negation-label').hide();
     $('input[name=negation]').prop('checked', false);
 
     
@@ -1673,7 +1697,13 @@ function cleanDataForm() {
     $("#drug2Dose").val('');
     $("#drug2Duration").val('');
     $("#drug2Formulation")[0].selectedIndex = -1;
-    $("#drug2Regimens")[0].selectedIndex = -1;       
+    $("#drug2Regimens")[0].selectedIndex = -1;
+    $('input[name=phenotypeGenre]').prop('checked', false);
+    $('input[name=phenotypeMetabolizer]').prop('checked', false);
+    $('input[name=phenotypePopulation]').prop('checked', false);
+    $('#geneFamily')[0].selectedIndex = 0;
+    $('#markerDrug option').remove();
+
 
     // clean data : auc, cmax, cl, half life
     $("#auc").val('');

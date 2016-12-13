@@ -48,7 +48,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["clinical trial", "Phenotype Clinical Study", "Case Report", "statement"],
+            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "statement"],
             optionsID:[]
         },
         {
@@ -221,9 +221,9 @@ var context4b = {
         {
             type:"radiobutton",
             name:"Type: ",
-            classname: "phenotypeType",
-            id:"phenotypeType",
-            options:["Drug Phenotype", "Genotype"],
+            classname: "phenotypeGenre",
+            id:"phenotypeGenre",
+            options:["Genotype", "Drug Phenotype"],
             optionsID:[]
         },
         {
@@ -588,7 +588,8 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             }
             else if (items[i].type=="radiobutton") {
                 for (var j = 0, sl = items[i].options.length; j < sl; j++) {
-                    out += "&nbsp;&nbsp;<input type='radio' name='" + items[i].classname + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j]+"</input>";
+                    out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];
+                    out += "</input>";
                 }
             } 
             else if (items[i].type=="checkbox") {
