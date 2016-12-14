@@ -335,7 +335,7 @@ span[name="annotator-mp"] {
 	/*clear: both;
 	position:fixed;*/
 	margin-bottom:20px;
-	margin-top:1px;
+	margin-top:1px !important;
 	margin-left: 60%;
 }
 
@@ -434,7 +434,7 @@ span[name="annotator-mp"] {
 
 
 .annotator-editor-form {
-	margin-top:10px;
+	margin-top:1px !important;
 	padding: 0;
 	margin-bottom: 10px;
     margin-left: 8% !important;
@@ -451,6 +451,8 @@ span[name="annotator-mp"] {
 	border-radius: 5px;
 	color:#000000;
 }
+
+
 
 .annotator-editor-form select {
 	width: 120px !important;
@@ -1300,6 +1302,10 @@ th, td {
 	font-family: Arial; 
 	list-style-type: none;
 	margin-left: 13%;
+    margin-top: 2px;
+	margin: 0;
+    /* margin-bottom: 5px; */
+    /* margin-right: 150px; */
 }
 
 .clear-user-agent-styles td:nth-of-type(even) {
