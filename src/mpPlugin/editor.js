@@ -320,7 +320,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                             // clean material : participants, dose1, dose2...
                             cleanDataForm();
-                            loadDataItemFromAnnotation(loadData, allHighlightedDrug);
+                            if (annotation.argues.method != "Case Report") {
+                                loadDataItemFromAnnotation(loadData, allHighlightedDrug);
+                            } else {
+                                loadDipsFromAnnotation(loadData);
+                            }
                             
                             var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
                             var drug2doseLabel = claim.qualifiedBy.drug2 + " Dose in MG: ";
@@ -518,6 +522,25 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 dose2Tmp.hasTarget = cachedOATarget;
                             }
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
+                        }
+
+                        // when method is case report
+                        if (annotation.argues.method == "Case Report") {
+                            //reviewer
+                            var reviewerTmp = mpData.reviewer;
+                            var reviewerValue = $("input[name=dips-reviewer]:checked").val();
+                            if (reviewerValue != "") {
+                                reviewerTmp.reviewer = reviewerValue;
+                                reviewerTmp.date = $('#datepicker').val().trim();
+                                if (reviewerValue == "Author") {
+                                    reviewerTmp.lackInfo = $("#author-lackscore").is(':checked');
+                                    reviewerTmp.total = $("#author-total").val().trim();
+                                }
+                            }
+                            mpData.reviewer = reviewerTmp;
+
+                            //dips question
+                            submitDipsScore(mpData.dips);
                         }
 
                         //material: phenotype
@@ -1341,6 +1364,81 @@ var mover = exports.mover = function mover(element, handle) {
 };
 
 
+//load dips from annotation
+function loadDipsFromAnnotation(loadData) {
+    //1.load reviewer info
+    if (loadData.reviewer != null) {
+        var reviewerTmp = loadData.reviewer;
+        $('input[name=dips-reviewer][value="'+ reviewerTmp.reviewer +'"]').prop('checked', true);
+        $('#datepicker').val(reviewerTmp.date);
+        if (reviewerTmp.reviewer == "Author") {
+            $('#author-lackscore').show();
+            $('#author-lackscore-label').show();
+            if (reviewerTmp.lackInfo) {
+                $('#author-lackscore').prop("checked", true);
+                $('#author-total').show();
+                $('#author-total-label').show();
+                $('#author-total').val(reviewerTmp.total);
+            }
+        }
+    }
+    //2. dose1 & dose2
+    if (loadData.supportsBy.supportsBy.drug1Dose != null) {
+        $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
+        $("#drug1Duration").val(loadData.supportsBy.supportsBy.drug1Dose.duration);
+        $("#drug1Formulation > option").each(function () {
+            if (this.value === loadData.supportsBy.supportsBy.drug1Dose.formulation) {
+                $(this).prop('selected', true);                                       
+            }
+        });
+        $("#drug1Regimens > option").each(function () {
+            if (this.value === loadData.supportsBy.supportsBy.drug1Dose.regimens) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+        if (loadData.supportsBy.supportsBy.drug1Dose.hasTarget != null) {
+            $('#dose1quote').html(loadData.supportsBy.supportsBy.drug1Dose.hasTarget.hasSelector.exact || '');       
+        } else {
+            if (cachedOATarget.hasSelector != null)
+                $('#dose1quote').html(cachedOATarget.hasSelector.exact || '');       
+            else
+                $('#dose1quote').html('');
+        }
+    }
+    if (loadData.supportsBy.supportsBy.drug2Dose != null) {
+        $("#drug2Dose").val(loadData.supportsBy.supportsBy.drug2Dose.value);
+        $("#drug2Duration").val(loadData.supportsBy.supportsBy.drug2Dose.duration);
+        $("#drug2Formulation > option").each(function () {
+            if (this.value === loadData.supportsBy.supportsBy.drug2Dose.formulation) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+        $("#drug2Regimens > option").each(function () {
+            if (this.value === loadData.supportsBy.supportsBy.drug2Dose.regimens) {
+                $(this).prop('selected', true);                                                  
+            }
+        });
+        if (loadData.supportsBy.supportsBy.drug2Dose.hasTarget != null) {
+            $('#dose2quote').html(loadData.supportsBy.supportsBy.drug2Dose.hasTarget.hasSelector.exact || '');     
+        } else {
+            if (cachedOATarget.hasSelector != null)
+                $('#dose2quote').html(cachedOATarget.hasSelector.exact || '');       
+            else 
+                $('#dose2quote').html('');                      
+        }  
+    }
+    //3. dips questions
+    if (loadData.dips != null) {
+        for (var i = 1; i <= 10; i++) {
+            if (loadData.dips["q" + i] != null) {
+                console.log(i + ":" + loadData.dips["q" + i]);
+                $('input[name=dips-q' + i + '][value=' + loadData.dips["q"+i] + ']').prop('checked', true);
+            }
+        }
+    }
+}
+
+
 // load one data item from mp annotation
 function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
 
@@ -1618,7 +1716,10 @@ function postDataForm(targetField) {
                 if ($('#' + field + '-unchanged-checkbox').is(':checked')) 
                     showDeleteBtn = true;                    
                 fieldVal = $("#" + fieldM[field]).val();
-            } else { // when field is text input
+            } else if (currAnnotation.argues.method == "Case Report"){ // when field is text input
+                $("#mp-dips-nav").show();
+                fieldVal = $("#" + fieldM[field]).val();
+            }  else { // when field is text input
                 $("#mp-data-nav").show();
                 fieldVal = $("#" + fieldM[field]).val();
             }
@@ -1701,9 +1802,18 @@ function cleanDataForm() {
 
     //clean reviewer
     $('#dips-reviewer').attr('checked',false);
+    $("#datepicker").val('');
+    $("#author-lackscore").hide();
+    $("#author-lackscore-label").hide();
+    $("#author-total").hide();
+    $("#author-total-label").hide();
 
     //clean questionList
+    for (var i = 1; i <= 10; i++) {
+        $('input[name=dips-q' + i + ']').prop('checked', false);
+    }
 
+    //clean material
     $("#participants").val('');
     $("#drug1Dose").val('');
     $("#drug1Duration").val('');
@@ -1718,7 +1828,6 @@ function cleanDataForm() {
     $('input[name=phenotypePopulation]').prop('checked', false);
     $('#geneFamily')[0].selectedIndex = 0;
     $('#markerDrug option').remove();
-
 
     // clean data : auc, cmax, cl, half life
     $("#auc").val('');
@@ -1838,4 +1947,14 @@ function generateQuote(highlightText, drugList, list, listid) {
     p.innerHTML = processedText;
     
     return p;
+}
+
+//submit dips score into store
+function submitDipsScore(dipsTmp) {
+    for (var i = 1; i <= 10; i++) {
+        var qValue = $('input[name=dips-q' + i + ']:checked').val();
+        if (qValue != "") {
+            dipsTmp["q" + i] = qValue;
+        }
+    }
 }

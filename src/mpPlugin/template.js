@@ -762,9 +762,13 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
 
             if(items[i].type=="text")
                 out += "<strong id='"+items[i].id+"'></strong><br>";
-            else if(items[i].type=="input")
-                out += "<input style='width:30px;' type='text' id='"+items[i].id+"'>";
-            else if (items[i].type=="dropdown") {
+            else if(items[i].type=="input") {
+                if (items[i].id == "datepicker") {
+                    out += "<input style='width:80px; height:20px;' type='text' id='"+items[i].id+"'>";
+                } else {
+                    out += "<input style='width:30px; height:20px;' type='text' id='"+items[i].id+"'>";
+                }
+            } else if (items[i].type=="dropdown") {
                 out = out + "<select id='" + items[i].id + "'>";
                 for(var j = 0, sl = items[i].options.length; j<sl; j++) {
                     if(items[i].optionsID.length==0)
@@ -802,9 +806,11 @@ Handlebars.registerHelper('buildFormDIPS', function(items, options) {
         out += '<div id="mp-data-form-q' + (i+1) + '" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">';
         //radio button
         out += "<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
+        out += "<br><a href='#' title='" + items[i].hint.join("\n") + "'>Hint</a>"
+        out += "<br>";
         for (var j = 0, sl = items[i].options.length; j < sl; j++) {
             out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];
-            out += "</input>";
+            out += "&nbsp&nbsp</input>";
         }
         out += '</div>';
     }
@@ -902,6 +908,22 @@ Template.content = [
     '<button id="nav-clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
     '<button id="nav-halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
     '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
+    '</div>',
+
+    '<div id="mp-dips-nav" style="display: none;">',
+    '<button id="nav-reviewer-btn" type="button" onclick="switchDataForm(\'reviewer\')" >Reviewer</button> &nbsp;->&nbsp;',
+    '<button id="nav-dose1-btn" type="button" onclick="switchDataForm(\'dose1\')" >Drug 1 Dose</button> &nbsp;->&nbsp;',
+    '<button id="nav-dose2-btn" type="button" onclick="switchDataForm(\'dose2\')" >Drug 2 Dose</button> &nbsp;->&nbsp;',
+    '<button id="nav-q1-btn" type="button" onclick="switchDataForm(\'q1\')" >Q1</button> &nbsp;->&nbsp;',
+    '<button id="nav-q2-btn" type="button" onclick="switchDataForm(\'q2\')" >Q2</button> &nbsp;->&nbsp;',
+    '<button id="nav-q3-btn" type="button" onclick="switchDataForm(\'q3\')" >Q3</button> &nbsp;->&nbsp;',
+    '<button id="nav-q4-btn" type="button" onclick="switchDataForm(\'q4\')" >Q4</button> &nbsp;->&nbsp;',
+    '<button id="nav-q5-btn" type="button" onclick="switchDataForm(\'q5\')" >Q5</button> &nbsp;->&nbsp;',
+    '<button id="nav-q6-btn" type="button" onclick="switchDataForm(\'q6\')" >Q6</button> &nbsp;->&nbsp;',
+    '<button id="nav-q7-btn" type="button" onclick="switchDataForm(\'q7\')" >Q7</button> &nbsp;->&nbsp;',
+    '<button id="nav-q8-btn" type="button" onclick="switchDataForm(\'q8\')" >Q8</button> &nbsp;->&nbsp;',
+    '<button id="nav-q9-btn" type="button" onclick="switchDataForm(\'q9\')" >Q9</button> &nbsp;->&nbsp;',
+    '<button id="nav-q10-btn" type="button" onclick="switchDataForm(\'q10\')" >Q10</button>',
     '</div>',
 
     // Claim form
