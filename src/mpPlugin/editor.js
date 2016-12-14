@@ -1600,17 +1600,9 @@ function postDataForm(targetField) {
     $("#mp-claim-form").hide();
 
     // field name and actual div id mapping
-    var fieldM = {"evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype"};
-
+    var fieldM = {"reviewer":"reviewer", "evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype",
+    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10"};
     var showDeleteBtn = false;
-
-    var questionList = ["reviewer", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"];
-    if (questionList.includes(targetField)){
-        console.log("show dips editor" + dataField);
-        var dataField = "#mp-data-form-"+targetField;
-        console.log("show dips editor" + dataField);
-        $(dataField).show();
-    } else {
 
     for (var field in fieldM) {       
         var dataid = "mp-data-form-"+field;
@@ -1643,7 +1635,6 @@ function postDataForm(targetField) {
             cleanFocusOnDataField(field);
             $("#"+dataid).hide();
         }
-    }
     }
 }
 
@@ -1707,6 +1698,11 @@ function cleanDataForm() {
     for (var i = 0; i < allDataFields.length; i++) {
         $(allDataFields[i]).css("background-color", "");
     }
+
+    //clean reviewer
+    $('#dips-reviewer').attr('checked',false);
+
+    //clean questionList
 
     $("#participants").val('');
     $("#drug1Dose").val('');

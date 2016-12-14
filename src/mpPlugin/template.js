@@ -484,7 +484,7 @@ var reviewer = {
         },
         {
             type:"checkbox",
-            name:"Question scores not provided",
+            name:"question scores not provided: ",
             id:"author-lackscore",
             html: "table",
             value: "author-lackscore",
