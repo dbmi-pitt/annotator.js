@@ -527,7 +527,9 @@ function main(options) {
                 updateAnnTable(ann.rawurl);
 
                 // show dialog for adding multiple claim/data on the same span
-                addClaimDataDialog(ann);
+                // skip statement
+                if (ann.argues.method != "statement")
+                    addClaimDataDialog(ann);
          
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.draw(ann);
