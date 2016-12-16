@@ -323,7 +323,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             if (annotation.argues.method != "Case Report") {
                                 loadDataItemFromAnnotation(loadData, allHighlightedDrug);
                             } else {
-                                loadDipsFromAnnotation(loadData);
+                                if (loadData != undefined) {
+                                    loadDipsFromAnnotation(loadData);
+                                } else {
+                                    $("#author-total").val('NA');
+                                }
                             }
                             
                             var drug1doseLabel = claim.qualifiedBy.drug1 + " Dose in MG: ";
@@ -534,13 +538,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 reviewerTmp.date = $('#datepicker').val().trim();
                                 if (reviewerValue == "Author") {
                                     reviewerTmp.lackInfo = $("#author-lackscore").is(':checked');
+                                    if (reviewerTmp.lackInfo) {
+                                        $("#author-total").val('NA');
+                                    }
                                     reviewerTmp.total = $("#author-total").val().trim();
                                 }
                             }
                             mpData.reviewer = reviewerTmp;
 
-                            //dips question
+                            // submit dips question
                             submitDipsScore(mpData.dips);
+                            //check availability of question info
+                            if (!reviewerTmp.lackInfo) {
+                                calculateDips(annotation);
+                            }
                         }
 
                         //material: phenotype
@@ -834,7 +845,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
         cachedOARanges = "";
         //TODO: do I need delete above snippet
 
-        
         if (typeof this.dfd !== 'undefined' && this.dfd !== null) {
             this.dfd.resolve();
         }
@@ -855,7 +865,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
         if (typeof this.dfd !== 'undefined' && this.dfd !== null) {
             this.dfd.resolve();
         }
-
         showEditor();
         app.annotations.update(this.annotation);
     },
@@ -1374,14 +1383,19 @@ function loadDipsFromAnnotation(loadData) {
         if (reviewerTmp.reviewer == "Author") {
             $('#author-lackscore').show();
             $('#author-lackscore-label').show();
-            if (reviewerTmp.lackInfo) {
+            if (reviewerTmp.lackInfo != undefined && reviewerTmp.lackInfo) {
                 $('#author-lackscore').prop("checked", true);
                 $('#author-total').show();
                 $('#author-total-label').show();
                 $('#author-total').val(reviewerTmp.total);
+            } else {
+                $("#author-total").val('NA');
             }
         }
+    } else {
+        $("#author-total").val('NA');
     }
+
     //2. dose1 & dose2
     if (loadData.supportsBy.supportsBy.drug1Dose != null) {
         $("#drug1Dose").val(loadData.supportsBy.supportsBy.drug1Dose.value);
@@ -1432,7 +1446,7 @@ function loadDipsFromAnnotation(loadData) {
         for (var i = 1; i <= 10; i++) {
             if (loadData.dips["q" + i] != null) {
                 console.log(i + ":" + loadData.dips["q" + i]);
-                $('input[name=dips-q' + i + '][value=' + loadData.dips["q"+i] + ']').prop('checked', true);
+                $('input[name=dips-q' + i + '][value="' + loadData.dips["q"+i] + '"]').prop('checked', true);
             }
         }
     }
@@ -1718,7 +1732,7 @@ function postDataForm(targetField) {
                 fieldVal = $("#" + fieldM[field]).val();
             } else if (currAnnotation.argues.method == "Case Report"){ // when field is text input
                 $("#mp-dips-nav").show();
-                fieldVal = $("#" + fieldM[field]).val();
+                fieldVal = $("#dips-" + fieldM[field]).val();
             }  else { // when field is text input
                 $("#mp-data-nav").show();
                 fieldVal = $("#" + fieldM[field]).val();
@@ -1949,7 +1963,7 @@ function generateQuote(highlightText, drugList, list, listid) {
     return p;
 }
 
-//submit dips score into store
+// submit dips score into store
 function submitDipsScore(dipsTmp) {
     for (var i = 1; i <= 10; i++) {
         var qValue = $('input[name=dips-q' + i + ']:checked').val();
@@ -1958,3 +1972,61 @@ function submitDipsScore(dipsTmp) {
         }
     }
 }
+
+// calculator for dips score
+function calculateDips(annotation) {
+    var total = 0;
+    var dipsTmp = annotation.argues.supportsBy[currDataNum].dips;
+    //score of every question
+    var scoreList = [
+        {
+            Yes: 1, No: -1, NA: 0
+        },
+        {
+            Yes: 1, No: -1, UNK: 0
+        },
+        {
+            Yes: 1, No: -1, "UNK/NA": 0
+        },
+        {
+            Yes: 1, No: -1, "UNK/NA": 0
+        },
+        {
+            Yes: 1, No: -2, NA: 0
+        },
+        {
+            Yes: 2, No: -1, "UNK/NA": 0
+        },
+        {
+            Yes: -1, No: 1, "UNK/NA": 0
+        },
+        {
+            Yes: 1, No: 0, "UNK/NA": 0
+        },
+        {
+            Yes: 1, No: 0, NA: 0
+        },
+        {
+            Yes: 1, No: -1, NA: 0
+        }
+    ];
+    for (var i = 1; i <= 10; i++) {
+        if (dipsTmp['q'+i] != null) {
+            var curr = dipsTmp['q'+i];
+            total += scoreList[i-1][curr];
+        } else {
+            //not all questions are answered
+            return;
+        }
+    }
+    annotation.argues.supportsBy[currDataNum].reviewer.total = total;
+    console.log(total);
+    return;
+}
+
+//disable dips questions input
+function freezeQuestions() {
+    //document.getElementById('mp-dips-tb').style.pointerEvents = 'auto';
+    $('.dipsQuestion').prop('disabled', true);
+}
+

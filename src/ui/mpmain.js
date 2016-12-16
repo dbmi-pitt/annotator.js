@@ -630,8 +630,13 @@ $( "#data-delete-confirm-btn" ).click(function() {
         currAnnotation.argues.supportsBy[currDataNum][currFormType] = {};
     } else if (currFormType == "evRelationship") {
         currAnnotation.argues.supportsBy[currDataNum].evRelationship = '';
+    } else if (currFormType == "reviewer") {
+        currAnnotation.argues.supportsBy[currDataNum].reviewer = '';
+        currAnnotation.argues.supportsBy[currDataNum].dips = '';
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
     } else {
-        alert("[ERROR] editor type is not avaliable!");
+        alert("[ERROR] editor type is not avaliable! - " + currFormType);
     }
 
     // after deletion, if this row is empty, then delete
