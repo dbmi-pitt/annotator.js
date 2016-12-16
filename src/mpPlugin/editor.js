@@ -1733,6 +1733,9 @@ function postDataForm(targetField) {
             } else if (currAnnotation.argues.method == "Case Report"){ // when field is text input
                 $("#mp-dips-nav").show();
                 fieldVal = $("#dips-" + fieldM[field]).val();
+            }  else if (field == "phenotype"){ // when field is text input
+                $("#mp-data-nav").show();
+                fieldVal = $("#" + fieldM[field] + "Genre").val();
             }  else { // when field is text input
                 $("#mp-data-nav").show();
                 fieldVal = $("#" + fieldM[field]).val();
