@@ -15,9 +15,6 @@ var HttpStorage = require('../storage').HttpStorage;
 // storage query options 
 var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"' + config.protocal + '://' + config.apache2.host + ':' + config.apache2.port + '/annotatorstore","urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search"}}';
 
-console.log("test!!!!!!!!!!!!!!!!");
-console.log(queryOptStr);
-
 // id returns an identifier unique within this session
 var id = (function () {
     var counter;
