@@ -192,7 +192,7 @@ var mpAdder = Widget.extend({
 
             // query MP annotation
             var annhost = config.annotator.host;
-            var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"http://' + annhost + '/annotatorstore" ,"urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search?_id=' + currAnnotationId +'"}}';
+            var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"' + config.protocal + '://' + annhost + '/annotatorstore" ,"urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search?_id=' + currAnnotationId +'"}}';
             
             var queryOptions = JSON.parse(queryOptStr);
             var storage = new HttpStorage(queryOptions);
