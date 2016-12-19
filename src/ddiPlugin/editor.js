@@ -578,7 +578,7 @@ var ddiEditor = exports.ddiEditor = Editor.extend({
 
         var queryObj = JSON.parse('{"uri":"'+source+'","email":"'+email+'"}');
 
-        var annhost = config.annotator.host;
+        var annhost = config.apache2.host;
         //var annport = config.store.port;
 
         // call apache for request annotator store

@@ -6,7 +6,7 @@ var util = require('../util');
 var $ = util.$;
 var Promise = util.Promise;
 var HttpStorage = require('./../storage').HttpStorage;
-var annhost = config.annotator.host;
+var annhost = config.apache2.host;
 
 
 // highlightRange wraps the DOM Nodes within the provided range with a highlight

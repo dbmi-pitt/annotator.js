@@ -800,7 +800,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
         var queryObj = JSON.parse('{"uri":"'+source+'"}');
 
-        var annhost = config.annotator.host;
+        var annhost = config.apache2.host;
 
         // call apache for request annotator store
         var storage = new HttpStorage(JSON.parse(queryOptStr));
