@@ -78,11 +78,11 @@ var context1 = {
         },
         {
             type:"radiobutton",
-            name:"Negation: ",
+            name:"Negate this claim: ",
             classname: "negation",
             id:"negation",
             html: "table",
-            options:["supports","refutes"],
+            options:["Yes","No"],
             optionsID:[]
         },
         {
@@ -806,7 +806,7 @@ Handlebars.registerHelper('buildFormDIPS', function(items, options) {
         out += '<div id="mp-data-form-q' + (i+1) + '" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">';
         //radio button
         out += "<strong id='"+ items[i].id +"-label'>" + items[i].name +"</strong>";
-        out += "<br><a href='#' title='" + items[i].hint.join("\n") + "'>Hint</a>"
+        out += "&nbsp<a href='#' title='" + items[i].hint.join("\n") + "'>Mouseover for Hint</a>"
         out += "<br>";
         for (var j = 0, sl = items[i].options.length; j < sl; j++) {
             out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];

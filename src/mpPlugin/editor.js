@@ -1376,10 +1376,12 @@ var mover = exports.mover = function mover(element, handle) {
 //load dips from annotation
 function loadDipsFromAnnotation(loadData) {
     //1.load reviewer info
-    if (loadData.reviewer != null) {
+    if (loadData.reviewer != undefined && loadData.reviewer.length != 0) {
         var reviewerTmp = loadData.reviewer;
         $('input[name=dips-reviewer][value="'+ reviewerTmp.reviewer +'"]').prop('checked', true);
-        $('#datepicker').val(reviewerTmp.date);
+        if(reviewerTmp.date != undefined) {
+            $('#datepicker').val(reviewerTmp.date);
+        }
         if (reviewerTmp.reviewer == "Author") {
             $('#author-lackscore').show();
             $('#author-lackscore-label').show();
@@ -1812,18 +1814,21 @@ function cleanClaimForm() {
 function cleanDataForm() {
     //clean form validation format
     $(".form-validation-alert").hide();
-    var allDataFields = ["#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
+    var allDataFields = ["#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
     for (var i = 0; i < allDataFields.length; i++) {
         $(allDataFields[i]).css("background-color", "");
     }
 
     //clean reviewer
     $('#dips-reviewer').attr('checked',false);
-    $("#datepicker").val('');
+    $("#author-lackscore").prop('checked', false);
     $("#author-lackscore").hide();
     $("#author-lackscore-label").hide();
+    $("#author-total").val('NA');
     $("#author-total").hide();
     $("#author-total-label").hide();
+    var today = getCurrentDate();
+    $("#datepicker").val(today);
 
     //clean questionList
     for (var i = 1; i <= 10; i++) {
@@ -2033,3 +2038,17 @@ function freezeQuestions() {
     $('.dipsQuestion').prop('disabled', true);
 }
 
+function getCurrentDate() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10){
+        dd='0'+dd;
+    } 
+    if(mm<10){
+        mm='0'+mm;
+    } 
+    var today = mm+'/'+dd+'/'+yyyy;
+    return today;
+}
