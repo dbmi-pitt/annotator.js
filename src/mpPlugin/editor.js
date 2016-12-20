@@ -1778,16 +1778,16 @@ function cleanClaimForm() {
 
     $("#quote").empty();
     $("#method")[0].selectedIndex = 0;
-    $("#relationship option[value = 'interact with']").removeAttr('disabled');
-    $("#relationship option[value = 'interact with']").show();
+    $("#relationship option").removeAttr('disabled');
+    $("#relationship option").show();
     $("#relationship")[0].selectedIndex = 0;
     
     $("#enzyme")[0].selectedIndex = 0;
     $("#enzyme").hide();
     $("#enzymesection1").hide();
     
-    $('input[type=radio][name=precipitant]').show();
-    $('.precipitantLabel').show();
+    $('input[type=radio][name=precipitant]').parent().show();
+    $('.precipitantLabel').parent().show();
     $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
     $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
 
