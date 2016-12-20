@@ -1951,13 +1951,13 @@ function generateQuote(highlightText, drugList, list, listid) {
             end: end
         });
     }
-
+    
     //add span to text
     var pos = 0;
     for (var i = 0; i < intervals.length; i++) {
         //plain text
         var temp = highlightText.substring(pos, intervals[i].start);
-        processedText += temp;
+
         //add span
         temp += "<span class='annotator-hl' >";
         temp += highlightText.substring(intervals[i].start, intervals[i].end + 1);
