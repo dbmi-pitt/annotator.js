@@ -542,6 +542,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                         $("#author-total").val('NA');
                                     }
                                     reviewerTmp.total = $("#author-total").val().trim();
+                                } else {
+                                    reviewerTmp.lackInfo = false;
+                                    reviewerTmp.total = $("#author-total").val().trim();
                                 }
                             }
                             mpData.reviewer = reviewerTmp;

@@ -291,6 +291,8 @@ function main(options) {
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
                     $( "#dialog-claim-delete-confirm" ).show();
+                } else if (currFormType == "reviewer") {
+                    $( "#dialog-dips-delete-confirm" ).show();
                 } else {
                     // delete confirmation for data & material
                     $( "#dialog-data-delete-confirm" ).show();
@@ -660,11 +662,43 @@ $( "#data-delete-confirm-btn" ).click(function() {
     showAnnTable();
 });
 
+//delete dips question score confirmation
+$( "#dips-delete-confirm-btn" ).click(function() {
+    $("#dialog-dips-delete-confirm").hide();
+    if (currFormType == "reviewer") {
+        currAnnotation.argues.supportsBy[currDataNum].reviewer = '';
+        currAnnotation.argues.supportsBy[currDataNum].dips = '';
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
+    } else {
+        currAnnotation.argues.supportsBy[currDataNum].dips = '';
+    }
+
+    // after deletion, if this row is empty, then delete
+    var boo = isDataRowEmpty(currAnnotation.argues.supportsBy[currDataNum]);
+    if (boo) {
+        //console.log("delete data empty row!");
+        currAnnotation.argues.supportsBy.splice(currDataNum, 1);
+        totalDataNum = totalDataNum -1;
+    }
+
+    if (typeof publics.mpeditor.dfd !== 'undefined' && publics.mpeditor.dfd !== null) {
+        publics.mpeditor.dfd.resolve();
+    }
+    showAnnTable();
+});
+
 $( "#data-delete-cancel-btn" ).click(function() {
     $( "#dialog-data-delete-confirm" ).hide();
 });
 $( "#data-delete-dialog-close" ).click(function() {
     $( "#dialog-data-delete-confirm" ).hide();
+});
+$( "#dips-delete-dialog-close" ).click(function() {
+    $( "#dialog-dips-delete-confirm" ).hide();
+});
+$( "#dips-delete-cancel-btn" ).click(function() {
+    $( "#dialog-dips-delete-confirm" ).hide();
 });
 
 
