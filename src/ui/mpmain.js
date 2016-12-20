@@ -630,6 +630,8 @@ $( "#data-delete-confirm-btn" ).click(function() {
         currAnnotation.argues.supportsBy[currDataNum][currFormType] = {};
     } else if (currFormType == "evRelationship") {
         currAnnotation.argues.supportsBy[currDataNum].evRelationship = '';
+    } else if (currFormType == "phenotype") {
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.phenotype = {};
     } else if (currFormType == "reviewer") {
         currAnnotation.argues.supportsBy[currDataNum].reviewer = '';
         currAnnotation.argues.supportsBy[currDataNum].dips = '';
