@@ -752,8 +752,12 @@ function addClaimDataDialog(ann) {
         claimDialog.style.display = "none";
         isTextSelected = true;
         cachedOATarget = ann.argues.hasTarget;
-        cachedOARanges = ann.argues.ranges;                    
-        addDataCellByEditor("participants", 0);                    
+        cachedOARanges = ann.argues.ranges; 
+        if (ann.argues.method == "Case Report") {
+            addDataCellByEditor("dose1", 0);
+        } else {
+            addDataCellByEditor("participants", 0);
+        }                              
         //addDataCellByEditor("auc", 0);                    
     }
     

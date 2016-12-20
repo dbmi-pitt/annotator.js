@@ -108,9 +108,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             flag = flag + 1;
                         }
                         
-                        if (flag < 2) {
+                        if (flag < 1) {
                             unsaved = false;
-                            alert("please highlight two different drugs in the text span you selected!");
+                            alert("please highlight at least one drug in the text span you selected!");
                             editorSelf.cancel();
                             $('.btn-success').click();
                         }
@@ -361,7 +361,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // MP Claim
                         var methodTemp = $('#method option:selected').text();
                         var relationTemp = $('#relationship option:selected').text();
-                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && methodTemp == 'Phenotype clinical study')) {
+                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && (methodTemp == 'Phenotype clinical study' || methodTemp == 'statement'))) {
                             if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
                                 unsaved = false;
                                 alert("Should highlight two different drugs.");

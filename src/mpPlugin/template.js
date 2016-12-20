@@ -242,7 +242,7 @@ var context4b = {
             id:"markerDrug",
             options:["UNK"],
             optionsID:[],
-            newline:"yes"
+            newline:"no"
         },
         {
             type:"radiobutton",
@@ -480,6 +480,12 @@ var reviewer = {
             type: "input",
             name: "Date: ",
             id: "datepicker",
+            newline: "no"
+        },
+        {
+            type: "hint",
+            name: "(Format: 'mm/yyyy' or 'dd/mm/yyyy')",
+            id: "dateHint",
             newline: "yes"
         },
         {
@@ -781,7 +787,7 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             else if (items[i].type=="radiobutton") {
                 for (var j = 0, sl = items[i].options.length; j < sl; j++) {
                     out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];
-                    out += "</input>";
+                    out += "&nbsp&nbsp</input>";
                 }
             } 
             else if (items[i].type=="checkbox") {
@@ -791,6 +797,7 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 if (items[i].id == "study-type-qs-clear")
                     out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";                
             }
+
             if (items[i].newline == "yes")
                     out += "<br>";
             else if (items[i].newline == "no")
