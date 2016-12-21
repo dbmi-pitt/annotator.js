@@ -530,7 +530,7 @@ function main(options) {
 
                 // show dialog for adding multiple claim/data on the same span
                 // skip statement
-                if (ann.argues.method != "statement")
+                if (ann.argues.method != "Statement")
                     addClaimDataDialog(ann);
          
             } else if (ann.annotationType == "DrugMention"){

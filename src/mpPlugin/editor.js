@@ -217,7 +217,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             // show precipitant if relationship is interact with 
                             if(claim.qualifiedBy.relationship == "inhibits" || claim.qualifiedBy.relationship == "substrate of")
                             {
-                                if (claim.method == "Phenotype clinical study" || claim.method == "statement") {
+                                if (claim.method == "Phenotype clinical study" || claim.method == "Statement") {
                                     $("#Drug1-label").html("Drug: ");
                                     $("#Drug2-label").parent().hide();
                                     $("#Drug2").parent().hide();
@@ -267,14 +267,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
 
                             // Claim statement and negation
-                            if (claim.method == "statement") {
+                            if (claim.method == "Statement") {
                                 $('#negation-label').show();
                                 $('#negationdiv').show();
 
-                                if (claim.negation == "supports")
-                                    $('input[name=negation][value=supports]').prop('checked', true);                                   
-                                else if (claim.negation == "refutes")
-                                    $('input[name=negation][value=refutes]').prop('checked', true);
+                                if (claim.negation == "Yes")
+                                    $('input[name=negation][value=Yes]').prop('checked', true);                                   
+                                else if (claim.negation == "No")
+                                    $('input[name=negation][value=No]').prop('checked', true);
                                 
                             }
 
@@ -361,7 +361,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         // MP Claim
                         var methodTemp = $('#method option:selected').text();
                         var relationTemp = $('#relationship option:selected').text();
-                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && (methodTemp == 'Phenotype clinical study' || methodTemp == 'statement'))) {
+                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && (methodTemp == 'Phenotype clinical study' || methodTemp == 'Statement'))) {
                             if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
                                 unsaved = false;
                                 alert("Should highlight two different drugs.");
@@ -376,7 +376,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         annotation.argues.method = $('#method option:selected').text();   
 
                         // When method is statement, submit negation
-                        if (annotation.argues.method == "statement") {
+                        if (annotation.argues.method == "Statement") {
                             var negationVal = $("input[name=negation]:checked").val();
                             annotation.argues.negation = negationVal;
                         }
@@ -437,7 +437,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
 
                         var claimStatement = "";
-                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study" || annotation.argues.method == "statement")) {
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study" || annotation.argues.method == "Statement")) {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
                         } else {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;
