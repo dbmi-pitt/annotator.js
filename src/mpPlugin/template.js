@@ -476,20 +476,12 @@ var context10 = {
     questions: [
         {
             type:"dropdown",
-            name:"Method: ",
+            name:"Method:        ",
             id:"method",
             options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement"],
             optionsID:[],
-            newline: "no"
-        },
-        {
-            type:"radiobutton",
-            name:"Was phenotyping done?",
-            classname: "phenotypingDone",
-            id:"phenotypingDone",
             newline: "yes",
-            options:["yes","no"],
-            optionsID:[]
+            isTable: true
         },
         {
             type:"radiobutton",
@@ -498,16 +490,18 @@ var context10 = {
             id:"groupRandomization",
             newline: "no",
             options:["yes","no"],
-            optionsID:[]
+            optionsID:[],
+            isTable: true
         },
         {
             type:"radiobutton",
-            name:"Was genotyping done?",
-            classname: "genotypingDone",
-            id:"genotypingDone",
+            name:"Did the study focus on pharmacokinetic processes?",
+            classname: "focusPharmacokinetic",
+            id:"focusPharmacokinetic",
             newline: "yes",
             options:["yes","no"],
-            optionsID:[]
+            optionsID:[],
+            isTable: true
         },
         {
             type:"radiobutton",
@@ -516,35 +510,50 @@ var context10 = {
             id:"parallelgroup",
             newline: "no",
             options:["yes","no"],
-            optionsID:[]
+            optionsID:[],
+            isTable: true
         },
         {
             type:"button",
             name:"Generate evidence type",
             classname: "generate-evidence-type",
             id:"generate-evidence-type",
-            newline: "yes"
+            newline: "no",
+            isTable: true
+        },
+        {
+            type:"button",
+            name:"Clear",
+            classname: "",
+            newline: "yes",
+            id:"evidence-type-qs-clear",
         },
         {
             type:"radiobutton",
-            name:"Did the study focus on pharmacokinetic processes?",
-            classname: "focusPharmacokinetic",
-            id:"focusPharmacokinetic",
+            name:"Was phenotyping done?",
+            classname: "phenotypingDone",
+            id:"phenotypingDone",
             newline: "no",
             options:["yes","no"],
-            optionsID:[]
+            optionsID:[],
+            isTable: true
         },
         {
             type: "input",
             name: "Evidence Type: ",
             id: "evidence-type",
-            newline: "yes"
+            newline: "yes",
+            isTable: true
         },
         {
-            type:"button",
-            name:"clear",
-            classname: "",
-            id:"study-type-qs-clear",
+            type:"radiobutton",
+            name:"Was genotyping done?",
+            classname: "genotypingDone",
+            id:"genotypingDone",
+            newline: "no",
+            options:["yes","no"],
+            optionsID:[],
+            isTable: true
         }
     ]
 };
@@ -867,6 +876,8 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             else if(items[i].type=="input") {
                 if (items[i].id == "datepicker") {
                     out += "<input style='width:80px; height:20px;' type='text' id='"+items[i].id+"'>";
+                } else if (items[i].id == "evidence-type") {
+                    out += "<input style='width:220px; height:15px;' type='text' id='"+items[i].id+"'>";
                 } else {
                     out += "<input style='width:30px; height:20px;' type='text' id='"+items[i].id+"'>";
                 }
@@ -890,8 +901,8 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
             }
             else if (items[i].type=="button") {
-                if (items[i].id == "study-type-qs-clear") {
-                    out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";                
+                if (items[i].id == "evidence-type-qs-clear" || items[i].id == "generate-evidence-type") {
+                    out += "<button onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">" + items[i].name + "</button>";                
                 } else {
                     out += "<a onclick='' id=" +items[i].id+ ">" + items[i].name + "</a>"; 
                 }
