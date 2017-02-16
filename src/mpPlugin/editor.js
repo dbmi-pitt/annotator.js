@@ -107,6 +107,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }));
                             flag = flag + 1;
                         }
+                        if (!list.includes(claim.qualifiedBy.drug1)) {
+                            $('#Drug1').append($('<option>', {
+                                value: claim.qualifiedBy.drug1 + "_0",
+                                text: claim.qualifiedBy.drug1
+                            }));
+                        }
+                        if (!list.includes(claim.qualifiedBy.drug2)) {
+                            $('#Drug2').append($('<option>', {
+                                value: claim.qualifiedBy.drug2 + "_0",
+                                text: claim.qualifiedBy.drug2
+                            }));
+                        }
                         
                         if (flag < 1) {
                             unsaved = false;
@@ -131,10 +143,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     existFlag = true;
                                 }
                             });
+
                             //highlight by drugname when store lacks drugID
                             if (!existFlag) {
                                 $("#Drug1").val(claim.qualifiedBy.drug1 + "_0");
                             }
+
                             existFlag = false;
                             $('#Drug2 > option').each(function () {
                                 if (this.value === claim.qualifiedBy.drug2ID) {
@@ -182,20 +196,28 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         drug2Index = drug2 == "" ? drug1Index : findIndex(quotecontent, drug2, drug2Index);
                         var drug1End = drug1Index + drug1.length;
                         var drug2End = drug2Index + drug2.length;
-                        if ((drug1Index <= drug2Index && drug1End >= drug2Index) || (drug2Index <= drug1Index && drug2End >= drug1Index)) {
-                            var end = Math.max(drug1End, drug2End);
-                            var start = Math.min(drug1Index, drug2Index);
-                            quotecontent = quotecontent.substring(0, start) + "<span class=\"highlightdrug\">" + quotecontent.substring(start, end) + "</span>" + quotecontent.substring(end, quotecontent.length);
-                        } else {
-                            if (drug1Index <= drug2Index) {
-                                quotecontent = quotecontent.substring(0, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
-                                                quotecontent.substring(drug1End, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
-                                                quotecontent.substring(drug2End, quotecontent.length);
+                        if (drug1Index != -1 && drug2Index != -1) {
+                            if ((drug1Index <= drug2Index && drug1End >= drug2Index) || (drug2Index <= drug1Index && drug2End >= drug1Index)) {
+                                var end = Math.max(drug1End, drug2End);
+                                var start = Math.min(drug1Index, drug2Index);
+                                quotecontent = quotecontent.substring(0, start) + "<span class=\"highlightdrug\">" + quotecontent.substring(start, end) + "</span>" + quotecontent.substring(end, quotecontent.length);
                             } else {
-                                quotecontent = quotecontent.substring(0, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
-                                                quotecontent.substring(drug2End, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
-                                                quotecontent.substring(drug1End, quotecontent.length);
+                                if (drug1Index <= drug2Index) {
+                                    quotecontent = quotecontent.substring(0, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
+                                                    quotecontent.substring(drug1End, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
+                                                    quotecontent.substring(drug2End, quotecontent.length);
+                                } else {
+                                    quotecontent = quotecontent.substring(0, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
+                                                    quotecontent.substring(drug2End, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
+                                                    quotecontent.substring(drug1End, quotecontent.length);
+                                }
                             }
+                        } else if (drug1Index != -1) {
+                            quotecontent = quotecontent.substring(0, drug1Index) + "<span class=\"highlightdrug\">" + drug1 + "</span>" +
+                            quotecontent.substring(drug1End, quotecontent.length);
+                        } else if (drug2Index != -1) {
+                            quotecontent = quotecontent.substring(0, drug2Index) + "<span class=\"highlightdrug\">" + drug2 + "</span>" +
+                            quotecontent.substring(drug2End, quotecontent.length);
                         }
                         //console.log(quotecontent);
                         $(quoteobject).html(quotecontent);
@@ -213,6 +235,28 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $(this).prop('selected', false);
                                 }
                             });
+                            //parent compound
+                            var drug1PC = claim.qualifiedBy.drug1PC;
+                            var drug2PC = claim.qualifiedBy.drug2PC;
+                            var isEnan = false;
+                            var isMeta = false;
+                            if (drug1PC.includes("|")) {
+                                isEnan = true;
+                                isMeta = true;
+                            } else if (drug1PC === "enantiomer") {
+                                isEnan = true;
+                            } else if (drug1PC === "metabolite") {
+                                isMeta = true;
+                            }
+                            if (isEnan) {
+                                $('#drug1enantiomer').prop('checked', true);
+                            }
+                            if (isMeta) {
+                                $('#drug1metabolite').prop('checked', true);
+                            }
+                            isEnan = false;
+                            isMeta = false;
+
                             // show enzyme if relationship is inhibits/substrate of
                             // show precipitant if relationship is interact with 
                             if(claim.qualifiedBy.relationship == "inhibits" || claim.qualifiedBy.relationship == "substrate of")
@@ -221,6 +265,21 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $("#Drug1-label").html("Drug: ");
                                     $("#Drug2-label").parent().hide();
                                     $("#Drug2").parent().hide();
+                                    $('input[type=radio][name=precipitant]').parent().hide();
+                                    $('.precipitantLabel').parent().hide();
+                                    $("#drug2enantiomerLabel").parent().hide();
+                                    $("#drug2enantiomer").parent().hide();
+                                    $("#drug2metaboliteLabel").parent().hide();
+                                    $("#drug2metabolite").parent().hide();
+                                } else {
+                                    $('input[type=radio][name=precipitant]').parent().show();
+                                    $('.precipitantLabel').parent().show();
+                                    if (claim.qualifiedBy.precipitant == "drug1")
+                                        $('input[name=precipitant][id=drug1precipitant]').prop('checked', true);
+                                    else if (claim.qualifiedBy.precipitant == "drug2")
+                                        $('input[name=precipitant][id=drug2precipitant]').prop('checked', true);      
+                                    else 
+                                        console.log("precipitant information not avaliable");
                                 }
                                 $("#enzyme").show();
                                 $("#enzymesection1").show();
@@ -233,9 +292,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     }
                                 });
 
-                                $('input[type=radio][name=precipitant]').parent().hide();
-                                $('.precipitantLabel').parent().hide();
-                                
                             } else if (claim.qualifiedBy.relationship == "interact with") {                                    
                                 $('input[type=radio][name=precipitant]').parent().show();
                                 $('.precipitantLabel').parent().show();
@@ -245,6 +301,24 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $('input[name=precipitant][id=drug2precipitant]').prop('checked', true);      
                                 else 
                                     console.log("precipitant information not avaliable");
+                            }
+                            //parent compound
+                            if (!$('#drug2').parent().is(':hidden')) {
+                                if (drug2PC.includes("|")) {
+                                    isEnan = true;
+                                    isMeta = true;
+                                } else if (drug2PC === "enantiomer") {
+                                    isEnan = true;
+                                } else if (drug2PC === "metabolite") {
+                                    console.log(drug2PC);
+                                    isMeta = true;
+                                }
+                                if (isEnan) {
+                                    $('#drug2enantiomer').prop('checked', true);
+                                }
+                                if (isMeta) {
+                                    $('#drug2metabolite').prop('checked', true);
+                                }
                             }
 
                             //Method: (phenotype: substrate of, inhibit)
@@ -403,17 +477,43 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         qualifiedBy.relationship = $('#relationship option:selected').text();
 
-                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study")) {
+                        //parent compound
+                        var isEnantiomer = $('#drug1enantiomer').is(':checked');
+                        var isMetabolite = $('#drug1metabolite').is(':checked');
+                        if (isEnantiomer && isMetabolite) {
+                            qualifiedBy.drug1PC = "enantiomer|metabolite";
+                        } else if (isMetabolite) {
+                            qualifiedBy.drug1PC = "metabolite";
+                        } else if (isEnantiomer) {
+                            qualifiedBy.drug1PC = "enantiomer";
+                        } else {
+                            qualifiedBy.drug1PC = "";
+                        }
+                        if ((qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") && (annotation.argues.method == "Phenotype clinical study" || annotation.argues.method == "Statement")) {
                             qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                             qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
                             qualifiedBy.drug2 = "";
                             qualifiedBy.drug2ID = "";
+                            qualifiedBy.drug2PC = "";
                         } else {
                             qualifiedBy.drug1 = $('#Drug1 option:selected').text();
                             qualifiedBy.drug2 = $('#Drug2 option:selected').text();
                             qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
                             qualifiedBy.drug2ID = $('#Drug2 option:selected').val();
+                            //parent compound
+                            isEnantiomer = $('#drug2enantiomer').is(':checked');
+                            isMetabolite = $('#drug2metabolite').is(':checked');
+                            if (isEnantiomer && isMetabolite) {
+                                qualifiedBy.drug2PC = "enantiomer|metabolite";
+                            } else if (isMetabolite) {
+                                qualifiedBy.drug2PC = "metabolite";
+                            } else if (isEnantiomer) {
+                                qualifiedBy.drug2PC = "enantiomer";
+                            } else {
+                                qualifiedBy.drug2PC = "";
+                            }
                         }
+
                         //relation of drug and drugDose
                         if (annotation.argues.supportsBy.length != 0) {  //has data or material
                             for (var i = 0; i < allrelationOfDose.length; i++) {
@@ -432,6 +532,9 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         if(qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") {
                             qualifiedBy.enzyme = $('#enzyme option:selected').text();
+                            if (annotation.argues.method == "DDI clinical trial") {
+                                qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
+                            }
                         }  else if (qualifiedBy.relationship == "interact with") {                           
                             qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
                         }
@@ -1795,6 +1898,15 @@ function cleanClaimForm() {
     $('.precipitantLabel').parent().show();
     $('input[name=precipitant][id=drug1precipitant]').prop('checked', false);
     $('input[name=precipitant][id=drug2precipitant]').prop('checked', false);
+
+    $('#drug1metabolite').prop('checked', false);
+    $('#drug1enantiomer').prop('checked', false);
+    $('#drug2metabolite').prop('checked', false);
+    $('#drug2enantiomer').prop('checked', false);
+    $("#drug2enantiomerLabel").parent().show();
+    $("#drug2enantiomer").parent().show();
+    $("#drug2metaboliteLabel").parent().show();
+    $("#drug2metabolite").parent().show();
 
     $('#negationdiv').hide();
     $('#negation-label').hide();

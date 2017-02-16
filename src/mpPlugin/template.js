@@ -36,6 +36,24 @@ var context1 = {
             optionsID:[]
         },
         {
+            type:"checkbox",
+            name:"Enantiomer: ",
+            classname: "enantiomer",
+            id:"drug1enantiomer",
+            html: "table",
+            options:["drug1"],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"Metabolite: ",
+            classname: "metabolite",
+            id:"drug1metabolite",
+            html: "table",
+            options:["drug1"],
+            optionsID:[]
+        },
+        {
             type:"dropdown",
             name:"Relationship: ",
             id:"relationship",
@@ -69,11 +87,29 @@ var context1 = {
             optionsID:[]
         },
         {
+            type:"checkbox",
+            name:"Enantiomer: ",
+            classname: "enantiomer",
+            id:"drug2enantiomer",
+            html: "table",
+            options:["drug1"],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"Metabolite: ",
+            classname: "metabolite",
+            id:"drug2metabolite",
+            html: "table",
+            options:["drug1"],
+            optionsID:[]
+        },
+        {
             type:"dropdown",
             name:"Enzyme: ",
             id:"enzyme",
             html: "table",
-            options:["UNK","cyp1a1","cyp1a2","cyp1b1","cyp2a6","cyp2a13","cyp2b6","cyp2c8","cyp2c9","cyp2c19","cyp2d6","cyp2e1","cyp2j2","cyp3a4","cyp3a5","cyp4a11","cyp2c8","cyp2c9","cyp2c19","OATP1B1","OATP1B3","P_Glycoprotein"],
+            options:["UNK","cyp1a1","cyp1a2","cyp1b1","cyp2a6","cyp2a13","cyp2b6","cyp2c8","cyp2c9","cyp2c19","cyp2d6","cyp2e1","cyp2j2","cyp3a4","cyp3a5","cyp4a11","cyp2c8","cyp2c9","cyp2c19","OATP1B1","OATP1B3","P_Glycoprotein","SLC01B1"],
             optionsID:[]
         },
         {
@@ -233,7 +269,7 @@ var context4b = {
             options:["UNK","ALK","BAFF/TNFSF13B","BCR/ABL1","BRAF","CCR5","CFTR","CYB5R1-4","CYP1A2","CYP2C19","CYP2C9","CYP2D6",
             "del (5q)","DPYD","EGFR","ERBB2","ESR1","ESR1, PGR","F2","F5","FIP1L1/PDGFRA","G6PD","GBA","HLA-A","HLA-B",
             "HPRT1","IFNL3","IL2RA","KIT","KRAS","LDLR","MS4A1","NAGS","NAGS, CPS1, ASS1, OTC, ASL, ABL2","NAT1-2","PDGFRB",
-            "Ph Chromosome","PML/RARA","POLG","SERPINC1","TNFRSF8","TPMT","UGT1A1","VKORC1"],
+            "Ph Chromosome","PML/RARA","POLG","SERPINC1","SLC01B1","TNFRSF8","TPMT","UGT1A1","VKORC1"],
             optionsID:[]
         },
         {
@@ -435,25 +471,74 @@ var context9 = {
     ]
 };
 
-// Data - questions about study type
+// Data - questions about evidence type
 var context10 = {
     questions: [
         {
+            type:"dropdown",
+            name:"Method: ",
+            id:"method",
+            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement"],
+            optionsID:[],
+            newline: "no"
+        },
+        {
+            type:"radiobutton",
+            name:"Was phenotyping done?",
+            classname: "phenotypingDone",
+            id:"phenotypingDone",
+            newline: "yes",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
             type:"radiobutton",
             name:"Is there group randomization?",
-            classname: "grouprandom",
-            id:"grouprandom",
+            classname: "groupRandomization",
+            id:"groupRandomization",
             newline: "no",
             options:["yes","no"],
             optionsID:[]
         },
         {
             type:"radiobutton",
-            name:"Is there parallel group design? ",
+            name:"Was genotyping done?",
+            classname: "genotypingDone",
+            id:"genotypingDone",
+            newline: "yes",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"radiobutton",
+            name:"Is there parallel group design?",
             classname: "parallelgroup",
             id:"parallelgroup",
             newline: "no",
             options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type:"button",
+            name:"Generate evidence type",
+            classname: "generate-evidence-type",
+            id:"generate-evidence-type",
+            newline: "yes"
+        },
+        {
+            type:"radiobutton",
+            name:"Did the study focus on pharmacokinetic processes?",
+            classname: "focusPharmacokinetic",
+            id:"focusPharmacokinetic",
+            newline: "no",
+            options:["yes","no"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Evidence Type: ",
+            id: "evidence-type",
+            newline: "yes"
         },
         {
             type:"button",
@@ -672,7 +757,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
     for (var i = 1, l=items.length; i<l; i++) {
         
         if (items[i].html == "table") {
-            if (((i)%5==0))
+            if (((i)%7==0))
                 out = out + "<tr>";
             // add label 
             if (items[i].id == "enzyme") 
@@ -682,8 +767,12 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             else if (items[i].id == "rejected-evidence") {
                 out += "<td><input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input></td>";
                 out += "<td><strong>" + items[i].name + "</strong></td>";
-            } else 
+            } else if (items[i].type=="checkbox"){
+                out += "<td><strong id='"+items[i].id+"Label'>" + items[i].name + "</strong></td>";
+                out += "<td><input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input></td>";
+            } else {
                 out = out + "<td><strong id = '" + items[i].id + "-label'>" + items[i].name +"</strong></td><td>";
+            }
             // add field element
             if (items[i].type=="radiobutton") {
                 if (items[i].classname == "precipitant") { // precipitant radio button (in different row)
@@ -705,17 +794,24 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
                         out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
                 }
                 out = out + "</select>";
-            } 
-            else if (items[i].type=="textarea") {
+                if (items[i].id == "Drug1") {
+                    out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
+                    out += "<img id='editDrug1' src='img/edit-button.png' style='float:left;margin-left:0px;width:16px;height:16px;'>";
+                    out += "<img id='commitDrug1' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                } else if (items[i].id == "Drug2") {
+                    out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
+                    out += "<img id='editDrug2' src='img/edit-button.png' style='float:left;margin-left:0px;width:16px;height:16px;'>";
+                    out += "<img id='commitDrug2' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                }
+            } else if (items[i].type=="textarea") {
             out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
-            }
-            else if(items[i].type=="input") {
+            } else if(items[i].type=="input") {
                 out += "<input style='width:120px;height=11px;' type='text' id='"+items[i].id+"'>";
             }
             
             out = out + "</td>";
 
-            if(((i+1)%5==0))
+            if(((i+1)%7==0))
                 out = out + "</tr>";
         } 
     }
@@ -794,8 +890,11 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";                    
             }
             else if (items[i].type=="button") {
-                if (items[i].id == "study-type-qs-clear")
+                if (items[i].id == "study-type-qs-clear") {
                     out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";                
+                } else {
+                    out += "<a onclick='' id=" +items[i].id+ ">" + items[i].name + "</a>"; 
+                }
             }
 
             if (items[i].newline == "yes")
@@ -914,7 +1013,7 @@ Template.content = [
     '<button id="nav-cmax-btn" type="button" onclick="switchDataForm(\'cmax\')" >Cmax</button> &nbsp;->&nbsp;',
     '<button id="nav-clearance-btn" type="button" onclick="switchDataForm(\'clearance\')" >Clearance</button> &nbsp;->&nbsp;',
     '<button id="nav-halflife-btn" type="button" onclick="switchDataForm(\'halflife\')" >Half-life</button>&nbsp;->&nbsp;',
-    '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >study type</button>',
+    '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >Evidence Type</button>',
     '</div>',
 
     '<div id="mp-dips-nav" style="display: none;">',
