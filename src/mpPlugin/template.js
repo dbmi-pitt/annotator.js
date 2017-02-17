@@ -130,22 +130,19 @@ var context1 = {
             type:"checkbox",
             name:"Rejected Evidence",
             id:"rejected-evidence",
-            html: "table",
             value: "rejectedevidence"
         },
         {
             type:"dropdown",
             name:"Reject Reason: ",
             id:"reject-reason",
-            html: "table",
             options:["UNK","DIPS score is too low (less than 5)","Poor Methodology", "Non-relevant evidence item"],
             optionsID:[]
         },
         {
             type: "input",
             name: "Comment: ",
-            id: "reject-reason-comment",
-            html: "table"
+            id: "reject-reason-comment"
         }
     ]
 };
@@ -813,7 +810,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
                     out += "<img id='commitDrug2' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
                 }
             } else if (items[i].type=="textarea") {
-            out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
+                out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
             } else if(items[i].type=="input") {
                 out += "<input style='width:120px;height=11px;' type='text' id='"+items[i].id+"'>";
             }
@@ -822,9 +819,28 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
 
             if(((i+1)%7==0))
                 out = out + "</tr>";
-        } 
+        } else {
+            if (items[i].id == "rejected-evidence") {
+                out +="</table>";
+                out += "<input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input>";
+                out += "<strong>" + items[i].name + "</strong>";
+            } else if (items[i].type=="dropdown") {
+                out += "<strong id = '" + items[i].id + "-label'>" + items[i].name +"</strong>";
+                out += "<select id='" + items[i].id + "'>";
+                for(var j = 0, sl = items[i].options.length; j<sl; j++) {
+                    if (items[i].optionsID.length==0)
+                        out += "<option value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
+                    else
+                        out += "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
+                }
+                out = out + "</select>";
+            } else {
+                out += "<strong id = '" + items[i].id + "-label'>" + items[i].name +"</strong>";
+                out += "<input style='width:120px;height=11px;' type='text' id='"+items[i].id+"'>";
+            }
+        }
     }
-    out +="</table>";
+    
     
     return out;
 });

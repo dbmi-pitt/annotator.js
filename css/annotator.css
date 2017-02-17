@@ -1537,3 +1537,7 @@ input[type="radio"] {
 #mp-annotation-tb {
 	justify-content: center;
 }
+
+#reject-reason-label, #reject-reason-comment-label {
+	margin-left: 50px;
+}
