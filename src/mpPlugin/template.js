@@ -802,11 +802,11 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
                 out = out + "</select>";
                 if (items[i].id == "Drug1") {
                     out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
-                    out += "<img id='editDrug1' src='img/edit-button.png' style='float:left;margin-left:0px;width:16px;height:16px;'>";
+                    out += "<img id='editDrug1' src='img/edit-button.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;'>";
                     out += "<img id='commitDrug1' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
                 } else if (items[i].id == "Drug2") {
                     out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
-                    out += "<img id='editDrug2' src='img/edit-button.png' style='float:left;margin-left:0px;width:16px;height:16px;'>";
+                    out += "<img id='editDrug2' src='img/edit-button.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;'>";
                     out += "<img id='commitDrug2' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
                 }
             } else if (items[i].type=="textarea") {

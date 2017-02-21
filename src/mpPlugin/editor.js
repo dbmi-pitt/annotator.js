@@ -240,13 +240,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             var drug2PC = claim.qualifiedBy.drug2PC;
                             var isEnan = false;
                             var isMeta = false;
-                            if (drug1PC.includes("|")) {
-                                isEnan = true;
-                                isMeta = true;
-                            } else if (drug1PC === "enantiomer") {
-                                isEnan = true;
-                            } else if (drug1PC === "metabolite") {
-                                isMeta = true;
+                            if (drug1PC != null) {
+                                if (drug1PC.includes("|")) {
+                                    isEnan = true;
+                                    isMeta = true;
+                                } else if (drug1PC === "enantiomer") {
+                                    isEnan = true;
+                                } else if (drug1PC === "metabolite") {
+                                    isMeta = true;
+                                }
                             }
                             if (isEnan) {
                                 $('#drug1enantiomer').prop('checked', true);
@@ -304,14 +306,15 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                             //parent compound
                             if (!$('#drug2').parent().is(':hidden')) {
-                                if (drug2PC.includes("|")) {
-                                    isEnan = true;
-                                    isMeta = true;
-                                } else if (drug2PC === "enantiomer") {
-                                    isEnan = true;
-                                } else if (drug2PC === "metabolite") {
-                                    console.log(drug2PC);
-                                    isMeta = true;
+                                if (drug2PC != null) {
+                                    if (drug2PC.includes("|")) {
+                                        isEnan = true;
+                                        isMeta = true;
+                                    } else if (drug2PC === "enantiomer") {
+                                        isEnan = true;
+                                    } else if (drug2PC === "metabolite") {
+                                        isMeta = true;
+                                    }
                                 }
                                 if (isEnan) {
                                     $('#drug2enantiomer').prop('checked', true);
@@ -1552,8 +1555,8 @@ function loadDipsFromAnnotation(loadData) {
     //3. dips questions
     if (loadData.dips != null) {
         for (var i = 1; i <= 10; i++) {
-            if (loadData.dips["q" + i] != null) {
-                console.log(i + ":" + loadData.dips["q" + i]);
+            if (loadData.dips["q" + i] != null && loadData.dips["q" + i] != "") {
+                //console.log(i + ":" + loadData.dips["q" + i]);
                 $('input[name=dips-q' + i + '][value="' + loadData.dips["q"+i] + '"]').prop('checked', true);
             }
         }
@@ -2088,10 +2091,15 @@ function generateQuote(highlightText, drugList, list, listid) {
 
 // submit dips score into store
 function submitDipsScore(dipsTmp) {
+    if (dipsTmp == null) {
+        dipsTmp = {"q1":"","q2":"","q3":"","q4":"","q5":"","q6":"","q7":"","q8":"","q9":"","q10":""};
+    }
     for (var i = 1; i <= 10; i++) {
         var qValue = $('input[name=dips-q' + i + ']:checked').val();
         if (qValue != "") {
             dipsTmp["q" + i] = qValue;
+        } else {
+            dipsTmp["q" + i] = "";
         }
     }
 }
@@ -2133,17 +2141,19 @@ function calculateDips(annotation) {
             Yes: 1, No: -1, NA: 0
         }
     ];
-    for (var i = 1; i <= 10; i++) {
-        if (dipsTmp['q'+i] != null) {
-            var curr = dipsTmp['q'+i];
-            total += scoreList[i-1][curr];
-        } else {
-            //not all questions are answered
-            return;
+    if (dipsTmp != null) {
+        for (var i = 1; i <= 10; i++) {
+            if (dipsTmp['q'+i] != null && dipsTmp['q'+i] != "") {
+                var curr = dipsTmp['q'+i];
+                total += scoreList[i-1][curr];
+            } else {
+                //not all questions are answered
+                return;
+            }
         }
+        annotation.argues.supportsBy[currDataNum].reviewer.total = total;
+        //console.log(total);
     }
-    annotation.argues.supportsBy[currDataNum].reviewer.total = total;
-    console.log(total);
     return;
 }
 
