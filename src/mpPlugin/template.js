@@ -769,7 +769,7 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
             if (items[i].id == "enzyme") 
                 out += "<td><strong id='enzymesection1'>" + items[i].name +"</strong></td><td>";
             else if (items[i].id == "drug1precipitant" || items[i].id == "drug2precipitant") 
-                out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong></td><td>";
+                out += "<td><strong class='precipitantLabel'>" + items[i].name +"</strong>";
             else if (items[i].id == "rejected-evidence") {
                 out += "<td><input type='checkbox' id='" + items[i].id + "' value='" + items[i].value + "'></input></td>";
                 out += "<td><strong>" + items[i].name + "</strong></td>";
@@ -801,13 +801,13 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
                 }
                 out = out + "</select>";
                 if (items[i].id == "Drug1") {
-                    out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
-                    out += "<img id='editDrug1' src='img/edit-button.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;'>";
-                    out += "<img id='commitDrug1' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                    out += "<input style='width:110px;height=11px;display:none;float:left;' type='text' id='"+items[i].id+"-input'>";
+                    out += "<img id='editDrug1' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
+                    out += "<img id='commitDrug1' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
                 } else if (items[i].id == "Drug2") {
-                    out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
-                    out += "<img id='editDrug2' src='img/edit-button.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;'>";
-                    out += "<img id='commitDrug2' src='img/check.png' style='float:left;margin-left:0px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                    out += "<input style='width:110px;height=11px;display:none;float:left;' type='text' id='"+items[i].id+"-input'>";
+                    out += "<img id='editDrug2' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
+                    out += "<img id='commitDrug2' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
                 }
             } else if (items[i].type=="textarea") {
                 out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";

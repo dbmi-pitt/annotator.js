@@ -1301,11 +1301,15 @@ th, td {
 	font-size: small;
 	font-family: Arial; 
 	list-style-type: none;
-	margin-left: 13%;
+	/*margin-left: 13%;*/
     margin-top: 2px;
 	margin: 0;
     /* margin-bottom: 5px; */
     /* margin-right: 150px; */
+}
+
+.clear-user-agent-styles td {
+	margin-left: 0px !important;
 }
 
 .clear-user-agent-styles td:nth-of-type(even) {
