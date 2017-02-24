@@ -463,6 +463,7 @@ var context9 = {
             classname: "evRelationship",
             id:"evRelationship",
             options:["supports","refutes"],
+            optionsLabel: ["supports", "challenges"],
             optionsID:[]
         }
     ]
@@ -908,9 +909,16 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                 out = out + "</select>";
             }
             else if (items[i].type=="radiobutton") {
-                for (var j = 0, sl = items[i].options.length; j < sl; j++) {
-                    out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];
-                    out += "&nbsp&nbsp</input>";
+                if (items[i].classname == "evRelationship") {
+                    for (var j = 0, sl = items[i].options.length; j < sl; j++) {
+                        out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].optionsLabel[j];
+                        out += "&nbsp&nbsp</input>";
+                    }
+                } else {
+                    for (var j = 0, sl = items[i].options.length; j < sl; j++) {
+                        out += "<input type='radio' name='" + items[i].id + "' id='" + items[i].id + "' value='" + items[i].options[j] + "'>"+items[i].options[j];
+                        out += "&nbsp&nbsp</input>";
+                    }
                 }
             } 
             else if (items[i].type=="checkbox") {
