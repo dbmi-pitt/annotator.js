@@ -184,7 +184,7 @@ var context3 = {
             type:"dropdown",
             name:"Formulation: ",
             id:"drug1Formulation",
-            options:["UNK","Oral","IV","transdermal"],
+            options:["UNK","Oral","IV","transdermal", "IM"],
             optionsID:[]
         },
         {
@@ -221,7 +221,7 @@ var context4 = {
             type:"dropdown",
             name:"Formulation: ",
             id:"drug2Formulation",
-            options:["UNK","Oral","IV","transdermal"],
+            options:["UNK","Oral","IV","transdermal","IM"],
             optionsID:[]
         },
         {

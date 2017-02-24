@@ -645,9 +645,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 if (reviewerValue == "Author") {
                                     reviewerTmp.lackInfo = $("#author-lackscore").is(':checked');
                                     if (reviewerTmp.lackInfo) {
+                                        reviewerTmp.total = $("#author-total").val().trim();
+                                    } else {
                                         $("#author-total").val('NA');
+                                        reviewerTmp.total = $("#author-total").val().trim();
                                     }
-                                    reviewerTmp.total = $("#author-total").val().trim();
                                 } else {
                                     reviewerTmp.lackInfo = false;
                                     reviewerTmp.total = $("#author-total").val().trim();
