@@ -475,7 +475,7 @@ var context10 = {
         {
             type:"dropdown",
             name:"Method:        ",
-            id:"method",
+            id:"evidencetype-method",
             options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement"],
             optionsID:[],
             newline: "yes",
@@ -484,18 +484,8 @@ var context10 = {
         {
             type:"radiobutton",
             name:"Is there group randomization?",
-            classname: "groupRandomization",
-            id:"groupRandomization",
-            newline: "no",
-            options:["yes","no"],
-            optionsID:[],
-            isTable: true
-        },
-        {
-            type:"radiobutton",
-            name:"Did the study focus on pharmacokinetic processes?",
-            classname: "focusPharmacokinetic",
-            id:"focusPharmacokinetic",
+            classname: "grouprandom",
+            id:"grouprandom",
             newline: "yes",
             options:["yes","no"],
             optionsID:[],
@@ -506,52 +496,16 @@ var context10 = {
             name:"Is there parallel group design?",
             classname: "parallelgroup",
             id:"parallelgroup",
-            newline: "no",
+            newline: "yes",
             options:["yes","no"],
             optionsID:[],
             isTable: true
         },
         {
             type:"button",
-            name:"Generate evidence type",
-            classname: "generate-evidence-type",
-            id:"generate-evidence-type",
-            newline: "no",
-            isTable: true
-        },
-        {
-            type:"button",
-            name:"Clear",
+            name:"clear",
             classname: "",
-            newline: "yes",
-            id:"evidence-type-qs-clear",
-        },
-        {
-            type:"radiobutton",
-            name:"Was phenotyping done?",
-            classname: "phenotypingDone",
-            id:"phenotypingDone",
-            newline: "no",
-            options:["yes","no"],
-            optionsID:[],
-            isTable: true
-        },
-        {
-            type: "input",
-            name: "Evidence Type: ",
-            id: "evidence-type",
-            newline: "yes",
-            isTable: true
-        },
-        {
-            type:"radiobutton",
-            name:"Was genotyping done?",
-            classname: "genotypingDone",
-            id:"genotypingDone",
-            newline: "no",
-            options:["yes","no"],
-            optionsID:[],
-            isTable: true
+            id:"study-type-qs-clear",
         }
     ]
 };
@@ -926,7 +880,9 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
             }
             else if (items[i].type=="button") {
                 if (items[i].id == "evidence-type-qs-clear" || items[i].id == "generate-evidence-type") {
-                    out += "<button onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">" + items[i].name + "</button>";                
+                    out += "<button onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">" + items[i].name + "</button>";   
+                } else if (items[i].id == "study-type-qs-clear") {
+                    out += "<a onclick='clearStudyTypeQuestions()' id=" +items[i].id+ ">Clear</a>";
                 } else {
                     out += "<a onclick='' id=" +items[i].id+ ">" + items[i].name + "</a>"; 
                 }

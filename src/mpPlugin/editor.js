@@ -1703,7 +1703,13 @@ function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
     if (loadData.parallelgroup == "yes")
         $('input[name=parallelgroup][value=yes]').prop('checked', true);  
     else if (loadData.parallelgroup == "no")
-        $('input[name=parallelgroup][value=no]').prop('checked', true);                         
+        $('input[name=parallelgroup][value=no]').prop('checked', true);   
+
+    if (annotation.argues.method != null) {
+        $("#evidencetype-method > option").each(function () {
+            if (this.value === annotation.argues.method) $(this).prop('selected', true);
+        });
+    }                      
 
 
     // AUC: if unchanged then mark on checkbox, else load auc
