@@ -213,7 +213,13 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                 if (currFormType == "clearance" && (data.clearance.ranges != null || data.clearance.hasTarget != null)) 
                     self.drawField(data.clearance, "clearance", currDataNum, dataRangesL, hldivL);
                 if (currFormType == "halflife" && (data.halflife.ranges != null || data.halflife.hasTarget != null)) 
-                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL);               
+                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL);   
+                if (currFormType == "cellSystem" && data.cellSystem != null && (data.cellSystem.ranges != null || data.cellSystem.hasTarget !=null)) 
+                    self.drawField(data.cellSystem, "cellSystem", currDataNum, dataRangesL, hldivL);
+                if (currFormType == "rateWith" && data.metaboliteRateWith != null && (data.metaboliteRateWith.ranges != null || data.metaboliteRateWith.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWith, "rateWith", currDataNum, dataRangesL, hldivL);
+                if (currFormType == "rateWithout" && data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWithout, "rateWithout", currDataNum, dataRangesL, hldivL);
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
                 if (material != null){                    

@@ -628,8 +628,11 @@ $( "#data-delete-confirm-btn" ).click(function() {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
     } else if (currFormType == "dose2") {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
-    } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
+    } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife" || currFormType == "cellSystem") {
         currAnnotation.argues.supportsBy[currDataNum][currFormType] = {};
+    } else if (currFormType == "rateWith" || currFormType == "rateWithout") {
+        var temp = {'rateWith': 'metaboliteRateWith', 'rateWithout': 'metaboliteRateWithout'};
+        currAnnotation.argues.supportsBy[currDataNum][temp[currFormType]] = {};
     } else if (currFormType == "evRelationship") {
         currAnnotation.argues.supportsBy[currDataNum].evRelationship = '';
     } else if (currFormType == "phenotype") {
@@ -716,6 +719,11 @@ function isDataRowEmpty(data) {
     
     if (data.supportsBy.supportsBy.participants.value != null || data.supportsBy.supportsBy.drug1Dose.value != null || data.supportsBy.supportsBy.drug2Dose.value !=null)
         return false;
+
+    if (data.cellSystem != null || data.metaboliteRateWith != null || data.metaboliteRateWithout != null) {
+        return false;
+    }
+
     return true   
 }
 

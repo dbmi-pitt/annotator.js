@@ -127,6 +127,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             $('.btn-success').click();
                         }
 
+                        //object metabolite
+                        var distinctDrug = new Set();
+                        for (var i = 0; i < allHighlightedDrug.length; i++) {
+                            if (!distinctDrug.has(allHighlightedDrug[i].toLowerCase())) {
+                                distinctDrug.add(allHighlightedDrug[i].toLowerCase());
+                                $('#object-metabolite').append($('<option>', {
+                                    value: allHighlightedDrug[i],
+                                    text: allHighlightedDrug[i]
+                                }));
+                            }
+                        }
+
                         // load method
                         if (claim.method != null) {
                             $("#method > option").each(function () {
@@ -345,14 +357,35 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                             // Claim statement and negation
                             if (claim.method == "Statement") {
-                                $('#negation-label').show();
-                                $('#negationdiv').show();
+                                $('#negation-label').parent().show();
+                                $('#negationdiv').parent().show();
 
                                 if (claim.negation == "Yes")
                                     $('input[name=negation][value=Yes]').prop('checked', true);                                   
                                 else if (claim.negation == "No")
                                     $('input[name=negation][value=No]').prop('checked', true);
                                 
+                            }
+
+                            //Method: (Experiment: substrate of, inhibit)
+                            if (claim.method == "Experiment") {
+                                $("#relationship option[value = 'interact with']").attr('disabled', 'disabled');
+                                $("#relationship option[value = 'interact with']").hide();
+                                if ($("#relationship option:selected").text() == "interact with") {
+                                    $("#relationship option:selected").prop("selected", false);
+                                    $("#relationship option[value='inhibits']").prop("selected", true);
+                                }
+                                $('#object-metabolite').parent().show();
+                                $('#object-metabolite-label').parent().show();
+                                if (claim.qualifiedBy.objectMetabolite != null) {
+                                    if (!distinctDrug.has(claim.qualifiedBy.objectMetabolite.toLowerCase())) {
+                                        $('#object-metabolite').append($('<option>', {
+                                            value: claim.qualifiedBy.objectMetabolite,
+                                            text: claim.qualifiedBy.objectMetabolite
+                                        }));
+                                    }
+                                    $("#object-metabolite").val(claim.qualifiedBy.objectMetabolite);
+                                }
                             }
 
                         }
@@ -397,7 +430,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                             // clean material : participants, dose1, dose2...
                             cleanDataForm();
-                            if (annotation.argues.method != "Case Report") {
+                            //Load data form
+                            if (annotation.argues.method == "Experiment") {
+                                loadExperimentFromAnnotation(loadData, annotation.argues.qualifiedBy.relationship);
+                            } else if (annotation.argues.method != "Case Report") {
                                 loadDataItemFromAnnotation(loadData, allHighlightedDrug);
                             } else {
                                 if (loadData != undefined) {
@@ -480,7 +516,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         }
                         qualifiedBy.relationship = $('#relationship option:selected').text();
 
-                        //parent compound
+                        //parent compound - drug1
                         var isEnantiomer = $('#drug1enantiomer').is(':checked');
                         var isMetabolite = $('#drug1metabolite').is(':checked');
                         if (isEnantiomer && isMetabolite) {
@@ -503,7 +539,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             qualifiedBy.drug2 = $('#Drug2 option:selected').text();
                             qualifiedBy.drug1ID = $('#Drug1 option:selected').val();
                             qualifiedBy.drug2ID = $('#Drug2 option:selected').val();
-                            //parent compound
+                            //parent compound - drug2
                             isEnantiomer = $('#drug2enantiomer').is(':checked');
                             isMetabolite = $('#drug2metabolite').is(':checked');
                             if (isEnantiomer && isMetabolite) {
@@ -515,6 +551,11 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             } else {
                                 qualifiedBy.drug2PC = "";
                             }
+                        }
+
+                        //Method: Experiment, submit objectMetabolite
+                        if (annotation.argues.method == "Experiment") {
+                            qualifiedBy.objectMetabolite = $('#object-metabolite option:selected').text();
                         }
 
                         //relation of drug and drugDose
@@ -535,7 +576,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         
                         if(qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") {
                             qualifiedBy.enzyme = $('#enzyme option:selected').text();
-                            if (annotation.argues.method == "DDI clinical trial") {
+                            if (annotation.argues.method == "DDI clinical trial" || annotation.argues.method == "Experiment") {
                                 qualifiedBy.precipitant = $("input[name=precipitant]:checked").val();
                             }
                         }  else if (qualifiedBy.relationship == "interact with") {                           
@@ -566,7 +607,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     } else if (currFormType != "claim" && currAnnotationId != null) { 
                         if (annotation.argues.supportsBy.length == 0) {
-                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, reviewer: {}, dips: {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
+                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, reviewer: {}, dips: {}, cellSystem: {}, metaboliteRateWith: {}, metaboliteRateWithout: {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
                             annotation.argues.supportsBy.push(data);
                         }
 
@@ -634,7 +675,45 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             mpData.supportsBy.supportsBy.drug2Dose = dose2Tmp;   
                         }
 
-                        // when method is case report
+                        // method: when method is Experiment
+                        if (annotation.argues.method == "Experiment") {
+                            if (currFormType == "cellSystem") {
+                                //cellSystem
+                                if (mpData.cellSystem == null || mpData.cellSystem.ranges == null) {
+                                    var cellSystemTmp = {};
+                                    cellSystemTmp['value'] = $('#cellSystem option:selected').text();
+                                    cellSystemTmp['ranges'] = cachedOARanges;
+                                    cellSystemTmp['hasTarget'] = cachedOATarget;
+                                    mpData.cellSystem = cellSystemTmp;
+                                } else {
+                                    mpData.cellSystem.value = $('#cellSystem option:selected').text();
+                                }
+                            } else if (currFormType == "rateWith") {
+                                //metabolite rate with
+                                if (mpData.metaboliteRateWith == null || mpData.metaboliteRateWith.ranges == null) {
+                                    var rateWithTmp = {};
+                                    rateWithTmp['value'] = $('#rateWithVal').val();
+                                    rateWithTmp['ranges'] = cachedOARanges;
+                                    rateWithTmp['hasTarget'] = cachedOATarget;
+                                    mpData.metaboliteRateWith = rateWithTmp;
+                                } else {
+                                    mpData.metaboliteRateWith.value = $('#rateWithVal').val();
+                                }
+                            } else if (currFormType == "rateWithout") {
+                                //metabolite rate without
+                                if (mpData.metaboliteRateWithout == null || mpData.metaboliteRateWithout.ranges == null) {
+                                    var rateWithoutTmp = {};
+                                    rateWithoutTmp['value'] = $('#rateWithoutVal').val();
+                                    rateWithoutTmp['ranges'] = cachedOARanges;
+                                    rateWithoutTmp['hasTarget'] = cachedOATarget;
+                                    mpData.metaboliteRateWithout = rateWithoutTmp;
+                                } else {
+                                    mpData.metaboliteRateWithout.value = $('#rateWithoutVal').val();
+                                }
+                            }
+                        }
+
+                        // method: when method is case report
                         if (annotation.argues.method == "Case Report") {
                             //reviewer
                             var reviewerTmp = mpData.reviewer;
@@ -1565,6 +1644,36 @@ function loadDipsFromAnnotation(loadData) {
     }
 }
 
+// load one experiment item from mp annotation
+function loadExperimentFromAnnotation(loadData, relationship) {
+    //change "precipitant" or "inhibit" based on relationship
+    if (relationship == "inhibits") {
+        $('#nav-rateWith-btn').text("Metabolite Rate With Precipitant");
+        $('#nav-rateWithout-btn').text("Metabolite Rate Without Precipitant");
+        $('#rateWithVal-label').text("Metabolite rate with precipitant (µL/min/mg): ");
+        $('#rateWithoutVal-label').text("Metabolite rate without precipitant (µL/min/mg): ");
+    } else if (relationship == "substrate of"){
+        $('#nav-rateWith-btn').text("Metabolite Rate With Inhibition");
+        $('#nav-rateWithout-btn').text("Metabolite Rate Without Inhibition");
+        $('#rateWithVal-label').text("Metabolite rate with inhibition (µL/min/mg): ");
+        $('#rateWithoutVal-label').text("Metabolite rate without inhibition (µL/min/mg): ");
+    }
+
+    if (loadData.cellSystem != null && loadData.cellSystem.hasTarget != null) {
+        $('#cellSystemquote').html(loadData.cellSystem.hasTarget.hasSelector.exact || '');
+        $("#cellSystem").val(loadData.cellSystem.value);
+    }
+
+    if (loadData.metaboliteRateWith != null && loadData.metaboliteRateWith.hasTarget != null) {
+        $('#rateWithquote').html(loadData.metaboliteRateWith.hasTarget.hasSelector.exact || '');
+        $("#rateWithVal").val(loadData.metaboliteRateWith.value);
+    }
+
+    if (loadData.metaboliteRateWithout != null && loadData.metaboliteRateWithout.hasTarget != null) {
+        $('#rateWithoutquote').html(loadData.metaboliteRateWithout.hasTarget.hasSelector.exact || '');
+        $("#rateWithoutVal").val(loadData.metaboliteRateWithout.value);
+    }
+}
 
 // load one data item from mp annotation
 function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
@@ -1832,7 +1941,7 @@ function postDataForm(targetField) {
 
     // field name and actual div id mapping
     var fieldM = {"reviewer":"reviewer", "evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype",
-    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10"};
+    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal"};
     var showDeleteBtn = false;
 
     for (var field in fieldM) {       
@@ -1849,9 +1958,12 @@ function postDataForm(targetField) {
                 if ($('#' + field + '-unchanged-checkbox').is(':checked')) 
                     showDeleteBtn = true;                    
                 fieldVal = $("#" + fieldM[field]).val();
-            } else if (currAnnotation.argues.method == "Case Report"){ // when field is text input
+            } else if (currAnnotation.argues.method == "Case Report"){
                 $("#mp-dips-nav").show();
                 fieldVal = $("#dips-" + fieldM[field]).val();
+            }  else if (currAnnotation.argues.method == "Experiment"){
+                $("#mp-experiment-nav").show();
+                fieldVal = $("#" + fieldM[field]).val();
             }  else if (field == "phenotype"){ // when field is text input
                 $("#mp-data-nav").show();
                 fieldVal = $("#" + fieldM[field] + "Genre").val();
@@ -1859,7 +1971,6 @@ function postDataForm(targetField) {
                 $("#mp-data-nav").show();
                 fieldVal = $("#" + fieldM[field]).val();
             }
-            //console.log(fieldVal);
                 
             if (fieldVal !=null && fieldVal != "")
                 $("#annotator-delete").show();
@@ -1919,14 +2030,16 @@ function cleanClaimForm() {
     $("#drug2metaboliteLabel").parent().show();
     $("#drug2metabolite").parent().show();
 
-    $('#negationdiv').hide();
-    $('#negation-label').hide();
+    $('#negationdiv').parent().hide();
+    $('#negation-label').parent().hide();
     $('input[name=negation]').prop('checked', false);
-
     
     $('#Drug1 option').remove();
     $('#Drug2 option').remove();
+    $('#object-metabolite option').remove();
 
+    $('#object-metabolite').parent().hide();
+    $('#object-metabolite-label').parent().hide();
     $("#Drug1-label").html("Drug1: ");
     $("#Drug2-label").parent().show();
     $("#Drug2").parent().show(); 
@@ -1940,7 +2053,7 @@ function cleanClaimForm() {
 function cleanDataForm() {
     //clean form validation format
     $(".form-validation-alert").hide();
-    var allDataFields = ["#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
+    var allDataFields = ["#cellSystem", "#rateWithVal", "rateWithoutVal", "#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
     for (var i = 0; i < allDataFields.length; i++) {
         $(allDataFields[i]).css("background-color", "");
     }
@@ -1960,6 +2073,11 @@ function cleanDataForm() {
     for (var i = 1; i <= 10; i++) {
         $('input[name=dips-q' + i + ']').prop('checked', false);
     }
+
+    //clean experiment data
+    $("#cellSystem").val('');
+    $("#rateWithVal").val('');
+    $("#rateWithoutVal").val('');
 
     //clean material
     $("#participants").val('');

@@ -66,7 +66,7 @@ var context1 = {
             name:"Method: ",
             id:"method",
             html: "table",
-            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement"],
+            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement", "Experiment"],
             optionsID:[]
         },
         {
@@ -119,6 +119,14 @@ var context1 = {
             id:"negation",
             html: "table",
             options:["Yes","No"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Object metabolite: ",
+            id:"object-metabolite",
+            html: "table",
+            options:[],
             optionsID:[]
         },
         {
@@ -705,6 +713,62 @@ var questionList = {
     ]
 };
 
+// Experiment Data - Cell System form
+var cellSystem = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"cellSystemquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Cell System: ",
+            id:"cellSystem",
+            options:["Not available", "Human cryopreserved hepatocytes", "Human freshly isolated hepatocytes", "Transgenic animal hepatocytes", "HepG2 cell line", "HepaRG cell line", "Fa2N-4 cell line", "BC2 cell line", "Cryopreserved Hepatocytes", "Primary Hepatocytes", "Sandwich Cultured Hepatocytes", "Intestinal Epithelial Cells", "Caco-2 Cells", "Individual human intestinal microsomes", "Human liver cytosolic fraction", "Human intestine cytosolic fraction", "Human liver S9 fraction", "Human intestine S9 fraction", "Pooled Human liver microsomes", "Individual Human liver microsomes", "Pooled human intestinal microsomes", "Baculovirus-insect cells", "E.coli", "Yeast", "siRNA Knock-out Caco-2 Cells", "siRNA Knock-out Other Cells", "X.laevis Oocytes injected", "Inside-out Membrane Vesicles", "MDCK transfected cells", "LLC-PK1 transfected cells", "HEK293 transfected cells", "HeLa transfected cells", "CHO transfected cells", "HepG2 transfected cells", "siRNA Knock-out Hepatocytes", "Transgenic Animal Model"],
+            optionsID:[]
+        }
+    ]
+};
+
+// Experiment Data - Metabolite Rate with precipitant
+var rateWith = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"rateWithquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Metabolite rate with precipitant (µL/min/mg): ",
+            id: "rateWithVal"
+        }
+    ]
+};
+
+// Experiment Data - Metabolite Rate without precipitant
+var rateWithout = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"rateWithoutquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Metabolite rate without precipitant (µL/min/mg): ",
+            id: "rateWithoutVal"
+        }
+    ]
+};
+
 // handlerbar - build form1 function
 // @inputs: JSON config - context1
 // @outputs: form1 in html
@@ -755,14 +819,14 @@ Handlebars.registerHelper('buildFormClaim', function(items, options) {
                         out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
                 }
                 out = out + "</select>";
-                if (items[i].id == "Drug1") {
+                if (items[i].id == "Drug1" || items[i].id == "Drug2") {
                     out += "<input style='width:110px;height=11px;display:none;float:left;' type='text' id='"+items[i].id+"-input'>";
-                    out += "<img id='editDrug1' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
-                    out += "<img id='commitDrug1' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
-                } else if (items[i].id == "Drug2") {
+                    out += "<img id='edit" + items[i].id + "' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
+                    out += "<img id='commit" + items[i].id + "' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                } else if (items[i].id == "object-metabolite") {
                     out += "<input style='width:110px;height=11px;display:none;float:left;' type='text' id='"+items[i].id+"-input'>";
-                    out += "<img id='editDrug2' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
-                    out += "<img id='commitDrug2' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                    out += "<img id='edit-" + items[i].id + "' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
+                    out += "<img id='commit-" + items[i].id + "' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
                 }
             } else if (items[i].type=="textarea") {
                 out = out + "<textarea id='" + items[i].id + "' class='" + items[i].id + "'></textarea>";
@@ -979,6 +1043,21 @@ source = "{{#buildFormDIPS questions}}{{/buildFormDIPS}}";
 template = Handlebars.compile(source);
 var formQuestion = template(questionList);
 
+// Experiment - cellSystem
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formCellSystem = template(cellSystem);
+
+// Experiment - rateWith
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formRateWith = template(rateWith);
+
+// Experiment - rateWithout
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formRateWithout = template(rateWithout);
+
 Template.content = [
 
     // '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
@@ -1021,6 +1100,12 @@ Template.content = [
     '<button class="dipsQuestion" id="nav-q8-btn" type="button" onclick="switchDataForm(\'q8\')" >Q8</button> &nbsp;->&nbsp;',
     '<button class="dipsQuestion" id="nav-q9-btn" type="button" onclick="switchDataForm(\'q9\')" >Q9</button> &nbsp;->&nbsp;',
     '<button class="dipsQuestion" id="nav-q10-btn" type="button" onclick="switchDataForm(\'q10\')" >Q10</button>',
+    '</div>',
+
+    '<div id="mp-experiment-nav" style="display: none;">',
+    '<button id="nav-cellSystem-btn" type="button" onclick="switchDataForm(\'cellSystem\')" >Cell System</button> &nbsp;->&nbsp;',
+    '<button id="nav-rateWith-btn" type="button" onclick="switchDataForm(\'rateWith\')" >Metabolite rate with precipitant</button> &nbsp;->&nbsp;',
+    '<button id="nav-rateWithout-btn" type="button" onclick="switchDataForm(\'rateWithout\')" >Metabolite rate without precipitant</button>',
     '</div>',
 
     // Claim form
@@ -1085,6 +1170,21 @@ Template.content = [
 
     // DIPS - question
     formQuestion,
+
+    // Experiment - cellSystem
+    '<div id="mp-data-form-cellSystem" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formCellSystem,
+    '</div>',
+
+    // Experiment - rateWith
+    '<div id="mp-data-form-rateWith" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formRateWith,
+    '</div>',
+
+    // Experiment - rateWithout
+    '<div id="mp-data-form-rateWithout" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formRateWithout,
+    '</div>',
 
     
     '</div>',

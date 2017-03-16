@@ -238,7 +238,13 @@ mpHighlighter.prototype.draw = function (annotation) {
                 if (data.clearance.ranges != null || data.clearance.hasTarget != null)
                     self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);                
                 if (data.halflife.ranges != null || data.halflife.hasTarget !=null) 
-                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);                                
+                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);
+                if (data.cellSystem != null && (data.cellSystem.ranges != null || data.cellSystem.hasTarget !=null)) 
+                    self.drawField(data.cellSystem, "cellSystem", idx, dataRangesL, hldivL);
+                if (data.metaboliteRateWith != null && (data.metaboliteRateWith.ranges != null || data.metaboliteRateWith.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWith, "metaboliteRateWith", idx, dataRangesL, hldivL);
+                if (data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWithout, "metaboliteRateWithout", idx, dataRangesL, hldivL);
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
 
