@@ -107,17 +107,19 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }));
                             flag = flag + 1;
                         }
-                        if (!list.includes(claim.qualifiedBy.drug1)) {
-                            $('#Drug1').append($('<option>', {
-                                value: claim.qualifiedBy.drug1 + "_0",
-                                text: claim.qualifiedBy.drug1
-                            }));
-                        }
-                        if (!list.includes(claim.qualifiedBy.drug2)) {
-                            $('#Drug2').append($('<option>', {
-                                value: claim.qualifiedBy.drug2 + "_0",
-                                text: claim.qualifiedBy.drug2
-                            }));
+                        if (claim.qualifiedBy != undefined) {
+                            if (!list.includes(claim.qualifiedBy.drug1)) {
+                                $('#Drug1').append($('<option>', {
+                                    value: claim.qualifiedBy.drug1 + "_0",
+                                    text: claim.qualifiedBy.drug1
+                                }));
+                            }
+                            if (!list.includes(claim.qualifiedBy.drug2)) {
+                                $('#Drug2').append($('<option>', {
+                                    value: claim.qualifiedBy.drug2 + "_0",
+                                    text: claim.qualifiedBy.drug2
+                                }));
+                            }
                         }
                         
                         if (flag < 1) {
@@ -2005,6 +2007,8 @@ function loadUnchangedMode() {
 
 // clean all value of claim form
 function cleanClaimForm() {
+    //clean form validation format
+    $('.form-validation-alert').hide();
 
     $("#quote").empty();
     $("#method")[0].selectedIndex = 0;
@@ -2053,6 +2057,7 @@ function cleanClaimForm() {
 function cleanDataForm() {
     //clean form validation format
     $(".form-validation-alert").hide();
+
     var allDataFields = ["#cellSystem", "#rateWithVal", "rateWithoutVal", "#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
     for (var i = 0; i < allDataFields.length; i++) {
         $(allDataFields[i]).css("background-color", "");
