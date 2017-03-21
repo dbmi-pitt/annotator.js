@@ -587,7 +587,16 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         var claimStatement = "";
                         if (qualifiedBy.relationship == "inhibits" || qualifiedBy.relationship == "substrate of") {
-                            claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
+                            if (qualifiedBy.precipitant != undefined) {
+                                if ((qualifiedBy.relationship == "inhibits" && qualifiedBy.precipitant == "drug1") || (qualifiedBy.relationship == "substrate of" && qualifiedBy.precipitant == "drug2")) {
+                                    claimStatement = qualifiedBy.drug1;
+                                } else {
+                                    claimStatement = qualifiedBy.drug2;
+                                }
+                                claimStatement += "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
+                            } else {
+                                claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.enzyme;
+                            }
                         } else {
                             claimStatement = qualifiedBy.drug1 + "_" + qualifiedBy.relationship + "_" + qualifiedBy.drug2;
                         }
