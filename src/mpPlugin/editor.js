@@ -94,6 +94,14 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 listid.splice(i,1);
                             }
                         }
+
+                        //add N/A to drug2 drop down list
+                        $('#Drug2').append($('<option>', {
+                            value: "N/A",
+                            text: "N/A"
+                        }));
+
+                        //add drugs to drug1 and drug2 drop down list
                         var index = 0;
                         for (var i = 0, len = list.length; i < len; i++) {
                             // avoid replacing span itself add to dropdown box
@@ -122,14 +130,20 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             }
                         }
                         
-                        if (flag < 1) {
+                        //cpnstraint: at least one drug selected in claim
+                        /*if (flag < 1) {
                             unsaved = false;
                             alert("please highlight at least one drug in the text span you selected!");
                             editorSelf.cancel();
                             $('.btn-success').click();
-                        }
+                        }*/
 
-                        //object metabolite
+                        //add N/A to object metabolite drop down list
+                        $('#object-metabolite').append($('<option>', {
+                            value: "N/A",
+                            text: "N/A"
+                        }));
+                        //add drugs to object metabolite
                         var distinctDrug = new Set();
                         for (var i = 0; i < allHighlightedDrug.length; i++) {
                             if (!distinctDrug.has(allHighlightedDrug[i].toLowerCase())) {
