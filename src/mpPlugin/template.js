@@ -769,6 +769,44 @@ var rateWithout = {
     ]
 };
 
+// Experiment Data - Measurement
+var measurement = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"measurementquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"measurement-unchanged-checkbox",
+            value: "measurementunchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Measurement: ",
+            id:"measurementType",
+            options:["UNK", "%inhibition", "Ki-total", "EC50", "IC50", "Efflux Rate Vmax or Jmax", "Kinact"],
+            optionsID:[]
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"measurementUnit",
+            options:["UNK","µM","%","nM"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "measurementValue"
+        }
+    ]
+};
+
 // handlerbar - build form1 function
 // @inputs: JSON config - context1
 // @outputs: form1 in html
@@ -1058,6 +1096,11 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var formRateWithout = template(rateWithout);
 
+// Experiment - measurement
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formMeasurement = template(measurement);
+
 Template.content = [
 
     // '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
@@ -1104,6 +1147,7 @@ Template.content = [
 
     '<div id="mp-experiment-nav" style="display: none;">',
     '<button id="nav-cellSystem-btn" type="button" onclick="switchDataForm(\'cellSystem\')" >Cell System</button> &nbsp;->&nbsp;',
+    '<button id="nav-measurement-btn" type="button" onclick="switchDataForm(\'measurement\')" >Measurement</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWith-btn" type="button" onclick="switchDataForm(\'rateWith\')" >Metabolite rate with precipitant</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWithout-btn" type="button" onclick="switchDataForm(\'rateWithout\')" >Metabolite rate without precipitant</button>',
     '</div>',
@@ -1184,6 +1228,11 @@ Template.content = [
     // Experiment - rateWithout
     '<div id="mp-data-form-rateWithout" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     formRateWithout,
+    '</div>',
+
+    // Experiment - measurement
+    '<div id="mp-data-form-measurement" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formMeasurement,
     '</div>',
 
     

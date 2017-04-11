@@ -735,6 +735,32 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 } else {
                                     mpData.metaboliteRateWithout.value = $('#rateWithoutVal').val();
                                 }
+                            } else if (currFormType == "measurement") {
+                                var measurementType = $('#measurementType option:selected').text();
+                                var measurementUnit = $('#measurementUnit option:selected').text();
+                                var measurementValue = $('#measurementValue').val();
+                                var measurementUnchanged = $('#measurement-unchanged-checkbox').is(':checked');
+
+                                if (measurementUnchanged) {
+                                    measurementValue = "unchanged";            
+                                    measurementType = "";
+                                    measurementUnit = "";      
+                                }
+                                //measurement
+                                if (mpData.measurement == null || mpData.measurement.ranges == null) {
+                                    var measurementTmp = {};
+                                    measurementTmp['value'] = measurementValue;
+                                    measurementTmp['type'] = measurementType;
+                                    measurementTmp['unit'] = measurementUnit;
+                                    measurementTmp['ranges'] = cachedOARanges;
+                                    measurementTmp['hasTarget'] = cachedOATarget;
+                                    mpData.measurement = measurementTmp;
+                                } else {
+                                    mpData.measurement.value = measurementValue;
+                                    mpData.measurement.type = measurementType;
+                                    mpData.measurement.unit = measurementUnit;
+                                }
+                                
                             }
                         }
 
@@ -1698,6 +1724,17 @@ function loadExperimentFromAnnotation(loadData, relationship) {
         $('#rateWithoutquote').html(loadData.metaboliteRateWithout.hasTarget.hasSelector.exact || '');
         $("#rateWithoutVal").val(loadData.metaboliteRateWithout.value);
     }
+
+    if (loadData.measurement != null && loadData.measurement.hasTarget != null) {
+        if (loadData.measurement.value == "unchanged") {
+            $('#measurement-unchanged-checkbox').prop("checked", true);
+        } else {
+            $('#measurementquote').html(loadData.measurement.hasTarget.hasSelector.exact || '');
+            $("#measurementValue").val(loadData.measurement.value);
+            $("#measurementType").val(loadData.measurement.type);
+            $("#measurementUnit").val(loadData.measurement.unit);
+        }
+    }
 }
 
 // load one data item from mp annotation
@@ -1966,7 +2003,7 @@ function postDataForm(targetField) {
 
     // field name and actual div id mapping
     var fieldM = {"reviewer":"reviewer", "evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype",
-    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal"};
+    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal", "measurement":"measurement"};
     var showDeleteBtn = false;
 
     for (var field in fieldM) {       
@@ -2106,6 +2143,10 @@ function cleanDataForm() {
     $("#cellSystem").val('');
     $("#rateWithVal").val('');
     $("#rateWithoutVal").val('');
+    $("#measurementValue").val('');
+    $('#measurement-unchanged-checkbox').attr('checked',false);
+    $("#measurementType")[0].selectedIndex = -1;
+    $("#measurementUnit")[0].selectedIndex = -1;
 
     //clean material
     $("#participants").val('');
