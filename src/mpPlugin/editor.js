@@ -632,7 +632,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     } else if (currFormType != "claim" && currAnnotationId != null) { 
                         if (annotation.argues.supportsBy.length == 0) {
-                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, reviewer: {}, dips: {}, cellSystem: {}, metaboliteRateWith: {}, metaboliteRateWithout: {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
+                            var data = {type : "mp:data", evRelationship: "", auc : {}, cmax : {}, clearance : {}, halflife : {}, reviewer: {}, dips: {}, cellSystem: {}, metaboliteRateWith: {}, metaboliteRateWithout: {}, measurement: {}, supportsBy : {type : "mp:method", supportsBy : {type : "mp:material", participants : {}, drug1Dose : {}, drug2Dose: {}, phenotype: {}}}, grouprandom: "", parallelgroup: ""};
                             annotation.argues.supportsBy.push(data);
                         }
 
@@ -735,32 +735,32 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 } else {
                                     mpData.metaboliteRateWithout.value = $('#rateWithoutVal').val();
                                 }
-                            } else if (currFormType == "measurement") {
-                                var measurementType = $('#measurementType option:selected').text();
-                                var measurementUnit = $('#measurementUnit option:selected').text();
-                                var measurementValue = $('#measurementValue').val();
-                                var measurementUnchanged = $('#measurement-unchanged-checkbox').is(':checked');
+                            } else if (currFormType == "cl" || currFormType == "vmax" || currFormType == "km" || currFormType == "ki" || currFormType == "inhibition") {
 
-                                if (measurementUnchanged) {
-                                    measurementValue = "unchanged";            
-                                    measurementType = "";
-                                    measurementUnit = "";      
+                                var clUnit = $('#'+currFormType+'Unit option:selected').text();
+                                var clValue = $('#'+currFormType+'Value').val();
+                                var clUnchanged = $('#'+currFormType+'-unchanged-checkbox').is(':checked');
+
+                                if (clUnchanged) {
+                                    clValue = "unchanged";            
+                                    clUnit = "";      
                                 }
-                                //measurement
-                                if (mpData.measurement == null || mpData.measurement.ranges == null) {
+
+                                if (mpData.measurement == null) {
                                     var measurementTmp = {};
-                                    measurementTmp['value'] = measurementValue;
-                                    measurementTmp['type'] = measurementType;
-                                    measurementTmp['unit'] = measurementUnit;
-                                    measurementTmp['ranges'] = cachedOARanges;
-                                    measurementTmp['hasTarget'] = cachedOATarget;
                                     mpData.measurement = measurementTmp;
-                                } else {
-                                    mpData.measurement.value = measurementValue;
-                                    mpData.measurement.type = measurementType;
-                                    mpData.measurement.unit = measurementUnit;
                                 }
-                                
+                                if (mpData.measurement[currFormType] == null) {
+                                    var clTmp = {};
+                                    clTmp['value'] = clValue;
+                                    clTmp['unit'] = clUnit;
+                                    clTmp['ranges'] = cachedOARanges;
+                                    clTmp['hasTarget'] = cachedOATarget;
+                                    mpData.measurement[currFormType] = clTmp;
+                                } else {
+                                    mpData.measurement[currFormType].value = clValue;
+                                    mpData.measurement[currFormType].unit = clUnit;
+                                }
                             }
                         }
 
@@ -1725,14 +1725,20 @@ function loadExperimentFromAnnotation(loadData, relationship) {
         $("#rateWithoutVal").val(loadData.metaboliteRateWithout.value);
     }
 
-    if (loadData.measurement != null && loadData.measurement.hasTarget != null) {
-        if (loadData.measurement.value == "unchanged") {
-            $('#measurement-unchanged-checkbox').prop("checked", true);
-        } else {
-            $('#measurementquote').html(loadData.measurement.hasTarget.hasSelector.exact || '');
-            $("#measurementValue").val(loadData.measurement.value);
-            $("#measurementType").val(loadData.measurement.type);
-            $("#measurementUnit").val(loadData.measurement.unit);
+    if (loadData.measurement != null) {
+        var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+        for (var i = 0; i < mTypes.length; i++) {
+            var mType = mTypes[i];
+            if (loadData.measurement[mType] == null) {
+                continue;
+            }
+            if (loadData.measurement[mType].value == "unchanged") {
+                $('#'+mType+'-unchanged-checkbox').prop("checked", true);
+            } else {
+                $('#'+mType+'quote').html(loadData.measurement[mType].hasTarget.hasSelector.exact || '');
+                $("#"+mType+"Value").val(loadData.measurement[mType].value);
+                $("#"+mType+"Unit").val(loadData.measurement[mType].unit);
+            }
         }
     }
 }
@@ -2003,7 +2009,7 @@ function postDataForm(targetField) {
 
     // field name and actual div id mapping
     var fieldM = {"reviewer":"reviewer", "evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype",
-    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal", "measurement":"measurement"};
+    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal", "cl":"cl", "vmax":"vmax", "km":"km", "ki":"ki", "inhibition":"inhibition"};
     var showDeleteBtn = false;
 
     for (var field in fieldM) {       
@@ -2143,10 +2149,21 @@ function cleanDataForm() {
     $("#cellSystem").val('');
     $("#rateWithVal").val('');
     $("#rateWithoutVal").val('');
-    $("#measurementValue").val('');
-    $('#measurement-unchanged-checkbox').attr('checked',false);
-    $("#measurementType")[0].selectedIndex = -1;
-    $("#measurementUnit")[0].selectedIndex = -1;
+    $("#clValue").val('');
+    $('#cl-unchanged-checkbox').attr('checked',false);
+    $("#clUnit")[0].selectedIndex = -1;
+    $("#vmaxValue").val('');
+    $('#vmax-unchanged-checkbox').attr('checked',false);
+    $("#vmaxUnit")[0].selectedIndex = -1;
+    $("#kmValue").val('');
+    $('#km-unchanged-checkbox').attr('checked',false);
+    $("#kmUnit")[0].selectedIndex = -1;
+    $("#kiValue").val('');
+    $('#ki-unchanged-checkbox').attr('checked',false);
+    $("#kiUnit")[0].selectedIndex = -1;
+    $("#inhibitionValue").val('');
+    $('#inhibition-unchanged-checkbox').attr('checked',false);
+    $("#inhibitionUnit")[0].selectedIndex = -1;
 
     //clean material
     $("#participants").val('');

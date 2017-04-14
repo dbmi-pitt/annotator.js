@@ -769,40 +769,157 @@ var rateWithout = {
     ]
 };
 
-// Experiment Data - Measurement
-var measurement = {
+// Experiment Data - CLint total
+var cl = {
     questions: [
         {
             type:"quote",
             name:"Quote: ",
-            id:"measurementquote",
+            id:"clquote",
             options:[],
             optionsID:[]
         },
         {
             type:"checkbox",
             name:"unchanged: ",
-            id:"measurement-unchanged-checkbox",
-            value: "measurementunchanged"
-        },
-        {
-            type:"dropdown",
-            name:"Measurement: ",
-            id:"measurementType",
-            options:["UNK", "%inhibition", "Ki-total", "EC50", "IC50", "Efflux Rate Vmax or Jmax", "Kinact"],
-            optionsID:[]
+            id:"cl-unchanged-checkbox",
+            value: "clunchanged"
         },
         {
             type:"dropdown",
             name:"Unit: ",
-            id:"measurementUnit",
-            options:["UNK","µM","%","nM"],
+            id:"clUnit",
+            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
             optionsID:[]
         },
         {
             type: "input",
             name: "Value: ",
-            id: "measurementValue"
+            id: "clValue"
+        }
+    ]
+};
+
+// Experiment Data - Vmax
+var vmax = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"vmaxquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"vmax-unchanged-checkbox",
+            value: "vmaxunchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"vmaxUnit",
+            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "vmaxValue"
+        }
+    ]
+};
+
+// Experiment Data - km
+var km = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"kmquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"km-unchanged-checkbox",
+            value: "kmunchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"kmUnit",
+            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "kmValue"
+        }
+    ]
+};
+
+// Experiment Data - inhibition
+var inhibition = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"inhibitionquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"inhibition-unchanged-checkbox",
+            value: "inhibitionunchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"inhibitionUnit",
+            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "inhibitionValue"
+        }
+    ]
+};
+
+// Experiment Data - ki
+var ki = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"kiquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"ki-unchanged-checkbox",
+            value: "kiunchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"kiUnit",
+            options:["UNK","%","µM","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "kiValue"
         }
     ]
 };
@@ -1096,10 +1213,30 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var formRateWithout = template(rateWithout);
 
-// Experiment - measurement
+// Experiment - cl
 source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
-var formMeasurement = template(measurement);
+var formCl = template(cl);
+
+// Experiment - vmax
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formVmax = template(vmax);
+
+// Experiment - km
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formKm = template(km);
+
+// Experiment - ki
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formKi = template(ki);
+
+// Experiment - inhibition
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formInhibition = template(inhibition);
 
 Template.content = [
 
@@ -1147,7 +1284,11 @@ Template.content = [
 
     '<div id="mp-experiment-nav" style="display: none;">',
     '<button id="nav-cellSystem-btn" type="button" onclick="switchDataForm(\'cellSystem\')" >Cell System</button> &nbsp;->&nbsp;',
-    '<button id="nav-measurement-btn" type="button" onclick="switchDataForm(\'measurement\')" >Measurement</button> &nbsp;->&nbsp;',
+    '<button id="nav-cl-btn" type="button" onclick="switchDataForm(\'cl\')" >CL<sub>int total</sub></button> &nbsp;->&nbsp;',
+    '<button id="nav-vmax-btn" type="button" onclick="switchDataForm(\'vmax\')" >V<sub>max</sub></button> &nbsp;->&nbsp;',
+    '<button id="nav-km-btn" type="button" onclick="switchDataForm(\'km\')" >K<sub>m total</sub></button> &nbsp;->&nbsp;',
+    '<button id="nav-ki-btn" type="button" onclick="switchDataForm(\'ki\')" >Ki<sub>total</sub></button> &nbsp;->&nbsp;',
+    '<button id="nav-inhibition-btn" type="button" onclick="switchDataForm(\'inhibition\')" >%Inhibition</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWith-btn" type="button" onclick="switchDataForm(\'rateWith\')" >Metabolite rate with precipitant</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWithout-btn" type="button" onclick="switchDataForm(\'rateWithout\')" >Metabolite rate without precipitant</button>',
     '</div>',
@@ -1230,9 +1371,29 @@ Template.content = [
     formRateWithout,
     '</div>',
 
-    // Experiment - measurement
-    '<div id="mp-data-form-measurement" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
-    formMeasurement,
+    // Experiment - cl
+    '<div id="mp-data-form-cl" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formCl,
+    '</div>',
+
+    // Experiment - vmax
+    '<div id="mp-data-form-vmax" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formVmax,
+    '</div>',
+
+    // Experiment - km
+    '<div id="mp-data-form-km" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formKm,
+    '</div>',
+
+    // Experiment - ki
+    '<div id="mp-data-form-ki" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formKi,
+    '</div>',
+
+    // Experiment - inhibition
+    '<div id="mp-data-form-inhibition" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formInhibition,
     '</div>',
 
     
