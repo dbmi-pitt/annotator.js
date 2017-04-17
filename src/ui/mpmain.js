@@ -799,6 +799,8 @@ function addClaimDataDialog(ann) {
         cachedOARanges = ann.argues.ranges; 
         if (ann.argues.method == "Case Report") {
             addDataCellByEditor("dose1", 0);
+        } else if (ann.argues.method == "Experiment") {
+            addDataCellByEditor("cellSystem", 0);
         } else {
             addDataCellByEditor("participants", 0);
         }                              

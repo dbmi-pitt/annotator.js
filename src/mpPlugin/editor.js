@@ -122,7 +122,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     text: claim.qualifiedBy.drug1
                                 }));
                             }
-                            if (!list.includes(claim.qualifiedBy.drug2)) {
+                            if (!list.includes(claim.qualifiedBy.drug2) && claim.qualifiedBy.drug2 != "N/A") {
                                 $('#Drug2').append($('<option>', {
                                     value: claim.qualifiedBy.drug2 + "_0",
                                     text: claim.qualifiedBy.drug2
@@ -394,7 +394,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 $('#object-metabolite').parent().show();
                                 $('#object-metabolite-label').parent().show();
                                 if (claim.qualifiedBy.objectMetabolite != null) {
-                                    if (!distinctDrug.has(claim.qualifiedBy.objectMetabolite.toLowerCase())) {
+                                    if (!distinctDrug.has(claim.qualifiedBy.objectMetabolite.toLowerCase()) && claim.qualifiedBy.objectMetabolite.toLowerCase() != "n/a") {
                                         $('#object-metabolite').append($('<option>', {
                                             value: claim.qualifiedBy.objectMetabolite,
                                             text: claim.qualifiedBy.objectMetabolite
@@ -1732,10 +1732,10 @@ function loadExperimentFromAnnotation(loadData, relationship) {
             if (loadData.measurement[mType] == null) {
                 continue;
             }
+            $('#'+mType+'quote').html(loadData.measurement[mType].hasTarget.hasSelector.exact || '');
             if (loadData.measurement[mType].value == "unchanged") {
                 $('#'+mType+'-unchanged-checkbox').prop("checked", true);
             } else {
-                $('#'+mType+'quote').html(loadData.measurement[mType].hasTarget.hasSelector.exact || '');
                 $("#"+mType+"Value").val(loadData.measurement[mType].value);
                 $("#"+mType+"Unit").val(loadData.measurement[mType].unit);
             }
@@ -2069,6 +2069,17 @@ function loadUnchangedMode() {
             $('#'+fields[i]+'Direction').attr('disabled', false);  
         }
     }
+
+    var fields = ["cl", "vmax", "km", "ki", "inhibition"];
+    for (var i = 0; i < fields.length; i++) {
+        if ($('#' + fields[i] + '-unchanged-checkbox').is(':checked')) {
+            $('#'+fields[i]+'Unit').attr('disabled', true);
+            $('#'+fields[i]+'Value').attr('disabled', true);  
+        } else {
+            $('#'+fields[i]+'Unit').attr('disabled', false);
+            $('#'+fields[i]+'Value').attr('disabled', false);  
+        }
+    }
 }
 
 // clean all value of claim form
@@ -2124,7 +2135,7 @@ function cleanDataForm() {
     //clean form validation format
     $(".form-validation-alert").hide();
 
-    var allDataFields = ["#cellSystem", "#rateWithVal", "rateWithoutVal", "#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
+    var allDataFields = ["#cellSystem", "#rateWithVal", "rateWithoutVal", "cl", "vmax", "km", "ki", "inhibition", "#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
     for (var i = 0; i < allDataFields.length; i++) {
         $(allDataFields[i]).css("background-color", "");
     }

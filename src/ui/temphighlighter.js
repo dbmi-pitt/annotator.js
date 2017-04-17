@@ -220,6 +220,19 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                     self.drawField(data.metaboliteRateWith, "rateWith", currDataNum, dataRangesL, hldivL);
                 if (currFormType == "rateWithout" && data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
                     self.drawField(data.metaboliteRateWithout, "rateWithout", currDataNum, dataRangesL, hldivL);
+                if (data.measurement != null) {
+                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+                    for (var i = 0; i < mTypes.length; i++) {
+                        var mType = mTypes[i];
+                        if (currFormType != mType) {
+                            continue;
+                        }
+                        if (data.measurement[mType] != null && (data.measurement[mType].ranges != null || data.measurement[mType].hasTarget !=null)) 
+                            self.drawField(data.measurement[mType], mType, currDataNum, dataRangesL, hldivL);
+                    }
+                }
+
+
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
                 if (material != null){                    

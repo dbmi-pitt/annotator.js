@@ -245,6 +245,15 @@ mpHighlighter.prototype.draw = function (annotation) {
                     self.drawField(data.metaboliteRateWith, "metaboliteRateWith", idx, dataRangesL, hldivL);
                 if (data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
                     self.drawField(data.metaboliteRateWithout, "metaboliteRateWithout", idx, dataRangesL, hldivL);
+                if (data.measurement != null) {
+                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+                    for (var i = 0; i < mTypes.length; i++) {
+                        var mType = mTypes[i];
+                        if (data.measurement[mType] != null && (data.measurement[mType].ranges != null || data.measurement[mType].hasTarget !=null)) 
+                            self.drawField(data.measurement[mType], mType, idx, dataRangesL, hldivL);
+                    }
+                }
+
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
 
