@@ -1729,7 +1729,7 @@ function loadExperimentFromAnnotation(loadData, relationship) {
         var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
         for (var i = 0; i < mTypes.length; i++) {
             var mType = mTypes[i];
-            if (loadData.measurement[mType] == null) {
+            if (loadData.measurement[mType] == null || loadData.measurement[mType].hasTarget == null) {
                 continue;
             }
             $('#'+mType+'quote').html(loadData.measurement[mType].hasTarget.hasSelector.exact || '');
@@ -2029,7 +2029,12 @@ function postDataForm(targetField) {
             } else if (currAnnotation.argues.method == "Case Report"){
                 $("#mp-dips-nav").show();
                 fieldVal = $("#dips-" + fieldM[field]).val();
-            }  else if (currAnnotation.argues.method == "Experiment"){
+            } else if (field == "cl" || field == "vmax" || field == "km" || field == "ki" || field == "inhibition") {
+                if ($('#' + field + '-unchanged-checkbox').is(':checked')) 
+                    showDeleteBtn = true; 
+                $("#mp-experiment-nav").show();
+                fieldVal = $("#" + fieldM[field] + "Value").val();
+            } else if (currAnnotation.argues.method == "Experiment"){
                 $("#mp-experiment-nav").show();
                 fieldVal = $("#" + fieldM[field]).val();
             }  else if (field == "phenotype"){ // when field is text input

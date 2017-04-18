@@ -727,7 +727,7 @@ var cellSystem = {
             type:"dropdown",
             name:"Cell System: ",
             id:"cellSystem",
-            options:["Not available", "Human cryopreserved hepatocytes", "Human freshly isolated hepatocytes", "Transgenic animal hepatocytes", "HepG2 cell line", "HepaRG cell line", "Fa2N-4 cell line", "BC2 cell line", "Cryopreserved Hepatocytes", "Primary Hepatocytes", "Sandwich Cultured Hepatocytes", "Intestinal Epithelial Cells", "Caco-2 Cells", "Individual human intestinal microsomes", "Human liver cytosolic fraction", "Human intestine cytosolic fraction", "Human liver S9 fraction", "Human intestine S9 fraction", "Pooled Human liver microsomes", "Individual Human liver microsomes", "Pooled human intestinal microsomes", "Baculovirus-insect cells", "E.coli", "Yeast", "siRNA Knock-out Caco-2 Cells", "siRNA Knock-out Other Cells", "X.laevis Oocytes injected", "Inside-out Membrane Vesicles", "MDCK transfected cells", "LLC-PK1 transfected cells", "HEK293 transfected cells", "HeLa transfected cells", "CHO transfected cells", "HepG2 transfected cells", "siRNA Knock-out Hepatocytes", "Transgenic Animal Model"],
+            options:["Not available", "Baculovirus-insect cells", "BC2 cell line", "Caco-2 Cells", "CHO transfected cells", "Cryopreserved Hepatocytes", "E.coli", "Fa2N-4 cell line", "HEK293 transfected cells", "HeLa transfected cells", "HepaRG cell line", "HepG2 cell line", "HepG2 transfected cells", "Human cryopreserved hepatocytes", "Human freshly isolated hepatocytes", "Human intestine cytosolic fraction", "Human intestine S9 fraction", "Human liver cytosolic fraction", "Human liver S9 fraction", "Individual human intestinal microsomes", "Individual Human liver microsomes", "Inside-out Membrane Vesicles", "Intestinal Epithelial Cells", "LLC-PK1 transfected cells", "MDCK transfected cells", "Pooled human intestinal microsomes", "Pooled Human liver microsomes", "Primary Hepatocytes", "Recombinant Enzyme System(NOS)", "Sandwich Cultured Hepatocytes", "siRNA Knock-out Caco-2 Cells", "siRNA Knock-out Hepatocytes", "siRNA Knock-out Other Cells", "Transgenic animal hepatocytes", "Transgenic Animal Model", "X.laevis Oocytes injected", "Yeast"],
             optionsID:[]
         }
     ]
@@ -789,7 +789,7 @@ var cl = {
             type:"dropdown",
             name:"Unit: ",
             id:"clUnit",
-            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
             optionsID:[]
         },
         {
@@ -820,7 +820,7 @@ var vmax = {
             type:"dropdown",
             name:"Unit: ",
             id:"vmaxUnit",
-            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
             optionsID:[]
         },
         {
@@ -851,7 +851,7 @@ var km = {
             type:"dropdown",
             name:"Unit: ",
             id:"kmUnit",
-            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
             optionsID:[]
         },
         {
@@ -882,7 +882,7 @@ var inhibition = {
             type:"dropdown",
             name:"Unit: ",
             id:"inhibitionUnit",
-            options:["UNK","µM","%","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
             optionsID:[]
         },
         {
@@ -913,7 +913,7 @@ var ki = {
             type:"dropdown",
             name:"Unit: ",
             id:"kiUnit",
-            options:["UNK","%","µM","nM","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
             optionsID:[]
         },
         {
