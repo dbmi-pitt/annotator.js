@@ -1283,6 +1283,7 @@ Template.content = [
     '</div>',
 
     '<div id="mp-experiment-nav" style="display: none;">',
+    '<button id="nav-evRelationship-btn" type="button" onclick="switchDataForm(\'evRelationship\')" >Ev relationship</button> &nbsp;->&nbsp;',
     '<button id="nav-cellSystem-btn" type="button" onclick="switchDataForm(\'cellSystem\')" >Cell System</button> &nbsp;->&nbsp;',
     '<button id="nav-cl-btn" type="button" onclick="switchDataForm(\'cl\')" >CL<sub>int total</sub></button> &nbsp;->&nbsp;',
     '<button id="nav-vmax-btn" type="button" onclick="switchDataForm(\'vmax\')" >V<sub>max</sub></button> &nbsp;->&nbsp;',
@@ -1290,7 +1291,8 @@ Template.content = [
     '<button id="nav-ki-btn" type="button" onclick="switchDataForm(\'ki\')" >Ki<sub>total</sub></button> &nbsp;->&nbsp;',
     '<button id="nav-inhibition-btn" type="button" onclick="switchDataForm(\'inhibition\')" >%Inhibition</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWith-btn" type="button" onclick="switchDataForm(\'rateWith\')" >Metabolite rate with precipitant</button> &nbsp;->&nbsp;',
-    '<button id="nav-rateWithout-btn" type="button" onclick="switchDataForm(\'rateWithout\')" >Metabolite rate without precipitant</button>',
+    '<button id="nav-rateWithout-btn" type="button" onclick="switchDataForm(\'rateWithout\')" >Metabolite rate without precipitant</button> <span id = "rateWithoutArrow">&nbsp;->&nbsp;</span>',
+    '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >Evidence Type</button>',
     '</div>',
 
     // Claim form

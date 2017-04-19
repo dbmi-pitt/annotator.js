@@ -816,6 +816,8 @@ function addClaimDataDialog(ann) {
         currFormType = "claim";
         var newAnn = (JSON.parse(JSON.stringify(ann)));
         newAnn.argues.qualifiedBy = {};
+        newAnn.argues.method = "";
+        newAnn.rejected = null;
         app.annotations.create(newAnn);                   
     }
     
