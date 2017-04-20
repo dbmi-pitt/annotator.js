@@ -6,7 +6,7 @@ var util = require('../util');
 var $ = util.$;
 var Promise = util.Promise;
 var HttpStorage = require('./../storage').HttpStorage;
-var annhost = config.annotator.host;
+var annhost = config.apache2.host;
 
 
 // highlightRange wraps the DOM Nodes within the provided range with a highlight
@@ -152,6 +152,7 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
     var drugMention = annotation.argues;
 
     if (drugMention.hasTarget !=null && drugMention.ranges.length <= 1) { // draw by oa selector
+    //console.log("drughighlighter - called");
         var drugName = drugMention.hasTarget.hasSelector.exact;
 
         //console.log("drug highlighter - drug: " + drugName);
@@ -193,6 +194,9 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
                     instance.mark(drugName, options);
                 }
             }
+            //new plugin branch
+            //var instance = new Mark($("#subcontent")[0]);   
+            //instance.mark(drugName, options);  
 
         } catch (err) {
             console.log(err);

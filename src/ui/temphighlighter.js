@@ -57,6 +57,9 @@ function highlightRange(normedRange, cssClass, dataRange) {
 // for those ranges which are not reanchorable in the current document.
 function reanchorRange(range, rootElement) {
     try {
+        console.log("reanchorRange");
+        console.log(range);
+        console.log(rootElement);
         return Range.sniff(range).normalize(rootElement);
     } catch (e) {
         if (!(e instanceof Range.RangeError)) {
@@ -105,14 +108,31 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
         "separateWordSearch": false,
         "acrossElements": true,
         "accuracy": "partially",
+        "caseSensitive": true,
+        "exclude": ["table","tr","td","img","script","style","meta","title","button"],
         "each": function(elem) {
-
             $(elem).attr('name', "annotator-currhl");
             $(elem).attr('fieldname', fieldType);
             $(elem).attr('datanum', dataNum);        
             $(elem).attr('data-markjs', false);
         }                
     };
+}
+
+//helper function of drawField: drawRanges()
+currHighlighter.prototype.drawRanges = function (ranges) {
+    var result = [];
+    for (var i = 0, ilen = ranges.length; i < ilen; i++) {
+        var r = reanchorRange(ranges[i], this.element);  
+        if (r !== null) { 
+            result.push(new DataRange(r, "", ""));
+        } else 
+            console.log("[Error]: temp draw by xpath failed: cachedOARanges");
+    }
+    for (var j = 0, jlen = result.length; j < jlen; j++) {
+        var dataNormed = result[j];
+        highlightRange(dataNormed.range, this.options.highlightClass, dataNormed);
+    }
 }
 
 
@@ -122,6 +142,7 @@ function markCurrOptions(fieldType, dataNum, hldivL) {
 // idx - data index (0 if it's claim)
 // dataRanges - list of xpath ranges
 // hldivL - list of span text nodes   
+// mode - deprecated: (1) regular: apply mark.js for whole article, (2) dailymed: apply for each section by find p tag with className First 
 currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
 
     if (obj.ranges.length > 0) { // draw by xpath range
@@ -129,24 +150,14 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
             var r = reanchorRange(obj.ranges[i], this.element);   
             if (r !== null) { 
                 dataRangesL.push(new DataRange(r, field, idx));
-                //console.log("temp draw by xpath: " + field);
             } else 
-                console.log("[Error]: temp draw by xpath failed: " + field);
+                console.log("[Error]: draw by xpath failed: " + field);
         }
     } else if (obj.hasTarget != null) { // draw by oa selector
 
-        // mark context
-        var context = document.querySelector("#subcontent");          
-        var markObj = new Mark(context);
-
         var oaselector = obj.hasTarget.hasSelector;
-        var listP = document.getElementsByTagName("p"); // highlight within all p tag
-        for (var i=0; i < listP.length; i++) {
-            var instance = new Mark(listP[i]);
-            instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));
-        }
-
-        //console.log("temp draw by oaselector: " + field);
+        var instance = new Mark($("#subcontent")[0]);
+        instance.mark(oaselector.exact, markCurrOptions(field, idx, hldivL));  
     } else {
         console.log("[Warning]: temp draw failed on field: " + field);
         console.log(obj);
@@ -161,6 +172,9 @@ currHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hl
 //
 // Returns an Array of drawn highlight elements.
 currHighlighter.prototype.draw = function (annotation, inputType) {
+
+    // all previous currhighlight
+    undrawCurrhighlighter();
     self = this;
 
     if(annotation.annotationType!=undefined) {
@@ -172,8 +186,12 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
     var dataRangesL = [];
 
     try {
-
         console.log("temphighlighter.js - field: " + currFormType);
+        // console.log(annotation);
+
+        // var mode = "regular";  
+        // if (annotation.rawurl.indexOf("/DDI-labels/") > 0) 
+        //     mode = "dailymed"; // dailymed labels in 'DDI-labels' directory
 
         if(currFormType == "claim" || inputType == "add") {            
 
@@ -195,7 +213,26 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                 if (currFormType == "clearance" && (data.clearance.ranges != null || data.clearance.hasTarget != null)) 
                     self.drawField(data.clearance, "clearance", currDataNum, dataRangesL, hldivL);
                 if (currFormType == "halflife" && (data.halflife.ranges != null || data.halflife.hasTarget != null)) 
-                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL);               
+                    self.drawField(data.halflife, "halflife", currDataNum, dataRangesL, hldivL);   
+                if (currFormType == "cellSystem" && data.cellSystem != null && (data.cellSystem.ranges != null || data.cellSystem.hasTarget !=null)) 
+                    self.drawField(data.cellSystem, "cellSystem", currDataNum, dataRangesL, hldivL);
+                if (currFormType == "rateWith" && data.metaboliteRateWith != null && (data.metaboliteRateWith.ranges != null || data.metaboliteRateWith.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWith, "rateWith", currDataNum, dataRangesL, hldivL);
+                if (currFormType == "rateWithout" && data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWithout, "rateWithout", currDataNum, dataRangesL, hldivL);
+                if (data.measurement != null) {
+                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+                    for (var i = 0; i < mTypes.length; i++) {
+                        var mType = mTypes[i];
+                        if (currFormType != mType) {
+                            continue;
+                        }
+                        if (data.measurement[mType] != null && (data.measurement[mType].ranges != null || data.measurement[mType].hasTarget !=null)) 
+                            self.drawField(data.measurement[mType], mType, currDataNum, dataRangesL, hldivL);
+                    }
+                }
+
+
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
                 if (material != null){                    
@@ -215,9 +252,15 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
         console.log(err);
     }
 
+    if (dataRangesL.length == 0 && cachedOARanges != "" && cachedOARanges.length > 0) {
+        self.drawRanges(cachedOARanges);
+        return;
+    }
+
     for (var j = 0, jlen = dataRangesL.length; j < jlen; j++) {
         var dataNormed = dataRangesL[j];
-
+        console.log(">>>>draw currHighlighter<<<<<<");
+        console.log(dataNormed);
         highlightRange(dataNormed.range, this.options.highlightClass, dataNormed);
     }
 

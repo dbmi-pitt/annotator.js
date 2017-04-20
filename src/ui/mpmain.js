@@ -65,7 +65,8 @@ function annotationFactory(contextEl, ignoreSelector) {
                     }
                 },
                 supportsBy : []
-            }
+            },
+            rawurl: sourceURL
         };
     };
 }
@@ -312,6 +313,8 @@ function main(options) {
                 if (currFormType == "claim") { 
                     // delete confirmation for claim
                     $( "#dialog-claim-delete-confirm" ).show();
+                } else if (currFormType == "reviewer") {
+                    $( "#dialog-dips-delete-confirm" ).show();
                 } else {
                     // delete confirmation for data & material
                     $( "#dialog-data-delete-confirm" ).show();
@@ -336,7 +339,7 @@ function main(options) {
         // select text, then load normed ranges to adder
         s.textselector = new textselector.TextSelector(options.element, {
             onSelection: function (ranges, event) {
-                console.log("mpmain - textselector - onSelection");
+                //console.log("mpmain - textselector - onSelection");
 
                 //global variable: rangeChildNodes
                 rangeChildNodes = ranges.childNodes;
@@ -562,7 +565,9 @@ function main(options) {
                 updateAnnTable(ann.rawurl);
 
                 // show dialog for adding multiple claim/data on the same span
-                addClaimDataDialog(ann);
+                // skip statement
+                if (ann.argues.method != "Statement")
+                    addClaimDataDialog(ann);
          
             } else if (ann.annotationType == "DrugMention"){
                 s.hlhighlighter.draw(ann);
@@ -571,6 +576,9 @@ function main(options) {
             }
         },
         beforeAnnotationUpdated: function (annotation) {
+            console.log(">>>>>>currAnnotationId<<<<<" + currAnnotationId);
+            currAnnotationId = annotation.id;
+            currAnnotation = annotation;
 
             if (annotation.annotationType == "MP"){
                 /*Parameters:
@@ -578,9 +586,8 @@ function main(options) {
                     hlAnnotation: a dummy annotation, used to store textSelected ranges
                 */
                 console.log("mpmain - beforeAnnotationUpdated");
-                //console.log(annotation);
 
-                if (!adderClick || hlAnnotation == undefined) {
+                if ((sourceURL.indexOf(".pdf") != -1 && !adderClick) || hlAnnotation == undefined) {
                     //edit claim or data of current annotation
                     console.log("[test-annotation ] "+ multiSelected + adderClick + hlAnnotation);
                     console.log(currAnnotation);
@@ -670,12 +677,24 @@ $( "#data-delete-confirm-btn" ).click(function() {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
     } else if (currFormType == "dose2") {
         currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
-    } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife") {
+    } else if (currFormType == "auc" || currFormType == "cmax" || currFormType == "clearance" || currFormType == "halflife" || currFormType == "cellSystem") {
         currAnnotation.argues.supportsBy[currDataNum][currFormType] = {};
+    } else if (currFormType == "rateWith" || currFormType == "rateWithout") {
+        var temp = {'rateWith': 'metaboliteRateWith', 'rateWithout': 'metaboliteRateWithout'};
+        currAnnotation.argues.supportsBy[currDataNum][temp[currFormType]] = {};
+    } else if (currFormType == "cl" || currFormType == "vmax" || currFormType == "km" || currFormType == "ki" || currFormType == "inhibition") {
+        currAnnotation.argues.supportsBy[currDataNum].measurement[currFormType] = {};
     } else if (currFormType == "evRelationship") {
         currAnnotation.argues.supportsBy[currDataNum].evRelationship = '';
+    } else if (currFormType == "phenotype") {
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.phenotype = {};
+    } else if (currFormType == "reviewer") {
+        currAnnotation.argues.supportsBy[currDataNum].reviewer = '';
+        currAnnotation.argues.supportsBy[currDataNum].dips = '';
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
     } else {
-        alert("[ERROR] editor type is not avaliable!");
+        alert("[ERROR] editor type is not avaliable! - " + currFormType);
     }
 
     // after deletion, if this row is empty, then delete
@@ -697,11 +716,43 @@ $( "#data-delete-confirm-btn" ).click(function() {
     showAnnTable();
 });
 
+//delete dips question score confirmation
+$( "#dips-delete-confirm-btn" ).click(function() {
+    $("#dialog-dips-delete-confirm").hide();
+    if (currFormType == "reviewer") {
+        currAnnotation.argues.supportsBy[currDataNum].reviewer = '';
+        currAnnotation.argues.supportsBy[currDataNum].dips = '';
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug1Dose = {};
+        currAnnotation.argues.supportsBy[currDataNum].supportsBy.supportsBy.drug2Dose = {};
+    } else {
+        currAnnotation.argues.supportsBy[currDataNum].dips = '';
+    }
+
+    // after deletion, if this row is empty, then delete
+    var boo = isDataRowEmpty(currAnnotation.argues.supportsBy[currDataNum]);
+    if (boo) {
+        //console.log("delete data empty row!");
+        currAnnotation.argues.supportsBy.splice(currDataNum, 1);
+        totalDataNum = totalDataNum -1;
+    }
+
+    if (typeof publics.mpeditor.dfd !== 'undefined' && publics.mpeditor.dfd !== null) {
+        publics.mpeditor.dfd.resolve();
+    }
+    showAnnTable();
+});
+
 $( "#data-delete-cancel-btn" ).click(function() {
     $( "#dialog-data-delete-confirm" ).hide();
 });
 $( "#data-delete-dialog-close" ).click(function() {
     $( "#dialog-data-delete-confirm" ).hide();
+});
+$( "#dips-delete-dialog-close" ).click(function() {
+    $( "#dialog-dips-delete-confirm" ).hide();
+});
+$( "#dips-delete-cancel-btn" ).click(function() {
+    $( "#dialog-dips-delete-confirm" ).hide();
 });
 
 
@@ -719,6 +770,11 @@ function isDataRowEmpty(data) {
     
     if (data.supportsBy.supportsBy.participants.value != null || data.supportsBy.supportsBy.drug1Dose.value != null || data.supportsBy.supportsBy.drug2Dose.value !=null)
         return false;
+
+    if (data.cellSystem != null || data.metaboliteRateWith != null || data.metaboliteRateWithout != null) {
+        return false;
+    }
+
     return true   
 }
 
@@ -791,8 +847,15 @@ function addClaimDataDialog(ann) {
         claimDialog.style.display = "none";
         isTextSelected = true;
         cachedOATarget = ann.argues.hasTarget;
-        cachedOARanges = ann.argues.ranges;                    
-        addDataCellByEditor("participants", 0);                    
+        cachedOARanges = ann.argues.ranges; 
+        if (ann.argues.method == "Case Report") {
+            addDataCellByEditor("dose1", 0);
+        } else if (ann.argues.method == "Experiment") {
+            addDataCellByEditor("cellSystem", 0);
+        } else {
+            addDataCellByEditor("participants", 0);
+        }                              
+        //addDataCellByEditor("auc", 0);                    
     }
     
     addClaimBtn.onclick = function() {
@@ -802,6 +865,8 @@ function addClaimDataDialog(ann) {
         currFormType = "claim";
         var newAnn = (JSON.parse(JSON.stringify(ann)));
         newAnn.argues.qualifiedBy = {};
+        newAnn.argues.method = "";
+        newAnn.rejected = null;
         app.annotations.create(newAnn);                   
     }
     

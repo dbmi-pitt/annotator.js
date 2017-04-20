@@ -70,7 +70,6 @@ TextSelector.prototype.captureDocumentSelection = function () {
     }
 
     // console.log("TextSelector - captureDocumentSelection");
-    // console.log(selection);
 
     for (i = 0; i < selection.rangeCount; i++) {
         var r = selection.getRangeAt(i),
@@ -78,7 +77,11 @@ TextSelector.prototype.captureDocumentSelection = function () {
             normedRange = browserRange.normalize().limit(this.element);
 
         // get list of text nodes by start and end node fails when bring mark.js in
-        var nodes = normedRange.textNodes();
+        if (normedRange != null)
+            var nodes = normedRange.textNodes();
+        else {
+            console.log("[WARNING] captureDocumentSelection fails");
+        }
 
         //console.log(nodes);
 

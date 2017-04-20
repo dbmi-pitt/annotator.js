@@ -215,11 +215,13 @@ var mpViewer = exports.mpViewer = Widget.extend({
             if ((left + 360) > width) {
                 left = width - 360;
             }
+
             this.element.css({
-                top: position.top + 10,
-                left: left
+                left: left,
+                top: position.top + 10
             });
         }
+
 
         var controls = this.element
             .find('.annotator-controls')

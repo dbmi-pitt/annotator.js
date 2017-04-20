@@ -154,9 +154,9 @@ function markOptions(fieldType, dataNum, hldivL) {
         "separateWordSearch": false,
         "acrossElements": true,
         "accuracy": "partially",
-        "caseSensitive": true, 
-        "each": function(elem) {
-            
+        "caseSensitive": true,
+        "exclude": ["table", "tr", "td", "img","script","style","meta","title","button"],
+        "each": function(elem) {            
             $(elem).attr('name', "annotator-mp");
             $(elem).attr('fieldname', fieldType);
             $(elem).attr('datanum', dataNum);     
@@ -171,7 +171,9 @@ function markOptions(fieldType, dataNum, hldivL) {
 // field - name of specific field for claim, data or material (ex auc, cmax, etc)  
 // idx - data index (0 if it's claim)
 // dataRanges - list of xpath ranges
-// hldivL - list of span text nodes   
+// hldivL - list of span text nodes
+// mode - deprecated: (1) regular: apply mark.js for whole article, (2) dailymed: apply for each section by find p tag with className First 
+  
 mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL, pageNumber) {
 
     //console.log("mphighlighter - drawField - called");
@@ -191,18 +193,10 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
         }
         
     } else if (obj.hasTarget != null) { // draw by oa selector
-        // && obj.qualifiedBy.drug1 == "rifampin"
-        console.log("mphighlighter - drawField - use oaSelector");
-
         var oaselector = obj.hasTarget.hasSelector;
-        var listP = document.getElementsByTagName("p"); // highlight within all p tag
 
-        for (var i=0; i < listP.length; i++) {
-            var instance = new Mark(listP[i]);
-            instance.mark(oaselector.exact, markOptions(field, idx, hldivL));
-        }
-
-        //console.log("draw by oaselector: " + field);
+        var instance = new Mark($("#subcontent")[0]);   
+        instance.mark(oaselector.exact, markOptions(field, idx, hldivL)); 
     } else {
         console.log("[Warning]: draw failed on field: " + field);
         console.log(obj);
@@ -231,6 +225,9 @@ mpHighlighter.prototype.draw = function (annotation, pageNumber) {
 
     try {       
         //console.log("mphighlighter - draw");
+        // var mode = "regular";  
+        // if (annotation.rawurl.indexOf("/DDI-labels/") > 0) 
+        //     mode = "dailymed"; // dailymed labels in 'DDI-labels' directory
 
         // draw MP claim        
         self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL, pageNumber);
@@ -250,6 +247,21 @@ mpHighlighter.prototype.draw = function (annotation, pageNumber) {
                     self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL, pageNumber);                
                 if (data.halflife.ranges != null || data.halflife.hasTarget !=null) 
                     self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL, pageNumber);                                
+                if (data.cellSystem != null && (data.cellSystem.ranges != null || data.cellSystem.hasTarget !=null)) 
+                    self.drawField(data.cellSystem, "cellSystem", idx, dataRangesL, hldivL, pageNumber);
+                if (data.metaboliteRateWith != null && (data.metaboliteRateWith.ranges != null || data.metaboliteRateWith.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWith, "metaboliteRateWith", idx, dataRangesL, hldivL, pageNumber);
+                if (data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
+                    self.drawField(data.metaboliteRateWithout, "metaboliteRateWithout", idx, dataRangesL, hldivL, pageNumber);
+                if (data.measurement != null) {
+                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+                    for (var i = 0; i < mTypes.length; i++) {
+                        var mType = mTypes[i];
+                        if (data.measurement[mType] != null && (data.measurement[mType].ranges != null || data.measurement[mType].hasTarget !=null)) 
+                            self.drawField(data.measurement[mType], mType, idx, dataRangesL, hldivL, pageNumber);
+                    }
+                }
+
                 // draw MP Material
                 var material = data.supportsBy.supportsBy;
 
@@ -261,6 +273,8 @@ mpHighlighter.prototype.draw = function (annotation, pageNumber) {
                         self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL, pageNumber);                    
                     if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) 
                         self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL, pageNumber);                    
+                    if (material.phenotype.ranges != null || material.phenotype.hasTarget != null) 
+                        self.drawField(material.phenotype, "phenotype", idx, dataRangesL, hldivL, pageNumber);                    
                 }
             }
         }
