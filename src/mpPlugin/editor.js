@@ -2132,6 +2132,7 @@ function experimentNav() {
         $("#rateWithoutArrow").show();
     }
     $("#mp-experiment-nav").show();
+
 }
 
 //initial load unchanged mode

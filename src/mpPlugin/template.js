@@ -484,7 +484,7 @@ var context10 = {
             type:"dropdown",
             name:"Method:        ",
             id:"evidencetype-method",
-            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement"],
+            options:["DDI clinical trial", "Phenotype clinical study", "Case Report", "Statement", "Experiment"],
             optionsID:[],
             newline: "yes",
             isTable: true
