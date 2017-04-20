@@ -485,6 +485,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                             loadUnchangedMode();
                             postDataForm(currFormType);
                         }
+
+                        showSaveButton(currFormType);
                     }                     
                     delete annotation.childNodes;
                 },
@@ -2055,7 +2057,12 @@ function loadDataItemFromAnnotation(loadData, allHighlightedDrug) {
     }                            
 }
 
-
+function showSaveButton(field) {
+    $(".annotator-save").hide();
+    if (field != "evRelationship" && field != "studytype") {
+        $(".annotator-save").show();
+    } 
+}
 
 /** post process data form (
     1.show current data form and hide others. 
