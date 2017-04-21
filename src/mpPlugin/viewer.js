@@ -256,7 +256,7 @@ var mpViewer = exports.mpViewer = Widget.extend({
             var fieldName = this.annotations[i].fieldName;
             var dataNum = this.annotations[i].dataNum;
 
-            console.log(annotation);
+            //console.log(annotation);
 
             if (annotation.annotationType == "MP"){
                 this._annotationItem(annotation, fieldName, dataNum)
