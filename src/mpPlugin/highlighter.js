@@ -246,7 +246,7 @@ mpHighlighter.prototype.draw = function (annotation) {
                 if (data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
                     self.drawField(data.metaboliteRateWithout, "metaboliteRateWithout", idx, dataRangesL, hldivL);
                 if (data.measurement != null) {
-                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition", "kinact", "ic50"];
                     for (var i = 0; i < mTypes.length; i++) {
                         var mType = mTypes[i];
                         if (data.measurement[mType] != null && (data.measurement[mType].ranges != null || data.measurement[mType].hasTarget !=null)) 

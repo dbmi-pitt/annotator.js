@@ -789,7 +789,7 @@ var cl = {
             type:"dropdown",
             name:"Unit: ",
             id:"clUnit",
-            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450","microliters/min/mg"],
             optionsID:[]
         },
         {
@@ -820,7 +820,7 @@ var vmax = {
             type:"dropdown",
             name:"Unit: ",
             id:"vmaxUnit",
-            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450","microliters/min/mg"],
             optionsID:[]
         },
         {
@@ -851,7 +851,7 @@ var km = {
             type:"dropdown",
             name:"Unit: ",
             id:"kmUnit",
-            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450","microliters/min/mg"],
             optionsID:[]
         },
         {
@@ -882,7 +882,7 @@ var inhibition = {
             type:"dropdown",
             name:"Unit: ",
             id:"inhibitionUnit",
-            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450","microliters/min/mg"],
             optionsID:[]
         },
         {
@@ -913,13 +913,75 @@ var ki = {
             type:"dropdown",
             name:"Unit: ",
             id:"kiUnit",
-            options:["UNK","%","µM","nM","μmol/L","μL/min/pmol P450","pmol/min/pmol P450"],
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol","pmol/min/pmol","microliters/min/mg"],
             optionsID:[]
         },
         {
             type: "input",
             name: "Value: ",
             id: "kiValue"
+        }
+    ]
+};
+
+// Experiment Data - k(inact)
+var kinact = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"kinactquote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"kinact-unchanged-checkbox",
+            value: "kinactunchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"kinactUnit",
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol","pmol/min/pmol","microliters/min/mg"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "kinactValue"
+        }
+    ]
+};
+
+// Experiment Data - IC(50)
+var ic50 = {
+    questions: [
+        {
+            type:"quote",
+            name:"Quote: ",
+            id:"ic50quote",
+            options:[],
+            optionsID:[]
+        },
+        {
+            type:"checkbox",
+            name:"unchanged: ",
+            id:"ic50-unchanged-checkbox",
+            value: "ic50unchanged"
+        },
+        {
+            type:"dropdown",
+            name:"Unit: ",
+            id:"ic50Unit",
+            options:["UNK","%","min(-1)","µM","nM","μmol/L","μL/min/pmol","pmol/min/pmol","microliters/min/mg"],
+            optionsID:[]
+        },
+        {
+            type: "input",
+            name: "Value: ",
+            id: "ic50Value"
         }
     ]
 };
@@ -1080,6 +1142,11 @@ Handlebars.registerHelper('buildFormData', function(items, options) {
                         out = out + "<option id='" + items[i].optionsID[j] + "' value='" + items[i].options[j] + "'>" + items[i].options[j] + "</option>";
                 }
                 out = out + "</select>";
+                if (items[i].name == "Unit: ") {
+                    out += "<input style='width:110px;height=11px;display:none;' type='text' id='"+items[i].id+"-input'>";
+                    out += "<img id='edit-" + items[i].id + "' src='img/edit-button.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;'>";
+                    out += "<img id='commit-" + items[i].id + "' src='img/check.png' style='margin-right:10px;margin-top:5px;width:16px;height:16px;display:none;'>";
+                }
             }
             else if (items[i].type=="radiobutton") {
                 if (items[i].classname == "evRelationship") {
@@ -1238,6 +1305,16 @@ source = "{{#buildFormData questions}}{{/buildFormData}}";
 template = Handlebars.compile(source);
 var formInhibition = template(inhibition);
 
+// Experiment - kinact
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formKinact = template(kinact);
+
+// Experiment - ic50
+source = "{{#buildFormData questions}}{{/buildFormData}}";
+template = Handlebars.compile(source);
+var formIc50 = template(ic50);
+
 Template.content = [
 
     // '<div class="annotator-outer annotator-editor annotator-invert-y annotator-invert-x">',
@@ -1290,6 +1367,8 @@ Template.content = [
     '<button id="nav-km-btn" type="button" onclick="switchDataForm(\'km\')" >K<sub>m total</sub></button> &nbsp;->&nbsp;',
     '<button id="nav-ki-btn" type="button" onclick="switchDataForm(\'ki\')" >Ki<sub>total</sub></button> &nbsp;->&nbsp;',
     '<button id="nav-inhibition-btn" type="button" onclick="switchDataForm(\'inhibition\')" >%Inhibition</button> &nbsp;->&nbsp;',
+    '<button id="nav-kinact-btn" type="button" onclick="switchDataForm(\'kinact\')" >K(inact)</button> &nbsp;->&nbsp;',
+    '<button id="nav-ic50-btn" type="button" onclick="switchDataForm(\'ic50\')" >IC(50)</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWith-btn" type="button" onclick="switchDataForm(\'rateWith\')" >Metabolite rate with precipitant</button> &nbsp;->&nbsp;',
     '<button id="nav-rateWithout-btn" type="button" onclick="switchDataForm(\'rateWithout\')" >Metabolite rate without precipitant</button> <span id = "rateWithoutArrow">&nbsp;->&nbsp;</span>',
     '<button id="nav-studytype-btn" type="button" onclick="switchDataForm(\'studytype\')" >Evidence Type</button>',
@@ -1396,6 +1475,16 @@ Template.content = [
     // Experiment - inhibition
     '<div id="mp-data-form-inhibition" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
     formInhibition,
+    '</div>',
+
+    // Experiment - kinact
+    '<div id="mp-data-form-kinact" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formKinact,
+    '</div>',
+
+    // Experiment - ic50
+    '<div id="mp-data-form-ic50" style="margin-top:7px;margin-buttom:7px;margin-left:25px;display: none;">',
+    formIc50,
     '</div>',
 
     

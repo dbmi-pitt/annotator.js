@@ -221,7 +221,7 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                 if (currFormType == "rateWithout" && data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
                     self.drawField(data.metaboliteRateWithout, "rateWithout", currDataNum, dataRangesL, hldivL);
                 if (data.measurement != null) {
-                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+                    var mTypes = ["cl", "vmax", "km", "ki", "inhibition", "kinact", "ic50"];
                     for (var i = 0; i < mTypes.length; i++) {
                         var mType = mTypes[i];
                         if (currFormType != mType) {

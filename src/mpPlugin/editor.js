@@ -756,7 +756,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 } else {
                                     mpData.metaboliteRateWithout.value = $('#rateWithoutVal').val();
                                 }
-                            } else if (currFormType == "cl" || currFormType == "vmax" || currFormType == "km" || currFormType == "ki" || currFormType == "inhibition") {
+                            } else if (currFormType == "cl" || currFormType == "vmax" || currFormType == "km" || currFormType == "ki" || currFormType == "inhibition" || currFormType == "kinact" || currFormType == "ic50") {
 
                                 var clUnit = $('#'+currFormType+'Unit option:selected').text();
                                 var clValue = $('#'+currFormType+'Value').val();
@@ -771,6 +771,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     var measurementTmp = {};
                                     mpData.measurement = measurementTmp;
                                 }
+                                console.log(cachedOARanges);
                                 if (mpData.measurement[currFormType] == null) {
                                     var clTmp = {};
                                     clTmp['value'] = clValue;
@@ -1265,7 +1266,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                     return valid;
                 }
             //input box
-            } else if (ns == "INPUT") {
+            } else if (ns == "INPUT" && fields[i].style.display != 'none') {
                 if (fields[i].value.trim() == "") {
                     $(fields[i]).css("background-color", "#f9dcd9");
                     //$("#" + fields[i].id + "-label").css("color", "red");
@@ -1762,20 +1763,35 @@ function loadExperimentFromAnnotation(loadData, relationship) {
     }
 
     if (loadData.measurement != null) {
-        var mTypes = ["cl", "vmax", "km", "ki", "inhibition"];
+        var mTypes = ["cl", "vmax", "km", "ki", "inhibition", "kinact", "ic50"];
         for (var i = 0; i < mTypes.length; i++) {
             var mType = mTypes[i];
+            
             if (loadData.measurement[mType] == null || loadData.measurement[mType].hasTarget == null) {
+                //quote context can be used multiple times
                 if (cachedOATarget.hasSelector != null)
                     $('#'+mType+'quote').html(cachedOATarget.hasSelector.exact || '');       
                 else
                     $('#'+mType+'quote').html('');
             } else {
+                //quote
                 $('#'+mType+'quote').html(loadData.measurement[mType].hasTarget.hasSelector.exact || '');
                 if (loadData.measurement[mType].value == "unchanged") {
+                    //unchanged
                     $('#'+mType+'-unchanged-checkbox').prop("checked", true);
                 } else {
+                    //value
                     $("#"+mType+"Value").val(loadData.measurement[mType].value);
+                    //unit - some options are added by users
+                    if (loadData.measurement[mType].unit != null) {
+                        var tempval = loadData.measurement[mType].unit;
+                        if ($('#'+mType+'Unit option[value = \"'+tempval+'\"]').length == 0) {
+                            $('#'+mType+'Unit').append($('<option>', {
+                                value: tempval,
+                                text: tempval
+                            }));
+                        }
+                    }
                     $("#"+mType+"Unit").val(loadData.measurement[mType].unit);
                 }
             }
@@ -2076,7 +2092,8 @@ function postDataForm(targetField) {
 
     // field name and actual div id mapping
     var fieldM = {"reviewer":"reviewer", "evRelationship":"evRelationship", "participants":"participants", "dose1":"drug1Dose", "dose2":"drug2Dose", "phenotype":"phenotype", "auc":"auc", "cmax":"cmax", "clearance":"clearance", "halflife":"halflife", "studytype":"studytype",
-    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal", "cl":"cl", "vmax":"vmax", "km":"km", "ki":"ki", "inhibition":"inhibition"};
+    "q1":"q1", "q2":"q2", "q3":"q3", "q4":"q4", "q5":"q5", "q6":"q6", "q7":"q7", "q8":"q8", "q9":"q9", "q10":"q10", "cellSystem":"cellSystem", "rateWith":"rateWithVal", "rateWithout":"rateWithoutVal", "cl":"cl", "vmax":"vmax", "km":"km", "ki":"ki", "inhibition":"inhibition",
+    "kinact":"kinact", "ic50":"ic50"};
     var showDeleteBtn = false;
 
     for (var field in fieldM) {       
@@ -2096,7 +2113,7 @@ function postDataForm(targetField) {
             } else if (currAnnotation.argues.method == "Case Report"){
                 $("#mp-dips-nav").show();
                 fieldVal = $("#dips-" + fieldM[field]).val();
-            } else if (field == "cl" || field == "vmax" || field == "km" || field == "ki" || field == "inhibition") {
+            } else if (field == "cl" || field == "vmax" || field == "km" || field == "ki" || field == "inhibition" || field == "kinact" || field == "ic50") {
                 if ($('#' + field + '-unchanged-checkbox').is(':checked')) 
                     showDeleteBtn = true; 
                 experimentNav();
@@ -2118,6 +2135,7 @@ function postDataForm(targetField) {
                 $("#annotator-delete").show();
             else 
                 $("#annotator-delete").hide();
+            focusOnDataField(targetField);
         }                        
         else {
             cleanFocusOnDataField(field);
@@ -2158,7 +2176,7 @@ function loadUnchangedMode() {
         }
     }
 
-    var fields = ["cl", "vmax", "km", "ki", "inhibition"];
+    var fields = ["cl", "vmax", "km", "ki", "inhibition", "kinact", "ic50"];
     for (var i = 0; i < fields.length; i++) {
         if ($('#' + fields[i] + '-unchanged-checkbox').is(':checked')) {
             $('#'+fields[i]+'Unit').attr('disabled', true);
@@ -2229,7 +2247,7 @@ function cleanDataForm() {
     //clean form validation format
     $(".form-validation-alert").hide();
 
-    var allDataFields = ["#cellSystem", "#rateWithVal", "rateWithoutVal", "cl", "vmax", "km", "ki", "inhibition", "#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
+    var allDataFields = ["#cellSystem", "#rateWithVal", "rateWithoutVal", "cl", "vmax", "km", "ki", "inhibition", "kinact", "ic50", "#dips-reviewer", "#datepicker", "#participants", "#drug1Dose", "#drug1Duration", "#drug1Formulation", "#drug1Regimens", "#drug2Dose", "#drug2Duration", "#drug2Formulation", "#drug2Regimens", "#auc", "#aucType", "#aucDirection", "#cmax", "#cmaxType", "#cmaxDirection", "#clearance", "#clearanceType", "#clearanceDirection", "#halflife", "#halflifeType", "#halflifeDirection"];
     for (var i = 0; i < allDataFields.length; i++) {
         $(allDataFields[i]).css("background-color", "");
     }
@@ -2269,6 +2287,12 @@ function cleanDataForm() {
     $("#inhibitionValue").val('');
     $('#inhibition-unchanged-checkbox').attr('checked',false);
     $("#inhibitionUnit")[0].selectedIndex = -1;
+    $("#kinactValue").val('');
+    $('#kinact-unchanged-checkbox').attr('checked',false);
+    $("#kinactUnit")[0].selectedIndex = -1;
+    $("#ic50Value").val('');
+    $('#ic50-unchanged-checkbox').attr('checked',false);
+    $("#ic50Unit")[0].selectedIndex = -1;
 
     //clean material
     $("#participants").val('');

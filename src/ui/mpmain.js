@@ -633,7 +633,7 @@ $( "#data-delete-confirm-btn" ).click(function() {
     } else if (currFormType == "rateWith" || currFormType == "rateWithout") {
         var temp = {'rateWith': 'metaboliteRateWith', 'rateWithout': 'metaboliteRateWithout'};
         currAnnotation.argues.supportsBy[currDataNum][temp[currFormType]] = {};
-    } else if (currFormType == "cl" || currFormType == "vmax" || currFormType == "km" || currFormType == "ki" || currFormType == "inhibition") {
+    } else if (currFormType == "cl" || currFormType == "vmax" || currFormType == "km" || currFormType == "ki" || currFormType == "inhibition" || currFormType == "kinact" || currFormType == "ic50") {
         currAnnotation.argues.supportsBy[currDataNum].measurement[currFormType] = {};
     } else if (currFormType == "evRelationship") {
         currAnnotation.argues.supportsBy[currDataNum].evRelationship = '';
