@@ -91,7 +91,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         //check if drug in store (case sensitive)
                         for(var i=0;i<list.length;i++) {
-                            while (i < list.length && !drugSet.has(list[i].trim().toLowerCase())) {
+                            if(allHighlightedDrug.indexOf(list[i].trim())==-1) {
                                 list.splice(i, 1);
                                 listid.splice(i,1);
                             }
