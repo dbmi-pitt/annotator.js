@@ -133,13 +133,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         $("#Drug1")[0].selectedIndex = 0;
                         $("#Drug2")[0].selectedIndex = 0;
-                        //cpnstraint: at least one drug selected in claim
-                        /*if (flag < 1) {
-                            unsaved = false;
-                            alert("please highlight at least one drug in the text span you selected!");
-                            editorSelf.cancel();
-                            $('.btn-success').click();
-                        }*/
 
                         //add N/A to object metabolite drop down list
                         $('#object-metabolite').append($('<option>', {
@@ -495,30 +488,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                     if (currFormType == "claim"){
 
-                        console.log("mpeditor submit claim");
-
-                        // MP Claim
-                        var methodTemp = $('#method option:selected').text();
-                        var relationTemp = $('#relationship option:selected').text();
-                        if (!((relationTemp == 'inhibits' || relationTemp == 'substrate of') && (methodTemp == 'Phenotype clinical study' || methodTemp == 'Statement'))) {
-                            if($('#Drug1 option:selected').text()==$('#Drug2 option:selected').text()){
-                                unsaved = false;
-                                alert("Should highlight two different drugs.");
-                                editorSelf.cancel();                            
-                                $('.btn-success').click();
-                            }
-                        }
-
-                        if (methodTemp == 'Experiment') {
-                            console.log($('#Drug1 option:selected').text());
-                            if($('#Drug1')[0].selectedIndex == -1){
-                                unsaved = false;
-                                alert("Should input Drug1.");
-                                editorSelf.cancel();                            
-                                $('.btn-success').click();
-                            }
-                        }
-                        
+                        console.log("[editor.js] mpeditor submit claim");                       
                         annotation.annotationType = "MP";
 
                         // MP method - keep with claim
@@ -548,8 +518,8 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 allrelationOfDose.push(relationOfDose);
                             }
                         } else {
-                            var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};                    
-                        }
+                            var qualifiedBy = {drug1 : "", drug2 : "", relationship : "", enzyme : "", precipitant : ""};
+			}
                         qualifiedBy.relationship = $('#relationship option:selected').text();
 
                         //parent compound - drug1
@@ -1246,46 +1216,68 @@ var mpEditor = exports.mpEditor = Widget.extend({
     },
 
     /**
-    Form Validation: check the field is not empty
+    Claim and Data Form Validation: check the fields is not empty
     Event callback: called when a user clicks the editor's save button
-    Returns noting
+    Returns Boolean: True if form valid, otherwise False  
     **/
     _onFormValid: function (event) {
         preventEventDefault(event);
-
-        //valid data form
-        var fields = $("#mp-data-form-" + currFormType).children();
-        console.log(">>>>>>>form validation<<<<<<<<");
-        //data form validation rule
+	console.log(">>>>>>>form validation<<<<<<<<");
         var valid = true;
-        for(var i = 0; i < fields.length; i++) {
-            var ns = fields[i].tagName;
-            //unchanged checkbox
-            if (fields[i].type == "checkbox") {
-                if ($(fields[i]).is(":checked")) {
-                    return valid;
-                }
-            //input box
-            } else if (ns == "INPUT" && fields[i].style.display != 'none') {
-                if (fields[i].value.trim() == "") {
-                    $(fields[i]).css("background-color", "#f9dcd9");
-                    //$("#" + fields[i].id + "-label").css("color", "red");
-                    valid = false;
-                } else {
-                    $(fields[i]).css("background-color", "");
-                    //$("#" + fields[i].id + "-label").css("color", "black");
-                }
-            //select box
-            } else if (ns == "SELECT") {
-                if (fields[i].selectedIndex == -1) {
-                    $(fields[i]).css("background-color", "#f9dcd9");
-                    //$("#" + fields[i].id + "-label").css("color", "red");
-                    valid = false;
-                } else {
-                    $(fields[i]).css("background-color", "");
-                    //$("#" + fields[i].id + "-label").css("color", "black");
-                }
-            }
+
+	if (currFormType == 'claim') { // validate claim form	    
+            var method = $('#method option:selected').text();
+            var relationship = $('#relationship option:selected').text();
+
+	    if (method == 'Statement' || method == 'DDI clinical trial') {
+		if (relationship == 'interact with') {
+		    if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#Drug2')[0])))
+			valid = false;
+		} else if (relationship == 'inhibits' || relationship == 'substrate of') {
+		    if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#enzyme')[0])))
+			valid = false;
+		} 
+	    } else if (method == 'Case Report') {
+		if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#Drug2')[0])))
+		    valid = false;
+	    } else if (method == 'Phenotype clinical study') {
+		if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#enzyme')[0])))
+		    valid = false;
+	    } else if (method == 'Experiment') {
+		if (relationship == 'inhibits' || relationship == 'substrate of') {
+		    if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#Drug2')[0])) || (!this._isFilledListbox($('#enzyme')[0])))
+			valid = false;
+		}
+	    }
+
+	} else { //validate data form
+            var fields = $("#mp-data-form-" + currFormType).children();
+            //data form validation rule
+            for(var i = 0; i < fields.length; i++) {
+		var ns = fields[i].tagName;
+		//unchanged checkbox
+		if (fields[i].type == "checkbox") {
+                    if ($(fields[i]).is(":checked")) {
+			return valid;
+                    }
+		//input box
+		} else if (ns == "INPUT" && fields[i].style.display != 'none') {
+                    if (fields[i].value.trim() == "") {
+			$(fields[i]).css("background-color", "#f9dcd9");
+			valid = false;
+                    } else {
+			$(fields[i]).css("background-color", "");
+                    }
+		//select box
+		} else if (ns == "SELECT") {
+                    if (fields[i].selectedIndex == -1) {
+			$(fields[i]).css("background-color", "#f9dcd9");
+			valid = false;
+                    } else {
+			$(fields[i]).css("background-color", "");
+                    }
+		}
+	    }
         }
 
         // reset unsave status
@@ -1296,6 +1288,18 @@ var mpEditor = exports.mpEditor = Widget.extend({
             $('.form-validation-alert').hide();
         }
         return valid;
+    },
+
+    // validate drop down listbox
+    // return boolean: if listbox selected
+    _isFilledListbox: function(field) {
+	if (field.selectedIndex == -1) {
+	    $(field).css("background-color", "#f9dcd9");
+	    return false;
+	} else {
+	    $(field).css("background-color", "");
+	    return true
+	}
     },
 
     // Event callback: called when a user clicks the editor form (by pressing
@@ -2191,8 +2195,13 @@ function loadUnchangedMode() {
 // clean all value of claim form
 function cleanClaimForm() {
     console.log("[editor.js] clean claim form");
-    //clean form validation format
+    // clean form validation format
     $('.form-validation-alert').hide();
+
+    var allClaimFields = ["#Drug1", "#Drug2"];
+    for (var i = 0; i < allClaimFields.length; i++) {
+        $(allClaimFields[i]).css("background-color", "");
+    }
 
     $("#quote").empty();
     // Method
