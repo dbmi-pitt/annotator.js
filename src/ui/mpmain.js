@@ -479,7 +479,7 @@ function main(options) {
                         if (!flag && anns[i].argues.supportsBy.length != 0) {
                             var data = anns[i].argues.supportsBy;
                             for (var j = 0; j < data.length; j++) {
-                                if (typeof data[j].auc.ranges != "undefined" &&
+                                if (data[j].auc != undefined && data[j].auc.ranges != undefined &&
                                     (data[j].auc.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
                                     annsByPage.push(anns[i]);
                                 } else if (typeof data[j].cmax.ranges != "undefined" &&
@@ -499,6 +499,11 @@ function main(options) {
                                     annsByPage.push(anns[i]);
                                 } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
                                     (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (data[j].supportsBy.supportsBy.phenotype != undefined && data[j].supportsBy.supportsBy.phenotype.ranges != undefined && 
+                                    (data[j].supportsBy.supportsBy.phenotype.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (isInPage(data[j], pageNumber, anns[i].argues.method)) {
                                     annsByPage.push(anns[i]);
                                 }
                             }
@@ -881,6 +886,33 @@ function addClaimDataDialog(ann) {
     }   
 }
 
+function isInPage(data, pageNumber, method) {
+    if (method == "Experiment") {
+        if (data.measurement != undefined) {
+            var mTypes = ["cl", "vmax", "ki", "km", "inhibition", "kinact", "ic50"];
+            for (var i = 0; i < mTypes.length; i++) {
+                var mType = mTypes[i];
+                if (data.measurement[mType] != undefined && data.measurement[mType].ranges != undefined &&
+            (data.measurement[mType].ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                    return true;
+                }
+            }
+        }
+        if (data.cellSystem != undefined && data.cellSystem.ranges != undefined &&
+            (data.cellSystem.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+            return true;
+        }
+        if (data.metaboliteRateWithout != undefined && data.metaboliteRateWithout.ranges != undefined &&
+            (data.metaboliteRateWithout.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+            return true;
+        }
+        if (data.metaboliteRateWith != undefined && data.metaboliteRateWith.ranges != undefined &&
+            (data.metaboliteRateWith.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 
