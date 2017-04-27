@@ -1231,21 +1231,21 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
 	    if (method == 'Statement' || method == 'DDI clinical trial') {
 		if (relationship == 'interact with') {
-		    if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#Drug2')[0])))
+		    if ((!this._isListboxFilled($('#Drug1')[0])) || (!this._isListboxFilled($('#Drug2')[0])))
 			valid = false;
 		} else if (relationship == 'inhibits' || relationship == 'substrate of') {
-		    if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#enzyme')[0])))
+		    if ((!this._isListboxFilled($('#Drug1')[0])) || (!this._isListboxFilled($('#enzyme')[0])))
 			valid = false;
 		} 
 	    } else if (method == 'Case Report') {
-		if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#Drug2')[0])))
+		if ((!this._isListboxFilled($('#Drug1')[0])) || (!this._isListboxFilled($('#Drug2')[0])))
 		    valid = false;
 	    } else if (method == 'Phenotype clinical study') {
-		if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#enzyme')[0])))
+		if ((!this._isListboxFilled($('#Drug1')[0])) || (!this._isListboxFilled($('#enzyme')[0])))
 		    valid = false;
 	    } else if (method == 'Experiment') {
 		if (relationship == 'inhibits' || relationship == 'substrate of') {
-		    if ((!this._isFilledListbox($('#Drug1')[0])) || (!this._isFilledListbox($('#Drug2')[0])) || (!this._isFilledListbox($('#enzyme')[0])))
+		    if ((!this._isListboxFilled($('#Drug1')[0])) || (!this._isListboxFilled($('#Drug2')[0])) || (!this._isListboxFilled($('#enzyme')[0])))
 			valid = false;
 		}
 	    }
@@ -1262,20 +1262,12 @@ var mpEditor = exports.mpEditor = Widget.extend({
                     }
 		//input box
 		} else if (ns == "INPUT" && fields[i].style.display != 'none') {
-                    if (fields[i].value.trim() == "") {
-			$(fields[i]).css("background-color", "#f9dcd9");
-			valid = false;
-                    } else {
-			$(fields[i]).css("background-color", "");
-                    }
+		    if (!this._isInputBoxFilled(fields[i]))
+			valid = false
 		//select box
 		} else if (ns == "SELECT") {
-                    if (fields[i].selectedIndex == -1) {
-			$(fields[i]).css("background-color", "#f9dcd9");
+		    if(!this._isListboxFilled(fields[i]))
 			valid = false;
-                    } else {
-			$(fields[i]).css("background-color", "");
-                    }
 		}
 	    }
         }
@@ -1290,17 +1282,39 @@ var mpEditor = exports.mpEditor = Widget.extend({
         return valid;
     },
 
-    // validate drop down listbox
-    // return boolean: if listbox selected
-    _isFilledListbox: function(field) {
+    // validate if drop down listbox selected
+    // return boolean: true if listbox selected, otherwise return false
+    _isListboxFilled: function(field) {
 	if (field.selectedIndex == -1) {
 	    $(field).css("background-color", "#f9dcd9");
 	    return false;
 	} else {
 	    $(field).css("background-color", "");
-	    return true
+	    return true;
 	}
     },
+
+    // validate if input box filled
+    // return boolean: true if input box filled, otherwise return false
+    _isInputBoxFilled: function(field) {
+	if (field.value.trim() == "") {
+	    $(field).css("background-color", "#f9dcd9");
+	    return false;
+	} else {
+	    $(field).css("background-color", "");
+	    return true;
+	}
+    },
+
+    _isRatioButtonFilled: function(name) {
+	if (!$("input[name='" + name + "']:checked").val()) {
+	    $("input[name='" + name + "']:checked").css("background-color", "#f9dcd9");
+	    return false;   
+	} else {
+	    $("input[name='" + name + "']:checked").css("background-color", "");
+	    return true;
+	}
+    }, 
 
     // Event callback: called when a user clicks the editor form (by pressing
     // return, for example).
