@@ -58,7 +58,7 @@ var context1 = {
             name:"Relationship: ",
             id:"relationship",
             html: "table",
-            options:["interact with","inhibits","substrate of"],
+            options:["interact with","inhibits","substrate of","has metabolite","controls formation of","inhibition constant"],
             optionsID:["r0","r1","r2"]
         },
         {

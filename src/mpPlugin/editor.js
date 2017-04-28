@@ -384,8 +384,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                 
                             }
 
-                            //Method: (Experiment: substrate of, inhibit)
+                            //Method: (Experiment: inhibits, substrate of, has metabolite, controls formation of, inhibition constant)
                             if (claim.method == "Experiment") {
+                                $("#relationship option").removeAttr('disabled');
+                                $("#relationship option").show();
                                 $("#relationship option[value = 'interact with']").attr('disabled', 'disabled');
                                 $("#relationship option[value = 'interact with']").hide();
                                 if ($("#relationship option:selected").text() == "interact with") {
@@ -404,7 +406,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
                                     $("#object-metabolite").val(claim.qualifiedBy.objectMetabolite);
                                 }
                             }
-
                         }
 
                         //show reject reason when reject checked
@@ -2225,6 +2226,13 @@ function cleanClaimForm() {
     $("#relationship option").removeAttr('disabled');
     $("#relationship option").show();
     $("#relationship")[0].selectedIndex = 0;
+    //default: hide (has metabolite, controls formation of, inhibition constant)
+    $("#relationship option[value = 'has metabolite']").attr('disabled', 'disabled');
+    $("#relationship option[value = 'has metabolite']").hide();
+    $("#relationship option[value = 'controls formation of']").attr('disabled', 'disabled');
+    $("#relationship option[value = 'controls formation of']").hide();
+    $("#relationship option[value = 'inhibition constant']").attr('disabled', 'disabled');
+    $("#relationship option[value = 'inhibition constant']").hide();
     
     // Enzyme
     $("#enzyme")[0].selectedIndex = 0;
