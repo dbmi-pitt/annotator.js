@@ -57,9 +57,9 @@ function highlightRange(normedRange, cssClass, dataRange) {
 // for those ranges which are not reanchorable in the current document.
 function reanchorRange(range, rootElement) {
     try {
-        console.log("reanchorRange");
-        console.log(range);
-        console.log(rootElement);
+        // console.log("reanchorRange");
+        // console.log(range);
+        // console.log(rootElement);
         return Range.sniff(range).normalize(rootElement);
     } catch (e) {
         if (!(e instanceof Range.RangeError)) {
