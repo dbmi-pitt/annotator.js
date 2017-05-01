@@ -244,7 +244,10 @@ currHighlighter.prototype.draw = function (annotation, inputType) {
                         self.drawField(material.drug1Dose, "dose1", currDataNum, dataRangesL, hldivL);
                     
                     if (currFormType == "dose2" && (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null)) 
-                        self.drawField(material.drug2Dose, "dose2", currDataNum, dataRangesL, hldivL);                                                
+                        self.drawField(material.drug2Dose, "dose2", currDataNum, dataRangesL, hldivL);
+
+                    if (currFormType == "phenotype" && (material.phenotype.ranges != null || material.phenotype.hasTarget != null)) 
+                        self.drawField(material.phenotype, "phenotype", currDataNum, dataRangesL, hldivL);   
                 }                                
             }
         }

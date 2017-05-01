@@ -5,7 +5,7 @@ var util = require('../util');
 var xUtil = require('../xutil');
 var textselector = require('./textselector');
 var crpgadder = require('./../mpPlugin/crosspageadder');
-
+var cancelcrpgadder = require('./../mpPlugin/cancelcrosspageadder');
 // mp
 var mpadder = require('./../mpPlugin/adder');
 var mphighlighter = require('./../mpPlugin/highlighter');
@@ -49,7 +49,6 @@ function annotationFactory(contextEl, ignoreSelector) {
             var serializedRange = r.serialize(contextEl, ignoreSelector)
             serializedRanges.push(serializedRange);
         }
-
 
         var prefix = "", suffix = "";
         prefix = getTxtFromNode(ranges[0].start, false, ignoreSelector, 50);
@@ -270,10 +269,13 @@ function main(options) {
 
         // multi select adder (will not create annotation)
         s.crpgadder = new crpgadder.Adder({
+
             onCreate: function (ann) {               
-                //console.log(currAnnotation);
                 undrawCurrhighlighter();
                 s.currhighlighter.draw(currAnnotation, "add");
+                if (currAnnotation != undefined && multiSelected) {
+                    s.cancelcrpgadder.show(s.interactionPoint);
+                }
                 //app.annotations.create(ann);
             },
             onUpdate: function (ann) {
@@ -281,6 +283,26 @@ function main(options) {
             }
         });
         s.crpgadder.attach();
+
+        // cancel multi select adder (will not create annotation)
+        s.cancelcrpgadder = new cancelcrpgadder.Adder({
+            onCreate: function () {
+                undrawCurrhighlighter();
+                if (currAnnotation == undefined || !multiSelected) {
+                    s.cancelcrpgadder.hide();
+                } else {
+                    s.currhighlighter.draw(currAnnotation, "add");
+                }
+                console.log("cancel multi select adder >>");
+                console.log(multiSelected);
+                console.log(currAnnotation);
+                //app.annotations.create(ann);
+            },
+            onUpdate: function (ann) {
+                //app.annotations.update(ann);
+            }
+        });
+        s.cancelcrpgadder.attach();
 
         // mp editor
         s.mpeditor = new mpeditor.mpEditor({
@@ -329,14 +351,20 @@ function main(options) {
                     s.interactionPoint = util.mousePosition(event);
                     s.hladder.load(hlAnnotation, s.interactionPoint);
                     s.mpadder.load(hlAnnotation, s.interactionPoint);
-                    if (sourceURL.indexOf(".pdf") != -1) {
+                    if (sourceURL.match(/\.pdf/g)) {
                         s.crpgadder.load(hlAnnotation, s.interactionPoint);
+                        if (currAnnotation != undefined && multiSelected) {
+                            s.cancelcrpgadder.show(s.interactionPoint); //duplicate show, but this can update adder position
+                        }
                     }
                     //console.log(currAnnotation);
                 } else {
                     s.hladder.hide();
                     s.mpadder.hide();
                     s.crpgadder.hide();
+                    if (currAnnotation == undefined || !multiSelected) {
+                        s.cancelcrpgadder.hide();
+                    }
                 }
             }
         });
@@ -426,54 +454,66 @@ function main(options) {
         },
 
         annotationsLoaded: function (anns, pageNumber) {
+            //highlight existed annotations
             if(pageNumber != undefined) {
                 //load by page
                 console.log("[load page " + pageNumber + "]");
                 var annsByPage = [];
                 for (var i = 0; i < anns.length; i++) {
-                    var ranges = anns[i].argues.ranges;
-                    var flag = false;
-                    for (var j = 0; j < ranges.length; j++) {
-                        if (ranges[j].start.substring(47, 48) == pageNumber) {
-                            annsByPage.push(anns[i]);
-                            flag = true;
-                            break;
-                        }
-                    }
 
-                    //data(not claim) in this annotation may appear in different pages
-                    //In order to load them successfully, check them every time
-                    if (!flag && anns[i].argues.supportsBy.length != 0) {
-                        var data = anns[i].argues.supportsBy;
-                        for (var j = 0; j < data.length; j++) {
-                            if (typeof data[j].auc.ranges != "undefined" &&
-                                (data[j].auc.ranges[0].start.substring(47, 48) == pageNumber || data[j].auc.ranges[0].end.substring(47, 48) == pageNumber)) {
+                    if (anns[i].annotationType == "DrugMention") {
+                        annsByPage.push(anns[i]);
+                    } else {
+                        var ranges = anns[i].argues.ranges;
+                        var flag = false;
+                        for (var j = 0; j < ranges.length; j++) {
+                            if (ranges[j].start.substring(19, 21).replace("]", "") == pageNumber) {
                                 annsByPage.push(anns[i]);
-                            } else if (typeof data[j].cmax.ranges != "undefined" &&
-                                (data[j].cmax.ranges[0].start.substring(47, 48) == pageNumber || data[j].cmax.ranges[0].end.substring(47, 48) == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].halflife.ranges != "undefined" &&
-                                (data[j].halflife.ranges[0].start.substring(47, 48) == pageNumber || data[j].halflife.ranges[0].end.substring(47, 48) == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].clearance.ranges != "undefined" &&
-                                (data[j].clearance.ranges[0].start.substring(47, 48) == pageNumber || data[j].clearance.ranges[0].end.substring(47, 48) == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug1Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.drug2Dose.ranges[0].end.substring(47, 48) == pageNumber)) {
-                                annsByPage.push(anns[i]);
-                            } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
-                                (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(47, 48) == pageNumber || data[j].supportsBy.supportsBy.participants.ranges[0].end.substring(47, 48) == pageNumber)) {
-                                annsByPage.push(anns[i]);
+                                flag = true;
+                                break;
+                            }
+                        }
+
+                        //data(not claim) in this annotation may appear in different pages
+                        //In order to load them successfully, check them every time
+                        if (!flag && anns[i].argues.supportsBy.length != 0) {
+                            var data = anns[i].argues.supportsBy;
+                            for (var j = 0; j < data.length; j++) {
+                                if (data[j].auc != undefined && data[j].auc.ranges != undefined &&
+                                    (data[j].auc.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].cmax.ranges != "undefined" &&
+                                    (data[j].cmax.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].halflife.ranges != "undefined" &&
+                                    (data[j].halflife.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].clearance.ranges != "undefined" &&
+                                    (data[j].clearance.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].supportsBy.supportsBy.drug1Dose.ranges != "undefined" &&
+                                    (data[j].supportsBy.supportsBy.drug1Dose.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].supportsBy.supportsBy.drug2Dose.ranges != "undefined" &&
+                                    (data[j].supportsBy.supportsBy.drug2Dose.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (typeof data[j].supportsBy.supportsBy.participants.ranges != "undefined" &&
+                                    (data[j].supportsBy.supportsBy.participants.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (data[j].supportsBy.supportsBy.phenotype != undefined && data[j].supportsBy.supportsBy.phenotype.ranges != undefined && 
+                                    (data[j].supportsBy.supportsBy.phenotype.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                                    annsByPage.push(anns[i]);
+                                } else if (isInPage(data[j], pageNumber, anns[i].argues.method)) {
+                                    annsByPage.push(anns[i]);
+                                }
                             }
                         }
                     }
                 }
-                console.log("[num of annotations: " + annsByPage.length + "]")
-                s.hlhighlighter.drawAll(annsByPage);
-                s.mphighlighter.drawAll(annsByPage);
+                console.log("[num of annotations: " + annsByPage.length + "]");
+                //console.log(annsByPage);
+                s.hlhighlighter.drawAll(annsByPage, pageNumber);
+                s.mphighlighter.drawAll(annsByPage, pageNumber);
             } else {
                 //load one time
                 s.hlhighlighter.drawAll(anns);
@@ -498,6 +538,7 @@ function main(options) {
             // keep text selection in annotation for draw current annotating text
             annotation.childNodes = rangeChildNodes; 
             // call different editor based on annotation type
+            s.cancelcrpgadder.hide();
             if (annotation.annotationType == "MP"){
                 s.currhighlighter.draw(annotation, "add");
                 adderClick = false;
@@ -553,15 +594,28 @@ function main(options) {
 
                 if ((sourceURL.indexOf(".pdf") != -1 && !adderClick) || hlAnnotation == undefined) {
                     //edit claim or data of current annotation
-                    s.currhighlighter.draw(annotation, "edit");
+                    console.log("[test-annotation ] "+ multiSelected + adderClick + hlAnnotation);
+                    console.log(currAnnotation);
+                    if (multiSelected) {
+                        s.currhighlighter.draw(currAnnotation, "add");
+                    } else {
+                        s.currhighlighter.draw(annotation, "edit");
+                    }
                 } else {
                     //add new data to current annotation
+                    console.log("[test-hlAnnotation ] "+ multiSelected);
+                    console.log(currAnnotation);
                     s.currhighlighter.draw(hlAnnotation, "add");
                 }
+                s.cancelcrpgadder.hide();
+                multiSelected = false; //TODO
                 adderClick = false;
                 hlAnnotation = undefined; //clean cached textSelected ranges
                 return s.mpeditor.load(s.interactionPoint,annotation);
             } else {
+                //console.log(annotation);
+                //s.hlhighlighter.undraw(annotation);
+                //console.log(hlAnnotation);
                 return null;
             }
         },
@@ -832,6 +886,33 @@ function addClaimDataDialog(ann) {
     }   
 }
 
+function isInPage(data, pageNumber, method) {
+    if (method == "Experiment") {
+        if (data.measurement != undefined) {
+            var mTypes = ["cl", "vmax", "ki", "km", "inhibition", "kinact", "ic50"];
+            for (var i = 0; i < mTypes.length; i++) {
+                var mType = mTypes[i];
+                if (data.measurement[mType] != undefined && data.measurement[mType].ranges != undefined &&
+            (data.measurement[mType].ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+                    return true;
+                }
+            }
+        }
+        if (data.cellSystem != undefined && data.cellSystem.ranges != undefined &&
+            (data.cellSystem.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+            return true;
+        }
+        if (data.metaboliteRateWithout != undefined && data.metaboliteRateWithout.ranges != undefined &&
+            (data.metaboliteRateWithout.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+            return true;
+        }
+        if (data.metaboliteRateWith != undefined && data.metaboliteRateWith.ranges != undefined &&
+            (data.metaboliteRateWith.ranges[0].start.substring(19, 21).replace("]", "") == pageNumber)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 

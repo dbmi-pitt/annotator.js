@@ -107,9 +107,10 @@ mpHighlighter.prototype.destroy = function () {
 // Public: Draw highlights for all the given annotations
 //
 // annotations - An Array of annotation Objects for which to draw highlights.
+// pageNumber - only in PDF, highlight sections which in this pageNumber, avoid duplicates
 //
 // Returns nothing.
-mpHighlighter.prototype.drawAll = function (annotations) {
+mpHighlighter.prototype.drawAll = function (annotations, pageNumber) {
     var self = this;
 
     var p = new Promise(function (resolve) {
@@ -119,11 +120,10 @@ mpHighlighter.prototype.drawAll = function (annotations) {
             if (typeof annList === 'undefined' || annList === null) {
                 annList = [];
             }
-
             var now = annList.splice(0, self.options.chunkSize);
             for (var i = 0, len = now.length; i < len; i++) {
                 if (now[i].annotationType == "MP")
-                    highlights = highlights.concat(self.draw(now[i]));
+                    highlights = highlights.concat(self.draw(now[i], pageNumber));
             }
 
             // If there are more to do, do them after a delay
@@ -174,20 +174,24 @@ function markOptions(fieldType, dataNum, hldivL) {
 // hldivL - list of span text nodes
 // mode - deprecated: (1) regular: apply mark.js for whole article, (2) dailymed: apply for each section by find p tag with className First 
   
-mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL) {
+mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldivL, pageNumber) {
 
     //console.log("mphighlighter - drawField - called");
     //console.log(obj);
 
     if (obj.ranges.length > 0) { // draw by xpath range
         for (var i = 0, ilen = obj.ranges.length; i < ilen; i++) {
-            var r = reanchorRange(obj.ranges[i], this.element);   
-            if (r !== null) { 
-                dataRangesL.push(new DataRange(r, field, idx));
-                //console.log("draw by xpath: " + field);
-            } else 
-                console.log("[Error]: draw by xpath failed: " + field);
+
+            // when pdf.js render pdf doc, the page num represents in xpath range in offset (47 - 49)
+            if (pageNumber == undefined || obj.ranges[i].start.substring(19, 21).replace("]", "") == pageNumber) {
+                var r = reanchorRange(obj.ranges[i], this.element);   
+                if (r !== null) { 
+                    dataRangesL.push(new DataRange(r, field, idx));                
+                } else 
+                    console.log("[Error]: draw by xpath failed: " + field);
+            }
         }
+        
     } else if (obj.hasTarget != null) { // draw by oa selector
         var oaselector = obj.hasTarget.hasSelector;
 
@@ -206,7 +210,9 @@ mpHighlighter.prototype.drawField = function (obj, field, idx, dataRangesL, hldi
 // annotation - An annotation Object for which to draw highlights.
 //
 // Returns an Array of drawn highlight elements.
-mpHighlighter.prototype.draw = function (annotation) {
+
+mpHighlighter.prototype.draw = function (annotation, pageNumber) {
+
     var self = this;
 
     if(annotation.annotationType!=undefined) {
@@ -218,39 +224,41 @@ mpHighlighter.prototype.draw = function (annotation) {
     var dataRangesL = [];
 
     try {       
+        //console.log("mphighlighter - draw");
         // var mode = "regular";  
         // if (annotation.rawurl.indexOf("/DDI-labels/") > 0) 
         //     mode = "dailymed"; // dailymed labels in 'DDI-labels' directory
-        
+
         // draw MP claim        
-        self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL);
+        self.drawField(annotation.argues, "claim", 0, dataRangesL, hldivL, pageNumber);
 
         // draw MP data
-        if (annotation.argues.supportsBy.length != 0){            
+        if (annotation.argues.supportsBy.length != 0){
+           
             var dataL = annotation.argues.supportsBy;
             for (var idx = 0; idx < dataL.length; idx++) {
                 var data = dataL[idx];
 
                 if (data.auc.ranges != null || data.auc.hasTarget != null) 
-                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL);   
+                    self.drawField(data.auc, "auc", idx, dataRangesL, hldivL, pageNumber);     
                 if (data.cmax.ranges != null || data.cmax.hasTarget != null) 
-                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL);            
+                    self.drawField(data.cmax, "cmax", idx, dataRangesL, hldivL, pageNumber);                
                 if (data.clearance.ranges != null || data.clearance.hasTarget != null)
-                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL);                
+                    self.drawField(data.clearance, "clearance", idx, dataRangesL, hldivL, pageNumber);                
                 if (data.halflife.ranges != null || data.halflife.hasTarget !=null) 
-                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL);
+                    self.drawField(data.halflife, "halflife", idx, dataRangesL, hldivL, pageNumber);                                
                 if (data.cellSystem != null && (data.cellSystem.ranges != null || data.cellSystem.hasTarget !=null)) 
-                    self.drawField(data.cellSystem, "cellSystem", idx, dataRangesL, hldivL);
+                    self.drawField(data.cellSystem, "cellSystem", idx, dataRangesL, hldivL, pageNumber);
                 if (data.metaboliteRateWith != null && (data.metaboliteRateWith.ranges != null || data.metaboliteRateWith.hasTarget !=null)) 
-                    self.drawField(data.metaboliteRateWith, "metaboliteRateWith", idx, dataRangesL, hldivL);
+                    self.drawField(data.metaboliteRateWith, "metaboliteRateWith", idx, dataRangesL, hldivL, pageNumber);
                 if (data.metaboliteRateWithout != null && (data.metaboliteRateWithout.ranges != null || data.metaboliteRateWithout.hasTarget !=null)) 
-                    self.drawField(data.metaboliteRateWithout, "metaboliteRateWithout", idx, dataRangesL, hldivL);
+                    self.drawField(data.metaboliteRateWithout, "metaboliteRateWithout", idx, dataRangesL, hldivL, pageNumber);
                 if (data.measurement != null) {
                     var mTypes = ["cl", "vmax", "km", "ki", "inhibition", "kinact", "ic50"];
                     for (var i = 0; i < mTypes.length; i++) {
                         var mType = mTypes[i];
                         if (data.measurement[mType] != null && (data.measurement[mType].ranges != null || data.measurement[mType].hasTarget !=null)) 
-                            self.drawField(data.measurement[mType], mType, idx, dataRangesL, hldivL);
+                            self.drawField(data.measurement[mType], mType, idx, dataRangesL, hldivL, pageNumber);
                     }
                 }
 
@@ -260,13 +268,13 @@ mpHighlighter.prototype.draw = function (annotation) {
                 if (material != null){                    
 
                     if (material.participants.ranges != null || material.participants.hasTarget != null)
-                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.participants, "participants", idx, dataRangesL, hldivL, pageNumber);                    
                     if (material.drug1Dose.ranges != null || material.drug1Dose.hasTarget != null) 
-                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.drug1Dose, "dose1", idx, dataRangesL, hldivL, pageNumber);                    
                     if (material.drug2Dose.ranges != null || material.drug2Dose.hasTarget != null) 
-                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL); 
+                        self.drawField(material.drug2Dose, "dose2", idx, dataRangesL, hldivL, pageNumber);                    
                     if (material.phenotype.ranges != null || material.phenotype.hasTarget != null) 
-                        self.drawField(material.phenotype, "phenotype", idx, dataRangesL, hldivL);                    
+                        self.drawField(material.phenotype, "phenotype", idx, dataRangesL, hldivL, pageNumber);                    
                 }
             }
         }

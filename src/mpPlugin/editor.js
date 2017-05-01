@@ -71,6 +71,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         var list = []; //store drug name in this quote
                         var listid = []; //store corresponding drug index in this quote
 
+
                         //----------------generate drug dropdown list---------------
                         var flag = 0;
                         //check drug list
@@ -79,7 +80,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         for (var i = 0, len = anns.length; i < len; i++) {
                             if (anns[i].annotationType == "DrugMention") {
-                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
+                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact.toLowerCase());
                             }
                         }
 
@@ -2456,6 +2457,51 @@ function generateQuote(highlightText, drugList, list, listid) {
         processedText += highlightText.substring(pos, highlightText.length);
     }
     var p = document.createElement("p");
+
+/* //PDF plugin
+    var prevNode = null; 
+    var goodChild; // good child means drug highlights with new parent node
+    var indexDict = {}; //hashmap<drugName, drugIndex>
+    var drugMap = {}; //hashmap<nodeID, nodeTextContent>, used in combining two drugs
+    var combines = []; //used in combining two drugs
+    
+    for (var qi = 0; qi < childrenInQuote.length; qi++) { 
+        var tempContent = $(childrenInQuote[qi]).text().trim();
+        
+        // if parent node is hl or currhl, then move up to parent
+        while(childrenInQuote[qi].parentNode.className=="annotator-hl" || childrenInQuote[qi].parentNode.className=="annotator-currhl") {
+            childrenInQuote[qi]= childrenInQuote[qi].parentNode;
+        }
+        
+        // if previous node and current node having the same parent, then skip. else, add current node to quote
+        if (!childrenInQuote[qi].isEqualNode(prevNode)) {
+            prevNode = childrenInQuote[qi];
+            goodChild = prevNode.cloneNode(true);
+            goodChild.innerHTML = tempContent;
+
+            //change drugMention elements' id to "drugName-drugIndex", e.g. terazosin-0
+            if (goodChild.getAttribute("name") == "annotator-hl") {
+                if (tempContent in indexDict) {
+                    indexDict[tempContent] = indexDict[tempContent] + 1;
+                    goodChild.id = tempContent + "_" + indexDict[tempContent];
+                    list.push(tempContent);
+                    listid.push(indexDict[tempContent]);
+                } else {
+                    indexDict[tempContent] = 0;
+                    goodChild.id = tempContent + "_" + indexDict[tempContent];
+                    list.push(tempContent);
+                    listid.push(indexDict[tempContent]);
+                }
+                //fing two drugs which need to combine
+                if (prevNode.id in drugMap && drugMap[prevNode.id] != tempContent) {
+                    combines.push(drugMap[prevNode.id]); //section1.drugname
+                    combines.push(indexDict[drugMap[prevNode.id]]); //section1.drugid
+                    combines.push(tempContent); //section2.drugname
+                    combines.push(0); //section2.drugid
+                } else {
+                    drugMap[prevNode.id] = tempContent;
+                }
+                */
     p.innerHTML = processedText;
     
     return p;
@@ -2523,6 +2569,20 @@ function calculateDips(annotation) {
                 return;
             }
         }
+
+    /* //PDF plugin
+    }
+    //combine two drugs (1. change nodeID in quote, 2. change list & listid)
+    if (combines.length > 0) {
+        var tempid = combines[0] + "_" + combines[1];
+        var newContent = combines[0] + combines[2];
+        p.innerHTML = p.innerHTML.replace(tempid, newContent + "_0");
+        tempid = "\"" + combines[2] + "_" + combines[3] + "\"";
+        p.innerHTML = p.innerHTML.replace(tempid, "\"" + newContent + "_0\"");
+        list.push(newContent);
+        listid.push(0);
+    }
+    return p;*/
         annotation.argues.supportsBy[currDataNum].reviewer.total = total;
         //console.log(total);
     }

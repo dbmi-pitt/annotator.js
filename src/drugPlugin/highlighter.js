@@ -92,9 +92,10 @@ Highlighter.prototype.destroy = function () {
 // Public: Draw highlights for all the given annotations
 //
 // annotations - An Array of annotation Objects for which to draw highlights.
+// pageNumber - only in PDF, highlight sections which in this pageNumber, avoid duplicates
 //
 // Returns nothing.
-Highlighter.prototype.drawAll = function (annotations) {
+Highlighter.prototype.drawAll = function (annotations, pageNumber) {
     var self = this;
 
     //alert("[INFO] hlhighlighter drawAll called")
@@ -106,10 +107,9 @@ Highlighter.prototype.drawAll = function (annotations) {
             if (typeof annList === 'undefined' || annList === null) {
                 annList = [];
             }
-
             var now = annList.splice(0, self.options.chunkSize);
             for (var i = 0, len = now.length; i < len; i++) {
-                highlights = highlights.concat(self.draw(now[i]));
+                highlights = highlights.concat(self.draw(now[i], pageNumber));
             }
 
             // If there are more to do, do them after a delay
@@ -134,10 +134,11 @@ Highlighter.prototype.drawAll = function (annotations) {
 // annotation - An annotation Object for which to draw highlights.
 //
 // Returns an Array of drawn highlight elements.
-// if oa selector is avaliable, use oa information to draw. Otherwise, use xpath apporach
-Highlighter.prototype.draw = function (annotation) {
 
-    // console.log("draw drug");
+Highlighter.prototype.draw = function (annotation, pageNumber) {
+
+    // if oa selector is avaliable, use oa information to draw. Otherwise, use xpath apporach
+    // console.log("drughighlighter - called");
     // console.log(annotation);
 
     if (annotation.annotationType != "DrugMention")
@@ -150,9 +151,8 @@ Highlighter.prototype.draw = function (annotation) {
 
     var drugMention = annotation.argues;
 
+    if (drugMention.hasTarget !=null && drugMention.ranges.length <= 1) { // draw by oa selector
     //console.log("drughighlighter - called");
-
-    if (drugMention.hasTarget !=null) { // draw by oa selector
         var drugName = drugMention.hasTarget.hasSelector.exact;
 
         //console.log("drug highlighter - drug: " + drugName);
@@ -174,9 +174,29 @@ Highlighter.prototype.draw = function (annotation) {
         };
 
         try {
-            // console.log("mphighlighter - drawField - use oaSelector");
-            var instance = new Mark($("#subcontent")[0]);   
-            instance.mark(drugName, options);  
+            //console.log("drughighlighter - drawField - use oaSelector");
+            if (sourceURL.indexOf(".pdf") != -1) {
+                // draw in pdf
+                var currPageContainer;
+                if (pageNumber == undefined) {
+                    currPageContainer = "#subcontent";
+                } else {
+                    currPageContainer = "#pageContainer" + pageNumber;
+                }
+                var context = document.querySelector(currPageContainer);
+                var instance = new Mark(context);
+                instance.mark(drugName, options);
+            } else {
+                // draw in Dailymed SPL or PMC article
+                var listP = document.getElementsByTagName("p"); 
+                for (var i=0; i < listP.length; i++) {
+                    var instance = new Mark(listP[i]);
+                    instance.mark(drugName, options);
+                }
+            }
+            //new plugin branch
+            //var instance = new Mark($("#subcontent")[0]);   
+            //instance.mark(drugName, options);  
 
         } catch (err) {
             console.log(err);
@@ -184,12 +204,15 @@ Highlighter.prototype.draw = function (annotation) {
 
     } else if (drugMention.ranges.length > 0) { // draw by ranges
         for (var i = 0, ilen = drugMention.ranges.length; i < ilen; i++) {
-            var r = reanchorRange(drugMention.ranges[i], this.element);   
-            if (r !== null) { 
+
+            if (pageNumber == undefined || annotation.argues.ranges[i].start.substring(19, 21).replace("]", "") == pageNumber) {
+                var r = reanchorRange(drugMention.ranges[i], this.element);   
+                if (r !== null) { 
                 normedRanges.push(r);
                 //console.log("draw drug by xpath: " + drugName);
             } else 
                 console.log("[Error]: draw by xpath failed: " + field);
+            }
         }
     }
 
@@ -227,7 +250,6 @@ Highlighter.prototype.draw = function (annotation) {
         $(annotation._local.highlights)
             .attr('id', annotation.id);
     }
-
     return annotation._local.highlights;
 };
 
