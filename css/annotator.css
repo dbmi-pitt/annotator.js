@@ -58,15 +58,16 @@
 /* Annotator Highlight
 -------------------------------------------------------------------- */
 
-.annotator-hl {
+/* move color style to html page specifically (displayWebPage.ejs for html and view.html for PDF) */
+/* .annotator-hl { */
 
-	/* HTML color */
-	background: rgba(255, 255, 10, 0.3);
+/* 	/\* HTML color *\/ */
+/* 	background: rgba(255, 255, 10, 0.3); */
 
-	/* PDF color */
-	/* background: #FFFF0A; */
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
-}
+/* 	/\* PDF color *\/ */
+/* 	/\* background: #FFFF0A; *\/ */
+/* 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /\* 0.3 == 4D in MS filters *\/ */
+/* } */
 
 .claimquoteborder {
 	clear: both;
@@ -147,16 +148,17 @@ span[name="annotator-ddi"] {
 
 /* Annotator Micropublication
 -------------------------------------------------------------------- */
-.annotator-mp {
-	/* HTML color  */
-	background: rgba(176, 196, 222, 0.4);
+/* move color style to html page specifically (displayWebPage.ejs for html and view.html for PDF) */
+/* .annotator-mp { */
+/* 	/\* HTML color  *\/ */
+/* 	background: rgba(176, 196, 222, 0.4); */
 
-	/* The heavy color for PDF */
-	/* background: rgba(86, 95, 115, 0.4); */
-	font-size: 11px;
-	font-style: strong;
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
-}
+/* 	/\* The heavy color for PDF *\/ */
+/* 	/\* background: rgba(86, 95, 115, 0.4); *\/ */
+/* 	font-size: 11px; */
+/* 	font-style: strong; */
+/* 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /\* 0.3 == 4D in MS filters *\/ */
+/* } */
 
 .annotator-mp-temporary {
 	background: #007CFF;
@@ -164,18 +166,19 @@ span[name="annotator-ddi"] {
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4D007CFF, endColorstr=#4D007CFF)";  /* 0.3 == 4D in MS filters */
 } 
 
-span[name="annotator-mp"] {
+/* move color style to html page specifically (displayWebPage.ejs for html and view.html for PDF) */
+/* span[name="annotator-mp"] { */
 
-	/* HTML color  */
- 	background: #B0C4DE;
-	background: rgba(176, 196, 222, 0.4);
+/* 	/\* HTML color  *\/ */
+/*  	background: #B0C4DE; */
+/* 	background: rgba(176, 196, 222, 0.4); */
 
-	/* PDF color  */
-	/* background: #969696; */
-	/* background: rgba(45, 50, 64, 0.4); */
+/* 	/\* PDF color  *\/ */
+/* 	/\* background: #969696; *\/ */
+/* 	/\* background: rgba(45, 50, 64, 0.4); *\/ */
 
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /* 0.3 == 4D in MS filters */
-}
+/* 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4DFFFF0A, endColorstr=#4DFFFF0A)";  /\* 0.3 == 4D in MS filters *\/ */
+/* } */
 
 #annotator-mp-temporary {
 	background: #007CFF;
