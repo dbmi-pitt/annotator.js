@@ -86,8 +86,8 @@ var Viewer = exports.Viewer = Widget.extend({
             if (annotation.annotationType == "DrugMention" && annotation.created) {
                 var returnText = "<div class='annotator-ddi'>By " + annotation.email + " on " + annotation.updated + "</div>" +
                     annotation.annotationType +
-                    ": <span class='annotator-ddi-active'>" + annotation.argues.hasTarget.hasSelector.exact + "</span>" + 
-                    "<button style= type='button' class='annotator-edit'>" + _t('redraw') + "</button>";
+                    ": <span class='annotator-ddi-active'>" + annotation.argues.hasTarget.hasSelector.exact + "</span>";
+		    // + "<button style= type='button' class='annotator-edit'>" + _t('redraw') + "</button>";
                 return returnText;
             } else {
                 return null;
