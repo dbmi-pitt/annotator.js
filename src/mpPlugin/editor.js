@@ -79,7 +79,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
                         for (var i = 0, len = anns.length; i < len; i++) {
                             if (anns[i].annotationType == "DrugMention") {
-                                allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact.toLowerCase());
+				allHighlightedDrug.push(anns[i].argues.hasTarget.hasSelector.exact);
                             }
                         }
 
@@ -142,8 +142,10 @@ var mpEditor = exports.mpEditor = Widget.extend({
                         //add drugs to object metabolite
                         var distinctDrug = new Set();
                         for (var i = 0; i < allHighlightedDrug.length; i++) {
-                            if (!distinctDrug.has(allHighlightedDrug[i].toLowerCase())) {
-                                distinctDrug.add(allHighlightedDrug[i].toLowerCase());
+                            // if (!distinctDrug.has(allHighlightedDrug[i].toLowerCase())) {
+                            //     distinctDrug.add(allHighlightedDrug[i].toLowerCase());
+                            if (!distinctDrug.has(allHighlightedDrug[i])) {
+                                distinctDrug.add(allHighlightedDrug[i]);
                                 $('#object-metabolite').append($('<option>', {
                                     value: allHighlightedDrug[i],
                                     text: allHighlightedDrug[i]
@@ -2681,7 +2683,8 @@ function loadObjectMetabolateForClaim(distinctDrug, qualifier) {
     $('#object-metabolite').parent().show();
     $('#object-metabolite-label').parent().show();
     if (qualifier.objectMetabolite != null) {
-        if (!distinctDrug.has(qualifier.objectMetabolite.toLowerCase()) && qualifier.objectMetabolite.toLowerCase() != "n/a") {
+        // if (!distinctDrug.has(qualifier.objectMetabolite.toLowerCase()) && qualifier.objectMetabolite.toLowerCase() != "n/a") {
+        if (!distinctDrug.has(qualifier.objectMetabolite) && qualifier.objectMetabolite.toLowerCase() != "n/a") {
             $('#object-metabolite').append($('<option>', {
                 value: qualifier.objectMetabolite,
                 text: qualifier.objectMetabolite
