@@ -1226,7 +1226,7 @@ var mpEditor = exports.mpEditor = Widget.extend({
 			valid = false
 		//select box
 		} else if (ns == "SELECT") {
-		    if(!this._isListboxFilled(fields[i]))
+		    if(!this._isListboxFilled(fields[i], true))
 			valid = false;
 		}
 	    }
