@@ -23,7 +23,7 @@ var _t = util.gettext;
 var rangeChildNodes = [];
 var hlAnnotation;  //a dummy annotation, used to store textSelected ranges
 var adderClick = false;  //to mark the adder is clicked, can be used to distinguish update annotation or add new data
-var publics;
+var publicsddi;
 
 // trim strips whitespace from either end of a string.
 //
@@ -238,7 +238,7 @@ function main(options) {
     var s = {
         interactionPoint: null
     };
-    publics = s;
+    publicsddi = s;
     function start(app) {
         var ident = app.registry.getUtility('identityPolicy');
         var authz = app.registry.getUtility('authorizationPolicy');
@@ -271,16 +271,17 @@ function main(options) {
         s.ddieditor = new ddieditor.ddiEditor({
             extensions: options.editorExtensions,
             onDelete: function (ann) {
-
-                currAnnotation = ann;
-                if (currFormType == "claim") { 
-                    // delete confirmation for claim
-                    $( "#dialog-claim-delete-confirm" ).show();
-                } else if (currFormType == "reviewer") {
-                    $( "#dialog-dips-delete-confirm" ).show();
-                } else {
-                    // delete confirmation for data & material
-                    $( "#dialog-data-delete-confirm" ).show();
+                if (ann.annotationType == "DDI") {
+                    currAnnotation = ann;
+                    if (currFormType == "claim") { 
+                        // delete confirmation for claim
+                        $( "#dialog-claim-delete-confirm" ).show();
+                    } else if (currFormType == "reviewer") {
+                        $( "#dialog-dips-delete-confirm" ).show();
+                    } else {
+                        // delete confirmation for data & material
+                        $( "#dialog-data-delete-confirm" ).show();
+                    }
                 }
             }
         });
@@ -709,8 +710,8 @@ $( "#data-delete-confirm-btn" ).click(function() {
         totalDataNum = totalDataNum -1;
     }
 
-    if (typeof publics.ddieditor.dfd !== 'undefined' && publics.ddieditor.dfd !== null) {
-     publics.ddieditor.dfd.resolve();
+    if (typeof publicsddi.ddieditor.dfd !== 'undefined' && publicsddi.ddieditor.dfd !== null) {
+     publicsddi.ddieditor.dfd.resolve();
      }
     showAnnTable();
 });
@@ -735,8 +736,8 @@ $( "#dips-delete-confirm-btn" ).click(function() {
         totalDataNum = totalDataNum -1;
     }
 
-    if (typeof publics.ddieditor.dfd !== 'undefined' && publics.ddieditor.dfd !== null) {
-        publics.ddieditor.dfd.resolve();
+    if (typeof publicsddi.ddieditor.dfd !== 'undefined' && publicsddi.ddieditor.dfd !== null) {
+        publicsddi.ddieditor.dfd.resolve();
     }
     showAnnTable();
 });

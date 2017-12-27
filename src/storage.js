@@ -49,7 +49,7 @@ exports.debug = function () {
             return annotation;
         },
 
-        'delete': function (annotation) {
+        delete: function (annotation) {
             trace('destroy', annotation);
             return annotation;
         },
@@ -222,8 +222,8 @@ HttpStorage.prototype.update = function (annotation) {
  */
 HttpStorage.prototype['delete'] = function (annotation) {
 
-    console.log("[INFO] storage - delete!")
-
+    console.log("[DEBUG] storage - apiRequest destroy!")
+    // console.log(annotation);
     return this._apiRequest('destroy', annotation);
 };
 
@@ -278,18 +278,21 @@ HttpStorage.prototype.setHeader = function (key, value) {
  */
 HttpStorage.prototype._apiRequest = function (action, obj) {
 
-    //console.log("storage.js - apiRequest - obj:" + JSON.stringify(obj));
+    console.log("[DEBUG] storage.js - apiRequest:" + action);
     
     var id = obj && obj.id;
     var url = this._urlFor(action, id);
     var options = this._apiRequestOptions(action, obj);
 
+    //console.log(options);
     var request = $.ajax(url, options);
 
     // Append the id and action to the request object
     // for use in the error callback.
     request._id = id;
     request._action = action;
+
+    console.log("[DEBUG] storage - apiRequest done!");
     return request;
 };
 
@@ -589,7 +592,7 @@ StorageAdapter.prototype.create = function (obj) {
  */
 StorageAdapter.prototype.update = function (obj) {
 
-    console.log("storage - StorageAdapter - update");
+    console.log("[DEBUG] storage - StorageAdapter - update");
 
     if (typeof obj.id === 'undefined' || obj.id === null) {
         throw new TypeError("annotation must have an id for update()");
@@ -619,7 +622,7 @@ StorageAdapter.prototype.update = function (obj) {
  */
 StorageAdapter.prototype['delete'] = function (obj) {
 
-    console.log("storage - StorageAdapter - delete");
+    console.log("[DEBUG] storage - StorageAdapter - delete!!!!!");
 
     if (typeof obj.id === 'undefined' || obj.id === null) {
         throw new TypeError("annotation must have an id for delete()");

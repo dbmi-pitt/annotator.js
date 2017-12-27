@@ -19,16 +19,12 @@ exports.ddieditor = require('./ddiPlugin/editor');
 exports.ddiviewer = require('./ddiPlugin/viewer');
 exports.ddiadder = require('./ddiPlugin/adder');
 exports.ddihighlighter = require('./ddiPlugin/highlighter');
+exports.ddimain = require('./ui/ddimain').main;
 
-//mpPlugin
-exports.mpeditor = require('./mpPlugin/editor');
-exports.mpviewer = require('./mpPlugin/viewer');
-exports.mpadder = require('./mpPlugin/adder');
-exports.mphighlighter = require('./mpPlugin/highlighter');
-
-//dbmi main
-exports.dbmimain = require('./ui/dbmimain').main;
-
-//mp main
-exports.mpmain = require('./ui/mpmain').main;
+// mpPlugin  uncomment below for mpPlugin (comment ddiPlugin)
+// exports.mpeditor = require('./mpPlugin/editor');
+// exports.mpviewer = require('./mpPlugin/viewer');
+// exports.mpadder = require('./mpPlugin/adder');
+// exports.mphighlighter = require('./mpPlugin/highlighter');
+// exports.mpmain = require('./ui/mpmain').main;
 

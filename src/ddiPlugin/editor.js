@@ -1325,11 +1325,13 @@ var ddiEditor = exports.ddiEditor = Widget.extend({
     _onDeleteClick: function (event) {
 
         console.log("ddieditor - _onDeleteClick:")
-        console.log(this.annotation);
-
-        preventEventDefault(event);
-        this.options.onDelete(this.annotation);
-        undrawCurrhighlighter();
+        if (this.annotation.annotationType == "DDI") {
+            console.log(this.annotation);
+            
+            preventEventDefault(event);
+            this.options.onDelete(this.annotation);
+            undrawCurrhighlighter();
+        }
 
         // reset unsave status
         unsaved = false;

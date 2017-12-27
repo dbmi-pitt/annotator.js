@@ -23,7 +23,7 @@ var _t = util.gettext;
 var rangeChildNodes = [];
 var hlAnnotation;  //a dummy annotation, used to store textSelected ranges
 var adderClick = false;  //to mark the adder is clicked, can be used to distinguish update annotation or add new data
-var publics;
+var publicsmp;
 
 // trim strips whitespace from either end of a string.
 //
@@ -238,7 +238,8 @@ function main(options) {
     var s = {
         interactionPoint: null
     };
-    publics = s;
+    if (publicsmp == null)
+        publicsmp = s;
     function start(app) {
         var ident = app.registry.getUtility('identityPolicy');
         var authz = app.registry.getUtility('authorizationPolicy');
@@ -271,16 +272,17 @@ function main(options) {
         s.mpeditor = new mpeditor.mpEditor({
             extensions: options.editorExtensions,
             onDelete: function (ann) {
-
-                currAnnotation = ann;
-                if (currFormType == "claim") { 
-                    // delete confirmation for claim
-                    $( "#dialog-claim-delete-confirm" ).show();
-                } else if (currFormType == "reviewer") {
-                    $( "#dialog-dips-delete-confirm" ).show();
-                } else {
-                    // delete confirmation for data & material
-                    $( "#dialog-data-delete-confirm" ).show();
+                if (ann.annotationType == "MP") {
+                    currAnnotation = ann;
+                    if (currFormType == "claim") { 
+                        // delete confirmation for claim
+                        $( "#dialog-claim-delete-confirm" ).show();
+                    } else if (currFormType == "reviewer") {
+                        $( "#dialog-dips-delete-confirm" ).show();
+                    } else {
+                        // delete confirmation for data & material
+                        $( "#dialog-data-delete-confirm" ).show();
+                    }
                 }
             }
         });
@@ -395,7 +397,9 @@ function main(options) {
                 }
             },
             onDelete: function (ann) {
-                app.annotations['delete'](ann);
+                if (ann.annotationType == "MP") {
+                    app.annotations['delete'](ann);
+                }
             },
             permitEdit: function (ann) {
                 return authz.permits('update', ann, ident.who());
@@ -420,7 +424,9 @@ function main(options) {
                 }
             },
             onDelete: function (ann) {
-                app.annotations['delete'](ann);
+                if (ann.annotationType == "DrugMention"){
+                    app.annotations['delete'](ann);
+                }
             },
             permitEdit: function (ann) {
                 return authz.permits('update', ann, ident.who());
@@ -530,9 +536,9 @@ function main(options) {
             //console.log("[mpmain--beforeAnnotationCreated]")
             //s.mphighlighter.draw(annotation);//enhancement
 
-		    annotation.rawurl = options.source;
-    		annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");		
-		    annotation.email = options.email;
+	    annotation.rawurl = options.source;
+    	    annotation.uri = options.source.replace(/[\/\\\-\:\.]/g, "");
+	    annotation.email = options.email;
 
             console.log("beforeAnnotationCreated");
 
@@ -582,7 +588,7 @@ function main(options) {
             }
         },
         beforeAnnotationUpdated: function (annotation) {
-            console.log(">>>>>>currAnnotationId<<<<<" + currAnnotationId);
+            // console.log(">>>>>>currAnnotationId<<<<<" + currAnnotationId);
             currAnnotationId = annotation.id;
             currAnnotation = annotation;
 
@@ -595,8 +601,8 @@ function main(options) {
 
                 if ((sourceURL.indexOf(".pdf") != -1 && !adderClick) || hlAnnotation == undefined) {
                     //edit claim or data of current annotation
-                    console.log("[test-annotation ] "+ multiSelected + adderClick + hlAnnotation);
-                    console.log(currAnnotation);
+                    //console.log("[test-annotation ] "+ multiSelected + adderClick + hlAnnotation);
+                    //console.log(currAnnotation);
                     if (multiSelected) {
                         s.currhighlighter.draw(currAnnotation, "add");
                     } else {
@@ -604,8 +610,8 @@ function main(options) {
                     }
                 } else {
                     //add new data to current annotation
-                    console.log("[test-hlAnnotation ] "+ multiSelected);
-                    console.log(currAnnotation);
+                    //console.log("[test-hlAnnotation ] "+ multiSelected);
+                    //console.log(currAnnotation);
                     s.currhighlighter.draw(hlAnnotation, "add");
                 }
                 s.cancelcrpgadder.hide();
@@ -634,14 +640,16 @@ function main(options) {
             }
         },
         beforeAnnotationDeleted: function (ann) {
+            console.log("[DEBUG] mpmain.js - beforeAnnotationDeleted called")
             s.mphighlighter.undraw(ann);
             s.hlhighlighter.undraw(ann);            
         }
         ,
         annotationDeleted: function (ann) {
-            //console.log("mpmain - annotationDeleted called");
+            console.log("[DEBUG] mpmain - annotationDeleted called");
             showAnnTable();
             setTimeout(function(){
+                console.log("[DEBUG] mpmain - annotationDeleted - updateAnnTable");
                 updateAnnTable(options.source);
             },1000);
         }
@@ -716,9 +724,9 @@ $( "#data-delete-confirm-btn" ).click(function() {
 // cachedOATarget = "";
 // cachedOARanges = "";
 
-    if (typeof publics.mpeditor.dfd !== 'undefined' && publics.mpeditor.dfd !== null) {
-     publics.mpeditor.dfd.resolve();
-     }
+    if (typeof publicsmp.mpeditor.dfd !== 'undefined' && publicsmp.mpeditor.dfd !== null) {
+        publicsmp.mpeditor.dfd.resolve();
+    }
     showAnnTable();
 });
 
@@ -742,8 +750,8 @@ $( "#dips-delete-confirm-btn" ).click(function() {
         totalDataNum = totalDataNum -1;
     }
 
-    if (typeof publics.mpeditor.dfd !== 'undefined' && publics.mpeditor.dfd !== null) {
-        publics.mpeditor.dfd.resolve();
+    if (typeof publicsmp.mpeditor.dfd !== 'undefined' && publicsmp.mpeditor.dfd !== null) {
+        publicsmp.mpeditor.dfd.resolve();
     }
     showAnnTable();
 });
