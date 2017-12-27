@@ -82,8 +82,8 @@ var Adder = Widget.extend({
     show: function (position) {
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
-                top: position.top,
-                left: position.left
+                top: position.top + 35,
+                right: 0
             });
         }
         Widget.prototype.show.call(this);
@@ -99,7 +99,6 @@ var Adder = Widget.extend({
         if (event.which > 1) {
             return;
         }
-
         event.preventDefault();
         // Prevent the selection code from firing when the mouse button is
         // released
@@ -142,39 +141,58 @@ var Adder = Widget.extend({
         console.log("[DEBUG] hladder - hide hl and ddi");
 
         // Hide the adder
-        this.hide();
+        if (currAnnotation == undefined || !multiSelected) {
+            this.hide();
+        }
         // Hide drug mention, mp and ddi adder
-        $('.annotator-adderddi').removeClass().addClass('annotator-addermp annotator-hide');
+        // $('.annotator-adderddi').hide();
         $('.annotator-addermp').removeClass().addClass('annotator-addermp annotator-hide');
         $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
         $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
 
         this.ignoreMouseup = false;
 
-        // Create a new annotation
-        if (this.annotation !== null && typeof this.onCreate === 'function') {
-            if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
-                var newRange = this.annotation.argues.ranges[0];
-                var exact = this.annotation.argues.hasTarget.hasSelector.exact;
-                console.log(newRange);
-                currAnnotation.argues.ranges.push(newRange);
-                currAnnotation.argues.hasTarget.hasSelector.exact += exact;
+        // Create a new annotation || add a new data
+        //if ((this.annotation !== null && typeof this.onCreate === 'function') || (editorType != "claim" && typeof this.onUpdate === 'function')) {
+            //this.annotation.annotationType = "MP";
+
+            //cancel multi select test code
+            console.log(currAnnotation.argues.ranges.length);
+            if (currAnnotation == undefined || multiSelected == false || currAnnotation.argues.ranges.length == 0) {
+
+                console.log("nothing can be deleted from multiSelected highlights");
+            } else {
+                //deselect browser's highlight
+                /*if ( document.selection ) {
+                    document.selection.empty();
+                } else if ( window.getSelection ) {
+                    window.getSelection().removeAllRanges();
+                } else {
+                    currAnnotation.argues.ranges.pop();
+                }*/
+                currAnnotation.argues.ranges.pop();
+                if (currAnnotation.argues.ranges.length == 0) {
+                    currAnnotation = undefined;
+                    multiSelected = false;
+                }
+                //var newRange = this.annotation.argues.ranges[0];
+                //var newExact = this.annotation.argues.hasTarget.hasSelector.exact;
+                //currAnnotation.argues.hasTarget.hasSelector.exact += " / " + exact;
+                //currAnnotation.argues.ranges.push(newRange);
+
                 console.log(currAnnotation);
-                this.annotation = currAnnotation;
-                multiSelected = false;
             }
-            this.annotation.annotationType = "DrugMention";
-            this.onCreate(this.annotation, event);
-            console.log("[INFO] drug mention created: " + this.annotation);
-        }
+            this.onCreate(event);
+            //multiSelected = true;
+        //}
     }
 });
 
 Adder.template = [
 
-    '<div class="annotator-adderhl annotator-hide">',
+    '<div class="annotator-addercancel annotator-hide">',
 
-    '  <button class="hl-adder-btn" type="button" title="Highlight">' + _t('Annotate') + '</button>',
+    '  <button class="hl-adder-btn" type="button" title="Cancel Highlight">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 

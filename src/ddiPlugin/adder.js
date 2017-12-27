@@ -2,12 +2,12 @@
 
 var Widget = require('./../ui/widget').Widget,
     util = require('../util');
-
+var Range = require('xpath-range').Range;
 var $ = util.$;
 var _t = util.gettext;
 
 var NS = 'annotator-adderddi';
-
+var HttpStorage = require('../storage').HttpStorage;
 
 // Adder shows and hides an annotation adder button that can be clicked on to
 // create an annotation.
@@ -18,20 +18,26 @@ var ddiAdder = Widget.extend({
 
         this.ignoreMouseup = false;
         this.annotation = null;
-
+        
+        this.onUpdate = this.options.onUpdate;
         this.onCreate = this.options.onCreate;
 
         var self = this;
         this.element
-            .on("click." + NS, 'button', function (e) {
-                self._onClick(e);
-            })
-            .on("mousedown." + NS, 'button', function (e) {
-                self._onMousedown(e);
-            });
+
+        // MP: add menu for create claim and add data
+        .on("click." + NS, '.mp-main-menu', function (e) {
+            self._onClick(e);
+        })
+
+        .on("mousedown." + NS, 'li', function (e) {
+            // console.log("mpadder - self._onMousedown(e)");
+            self._onMousedown(e);
+        });
 
         this.document = this.element[0].ownerDocument;
         $(this.document.body).on("mouseup." + NS, function (e) {
+            // console.log("mpadder - self._onMouseup(e)");
             self._onMouseup(e);
         });
     },
@@ -127,6 +133,9 @@ var ddiAdder = Widget.extend({
     _onClick: function (event) {
         // Do nothing for right-clicks, middle-clicks, etc.
 
+        // close MP menu after click action 
+        $('.mp-main-menu').hide();
+        
         if (event.which > 1) {
             return;
         }
@@ -134,40 +143,120 @@ var ddiAdder = Widget.extend({
         event.preventDefault();
 
         console.log("[DEBUG] ddiadder - hide hl and ddi");
+        this.ignoreMouseup = false;
 
         // Hide the adder
         this.hide();
-        // Hide drug highlight dder
-        // $('.annotator-adderhl').hide();
+        
+        // Hide drug highlight adder
+        $('.annotator-adderddi').removeClass().addClass('annotator-adderddi annotator-hide');
         $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
+        $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
+        
+        var editorType = currFormType;
+        if (editorType == null || editorType.trim() == ""){
+            editorType = "participants";
+        }
 
-        this.ignoreMouseup = false;
-
-        // Create a new annotation
-
-        if (this.annotation !== null && typeof this.onCreate === 'function') {
+        // if type is claim, then  create annotation
+        if (this.annotation !== null && editorType == "claim" && typeof this.onCreate === 'function') { 
+            isTextSelected = true;
+            cachedOATarget = this.annotation.argues.hasTarget;
+            cachedOARanges = this.annotation.argues.ranges;
+            if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
+                var newRange = this.annotation.argues.ranges[0];
+                console.log(newRange);
+                currAnnotation.argues.ranges.push(newRange);
+                console.log(currAnnotation);
+                this.annotation = currAnnotation;
+                multiSelected = false;
+            }
             this.annotation.annotationType = "DDI";
             this.onCreate(this.annotation, event);
+        }        
+
+        // add data to claim: 1) query MP annotation, 2) enable data editor, 3) load existing MP annotation                        
+        else if (editorType != "claim" && typeof this.onUpdate === 'function') { 
+
+            // query MP annotation
+            var annhost = config.apache2.host;
+            var queryOptStr = '{"emulateHTTP":false,"emulateJSON":false,"headers":{},"prefix":"' + config.protocal + '://' + annhost + '/annotatorstore" ,"urls":{"create":"/annotations","update":"/annotations/{id}","destroy":"/annotations/{id}","search":"/search?_id=' + currAnnotationId +'"}}';
+            
+            var queryOptions = JSON.parse(queryOptStr);
+            var storage = new HttpStorage(queryOptions);
+            
+            var temp = this;
+            storage.query()
+                .then(function(data){
+
+                    if (data.results.length == 0)
+                        return;                    
+                    
+                    var oriAnnotation = data.results[0];
+                    // set current mp annotation
+                    $('#mp-annotation-work-on').html(oriAnnotation.id);
+
+                    // show annotation table, click data cell to trigger editor
+                    showAnnTable();
+
+                    // text has been selected, cached selector                    
+                    isTextSelected = true;
+                    
+                    //this data is comprised of multiple sections
+                    if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
+                        var newRange = temp.annotation.argues.ranges[0];
+                        var exact = temp.annotation.argues.hasTarget.hasSelector.exact;
+                        console.log(newRange);
+                        currAnnotation.argues.ranges.push(newRange);
+                        currAnnotation.argues.hasTarget.hasSelector.exact += " / " + exact;
+                        console.log(currAnnotation);
+                        cachedOATarget = currAnnotation.argues.hasTarget;
+                        cachedOARanges = currAnnotation.argues.ranges;
+                        
+                    } else {
+                        // get selection for data
+                        cachedOATarget = temp.annotation.argues.hasTarget;
+                        cachedOARanges = temp.annotation.argues.ranges;  
+                    }
+                              
+                });                         
         }
+
+        // // Create a new annotation
+        // if (this.annotation !== null && typeof this.onCreate === 'function') {
+        //     this.annotation.annotationType = "DDI";
+        //     this.onCreate(this.annotation, event);
+        // }
     }
 });
 
-// from hypothesis
-// Guest.prototype.html = jQuery.extend({}, Annotator.prototype.html, {
-//   adder: '<div class="annotator-adder">\n  <button class="h-icon-insert-comment" data-action="comment" title="New Note"></button>\n  <button class="h-icon-border-color" data-action="highlight" title="Highlight"></button>\n</div>'
-// });
-
 ddiAdder.template = [
     '<div class="annotator-adderddi annotator-hide">',
-    '  <button type="button" title="DDI" onclick="showright(),editorload()">' + _t('Annotate') + '</button>',
+    // MP: add menu for create claim and add data
+    '<button class="mp-menu-btn" type="button">' + _t('Annotate') + '</button>',
+    '<ul class="mp-main-menu">',
+    '<li class="mp-main-menu-1" onclick="showEditor(),claimEditorLoad();">',
+    'create a claim',
+    '</li>',
+    '<li class="mp-main-menu-2">',
+    'add data for',
+    '<ul class="mp-sub-menu-2">',
+    '</ul>',
+    '</li>',
+    '</ul>',
     '</div>'
+    
+    // '<div class="annotator-adderddi annotator-hide">',
+    // '  <button type="button" title="DDI" onclick="showright(),editorload()">' + _t('Annotate') + '</button>',
+    // '</div>'
 ].join('\n');
 
 // Configuration options
 ddiAdder.options = {
     // Callback, called when the user clicks the adder when an
     // annotation is loaded.
-    onCreate: null
+    onUpdate: null,
+    onCreate: null   
 };
 
 exports.ddiAdder = ddiAdder;

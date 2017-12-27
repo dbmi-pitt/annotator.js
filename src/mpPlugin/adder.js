@@ -10,7 +10,7 @@ var NS = 'annotator-addermp';
 
 // bring storage in
 var HttpStorage = require('../storage').HttpStorage;
-var mphighlighter = require('./highlighter');
+// var mphighlighter = require('./highlighter');
 
 
 // Adder shows and hides an annotation adder button that can be clicked on to
@@ -30,18 +30,9 @@ var mpAdder = Widget.extend({
         this.element
 
         // MP: add menu for create claim and add data
-
-        // .on("click." + NS, 'button', function (e) {
-        //     self._onClick(e);
-        // })
         .on("click." + NS, '.mp-main-menu', function (e) {
             self._onClick(e);
         })
-
-        // .on("mousedown." + NS, function (e) {
-        //     console.log("mpadder - self._onMousedown(e)");
-        //     self._onMousedown(e);
-        // });
 
         .on("mousedown." + NS, 'li', function (e) {
             // console.log("mpadder - self._onMousedown(e)");
@@ -231,17 +222,6 @@ var mpAdder = Widget.extend({
                         cachedOARanges = temp.annotation.argues.ranges;  
                     }
                               
-                    // console.log("[TEST] highlight text span!");
-                    // for (var i = 0, ilen = cachedOARanges.length; i < ilen; i++) {
-                    //     //var r = reanchorRange(cachedOARanges[i], this.element);  
-                    //     console.log(this.element);
-                    //     console.log(cachedOARanges[i]);
-                    //     var r = Range.sniff(cachedOARanges[i]).normalize(this.element);
-                    //     if (r !==null) {
-                    //         console.log(r);
-                    //     } 
-                    // }
-
                 });                         
         }
     }   

@@ -98,7 +98,7 @@ Highlighter.prototype.destroy = function () {
 Highlighter.prototype.drawAll = function (annotations, pageNumber) {
     var self = this;
 
-    //alert("[INFO] hlhighlighter drawAll called")
+    console.log("[INFO] hlhighlighter drawAll called")
 
     var p = new Promise(function (resolve) {
         var highlights = [];
@@ -138,8 +138,8 @@ Highlighter.prototype.drawAll = function (annotations, pageNumber) {
 Highlighter.prototype.draw = function (annotation, pageNumber) {
 
     // if oa selector is avaliable, use oa information to draw. Otherwise, use xpath apporach
-    // console.log("drughighlighter - called");
-    // console.log(annotation);
+    console.log("drughighlighter - called");
+    console.log(annotation);
 
     if (annotation.annotationType != "DrugMention")
         return null;
@@ -152,10 +152,9 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
     var drugMention = annotation.argues;
 
     if (drugMention.hasTarget !=null && drugMention.ranges.length <= 1) { // draw by oa selector
-    //console.log("drughighlighter - called");
-        var drugName = drugMention.hasTarget.hasSelector.exact;
 
-        //console.log("drug highlighter - drug: " + drugName);
+        var drugName = drugMention.hasTarget.hasSelector.exact;
+        console.log("[DEBUG] draw drug by oaselector: " + drugName);
 
         // mark context
         var options = {
@@ -209,7 +208,7 @@ Highlighter.prototype.draw = function (annotation, pageNumber) {
                 var r = reanchorRange(drugMention.ranges[i], this.element);   
                 if (r !== null) { 
                 normedRanges.push(r);
-                //console.log("draw drug by xpath: " + drugName);
+                console.log("[DEBUG] draw drug by xpath: " + drugName);
             } else 
                 console.log("[Error]: draw by xpath failed: " + field);
             }

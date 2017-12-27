@@ -75,9 +75,9 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     // Returns a new Viewer instance.
     constructor: function (options) {
         Widget.call(this, options);
-
-	//console.log("ddiviewer - constructor");
-
+        
+	    console.log("ddiviewer - constructor");
+        
         this.itemTemplate = ddiViewer.itemTemplate;
         this.fields = [];
         this.annotations = [];
@@ -85,51 +85,33 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
         this.hideTimerDfd = null;
         this.hideTimerActivity = null;
         this.mouseDown = false;
-        this.render = function (annotation) {
+        this.render = function (annotation, fieldName, dataNum) {
+	        var claim = annotation.argues
+	        if (claim.label) {
+                
+		        var returnText =
+                    "<div> <div class='annotator-ddi'> By " + annotation.email + " on " + annotation.updated + "</div>" + "<table class='viewertable'>";
 
-	    var clinicalTrialRows = "";
-            if(annotation.assertion_type=="DDI clinical trial")
-            {
-		var cTHeader = "<tr><td>Dosage</td><td>Dosage</td><td>participants</td><td>AUC_i/AUC</td><td>CL_i/CL:</td><td>Cmax</td><td>Cmin</td><td>T1/2:</td></tr>"
-		var cTValue = "<tr><td>Dose in MG:" + annotation.DoseMG_precipitant + "<br>Formulation:" + annotation.FormulationP + "<br>Duration(days):" + annotation.Duration_precipitant + "<br>Regiments: " + annotation.RegimentsP + "</td>" +
-		    "<td>Dose in MG:" + annotation.DoseMG_object + "<br>Formulation:" + annotation.FormulationO + "<br>Duration(days):" + annotation.Duration_object + "<br>Regiments: " + annotation.RegimentsO + "</td>" +
-		    "<td>Number: " + annotation.Number_participants + "</td>" +
-		    "<td>Auc :" + annotation.Aucval + "<br>Type:" + annotation.AucType + "<br>Dire:" + annotation.AucDirection + "</td>" +
-		    "<td>Cl: " + annotation.Clval + "<br>Type:" + annotation.ClType + "<br>Dire:" + annotation.ClDirection + "</td>" +
-		    "<td>cmax: " + annotation.cmaxval + "<br>Type:" + annotation.cmaxType +"<br>Dire:" + annotation.cmaxDirection + "</td>" +
-		    "<td>cmin: " + annotation.cminval + "<br>Type:" + annotation.cminType + "<br>Dire:" + annotation.cminDirection + "</td>" +
-		    "<td>t12: " + annotation.t12 + "<br>Type:" + annotation.t12Type + "<br>Dire: " + annotation.t12Direction + "</td></tr>";
-		
-		clinicalTrialRows = cTHeader + cTValue;
-	    }
-	    
-	    if (annotation.Drug1 && annotation.Drug2) {
-		var returnText =
-                    "<div  class='annotator-ddi'> By " + annotation.email + " on " + annotation.updated + "</div>" +
-		    "<div  class='annotator-ddi'> Quote: " + annotation.quote + "</div>" +
-                    "<table class='viewertable' style='float:left;'>" +
-		    "<tr><td>" + annotation.Role1 + "</td><td>" + annotation.Role2 + "</td><td>Relationship</td><td>Asrt Type</td><td>Modality</td><td>Evidence</td><td>Comment</td></tr>" +
-                    "<tr><td><span class='annotator-ddi-active'>" + annotation.Drug1 + "</span> (" +annotation.Type1 + ")</td>" +
-		    "<td><span class='annotator-ddi-active'>" + annotation.Drug2 + "</span> (" +annotation.Type2 + ")</td>" +
-                    "<td>" + annotation.relationship + "<br>" + annotation.enzyme + "</td>" +
-                    "<td>" + annotation.assertion_type + "</td>" +
-                    "<td>" + annotation.Modality + "</td>" +
-                    "<td>" + annotation.Evidence_modality + "</td>" +
-                    "<td>" + annotation.Comment + "</td></tr> " + clinicalTrialRows + "</table>";
-		
- 		return returnText;
-        } else {
-            return null;
-        }
-	    
+                returnText += "<tr><td>Claim: " + claim.label + "</td></tr>";
+
+                if (fieldName !== "claim" && dataNum != null) {
+                    returnText += "<tr><td>Data: " + (parseInt(dataNum)+1) + " Field: " + fieldName + "</td></tr>";
+                }                    
+                returnText += "</table></div>";
+		        
+ 		        return returnText;
+            } else {
+                return null;
+            }
+	        
         };
         
         var self = this;
 
         if (this.options.defaultFields) {
             this.addField({
-                load: function (field, annotation) {
-                    $(field).html(self.render(annotation));
+                load: function (field, annotation, controller, fieldName, dataNum) {   
+                    $(field).html(self.render(annotation, fieldName, dataNum));
                 }
             });
         }
@@ -227,11 +209,19 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     show: function (position) {
 
         if (typeof position !== 'undefined' && position !== null) {
+            //adjust based on window size, avoid cutting the viewer
+            var width = window.innerWidth;
+            var left = position.left;
+            if ((left + 360) > width) {
+                left = width - 360;
+            }
+
             this.element.css({
-                top: position.top,
-                left: position.left
+                left: left,
+                top: position.top + 10
             });
         }
+
 
         var controls = this.element
             .find('.annotator-controls')
@@ -251,28 +241,30 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     //
     // Examples
     //
-    //   viewer.load([annotation1, annotation2, annotation3])
+    //   viewer.load([{annotation: annotation1, fieldName: dose1}, annotation2, annotation3])
     //
     // Returns nothing.
     load: function (annotations, position) {
-
 
         this.annotations = annotations || [];
 
         var list = this.element.find('ul:first').empty();
 
         for (var i = 0, len = this.annotations.length; i < len; i++) {
-            var annotation = this.annotations[i];
+
+            var annotation = this.annotations[i].annotation;
+            var fieldName = this.annotations[i].fieldName;
+            var dataNum = this.annotations[i].dataNum;
+
+            //console.log(annotation);
 
             if (annotation.annotationType == "DDI"){
-            this._annotationItem(annotation)
-              .appendTo(list)
-              .data('annotation', annotation);
+                this._annotationItem(annotation, fieldName, dataNum)
+                    .appendTo(list)
+                    .data('annotation', annotation);
                 this.show(position);
             }
         }
-        //if(this.annotations.length != 0)
-
     },
 
     // Public: Set the annotation renderer.
@@ -285,7 +277,7 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     },
 
     // Private: create the list item for a single annotation
-    _annotationItem: function (annotation) {
+    _annotationItem: function (annotation, fieldName, dataNum) {
         var item = $(this.itemTemplate).clone();
 
         var controls = item.find('.annotator-controls'),
@@ -333,7 +325,7 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
         for (var i = 0, len = this.fields.length; i < len; i++) {
             var field = this.fields[i];
             var element = $(field.element).clone().appendTo(item)[0];
-            field.load(element, annotation, controller);
+            field.load(element, annotation, controller, fieldName, dataNum);
         }
 
         return item;
@@ -382,8 +374,22 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
         var item = $(event.target)
             .parents('.annotator-annotation')
             .data('annotation');
-        this.hide();
-        this.options.onEdit(item);
+
+        if (this.annotations.length > 0) {
+            var fieldName = this.annotations[0].fieldName;
+            var dataNum = this.annotations[0].dataNum;
+            
+            if (fieldName == null || dataNum == null) {
+                fieldName = "claim";
+                dataNum = 0;
+            }
+
+            currFormType = fieldName;
+
+            this.hide();
+
+            this.options.onEdit(item, fieldName, dataNum);
+        }
     },
 
     // Event callback: called when the delete button is clicked.
@@ -417,8 +423,6 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     _onHighlightMouseover: function (event) {
         // If the mouse button is currently depressed, we're probably trying to
         // make a selection, so we shouldn't show the viewer.
-
-	//console.log("ddiviewer - _onHighlightMouseover called - mouseDown:" + this.mouseDown);
 	
         if (this.mouseDown) {
             return;
@@ -427,12 +431,15 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
         var self = this;
         this._startHideTimer(true)
             .done(function () {
+
+                console.log("ddiviewer - _onHighlightMouseover");
 		
                 var annotations = $(event.target)
                     .parents('.annotator-hl')
                     .addBack()
                     .map(function (_, elem) {
-                        return $(elem).data("annotation");
+                        //return $(elem).data("annotation");
+                        return { annotation: $(elem).data("annotation"), fieldName: $(elem).attr("fieldname"), dataNum: $(elem).attr("datanum")};
                     })
                     .toArray();
 
@@ -452,7 +459,6 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     // Returns a Promise.
     _startHideTimer: function (activity) {
 
-	//console.log("ddiviewer - _startHideTimer called");
         if (typeof activity === 'undefined' || activity === null) {
             activity = false;
         }
@@ -500,8 +506,6 @@ var ddiViewer = exports.ddiViewer = Widget.extend({
     //
     // Returns nothing.
     _clearHideTimer: function () {
-
-	//console.log("ddiviewer - _clearHideTimer called");
 	
         clearTimeout(this.hideTimer);
         this.hideTimer = null;
@@ -518,7 +522,7 @@ ddiViewer.classes = {
 // HTML templates for this.widget and this.item properties.
 ddiViewer.template = [
     '<div class="annotator-outer annotator-viewer annotator-hide">',
-    '  <ul class="annotator-clinicalwidgetview annotator-listing"></ul>',
+    '  <ul class="annotator-mpwidgetview annotator-listing"></ul>',
     '</div>'
 ].join('\n');
 
@@ -530,10 +534,10 @@ ddiViewer.itemTemplate = [
     '       class="annotator-link">' + _t('View as webpage') + '</a>',
     '    <button type="button"',
     '            title="' + _t('Edit') + '"',
-    '            class="annotator-edit" onclick="showright()">' + _t('Edit') + '</button>',
-    '    <button type="button"',
-    '            title="' + _t('Delete') + '"',
-    '            class="annotator-delete">' + _t('Delete') + '</button> &nbsp;&nbsp;',
+    '            class="annotator-edit" onclick="showEditor()">' + _t('Edit') + '</button>',
+    // '    <button type="button"',
+    // '            title="' + _t('Delete') + '"',
+    // '            class="annotator-delete">' + _t('Delete') + '</button> &nbsp;&nbsp;',
     '    <button type="button"',
     '            title="' + _t('Cancel') + '"',
     '            class="annotator-cancel">' + _t('Cancel') + '</button>',

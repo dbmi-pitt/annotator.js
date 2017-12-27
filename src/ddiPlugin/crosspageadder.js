@@ -83,7 +83,7 @@ var Adder = Widget.extend({
         if (typeof position !== 'undefined' && position !== null) {
             this.element.css({
                 top: position.top,
-                left: position.left
+                right: 0
             });
         }
         Widget.prototype.show.call(this);
@@ -99,7 +99,6 @@ var Adder = Widget.extend({
         if (event.which > 1) {
             return;
         }
-
         event.preventDefault();
         // Prevent the selection code from firing when the mouse button is
         // released
@@ -144,37 +143,41 @@ var Adder = Widget.extend({
         // Hide the adder
         this.hide();
         // Hide drug mention, mp and ddi adder
-        $('.annotator-adderddi').removeClass().addClass('annotator-addermp annotator-hide');
+        // $('.annotator-adderddi').hide();
         $('.annotator-addermp').removeClass().addClass('annotator-addermp annotator-hide');
         $('.annotator-adderhl').removeClass().addClass('annotator-adderhl annotator-hide');
-        $('.annotator-adderselect').removeClass().addClass('annotator-adderselect annotator-hide');
+        //$('.annotator-adderddi').removeClass().addClass('annotator-adderhl annotator-hide');
 
         this.ignoreMouseup = false;
 
-        // Create a new annotation
-        if (this.annotation !== null && typeof this.onCreate === 'function') {
-            if (sourceURL.indexOf(".pdf") != -1 && multiSelected == true) {
-                var newRange = this.annotation.argues.ranges[0];
-                var exact = this.annotation.argues.hasTarget.hasSelector.exact;
-                console.log(newRange);
-                currAnnotation.argues.ranges.push(newRange);
-                currAnnotation.argues.hasTarget.hasSelector.exact += exact;
+        // Create a new annotation || add a new data
+        if ((this.annotation !== null && typeof this.onCreate === 'function') || (editorType != "claim" && typeof this.onUpdate === 'function')) {
+            this.annotation.annotationType = "MP";
+
+            //multi select test code
+            if (currAnnotation == undefined || multiSelected == false) {
+                currAnnotation = this.annotation;
                 console.log(currAnnotation);
-                this.annotation = currAnnotation;
-                multiSelected = false;
+            } else {
+                var newRange = this.annotation.argues.ranges[0];
+                var newExact = this.annotation.argues.hasTarget.hasSelector.exact;
+                currAnnotation.argues.hasTarget.hasSelector.exact += " / " + newExact;
+                currAnnotation.argues.ranges.push(newRange);
+
+                console.log(currAnnotation);
             }
-            this.annotation.annotationType = "DrugMention";
+            multiSelected = true;
+            console.log("before oncreate");
             this.onCreate(this.annotation, event);
-            console.log("[INFO] drug mention created: " + this.annotation);
         }
     }
 });
 
 Adder.template = [
 
-    '<div class="annotator-adderhl annotator-hide">',
+    '<div class="annotator-adderselect annotator-hide">',
 
-    '  <button class="hl-adder-btn" type="button" title="Highlight">' + _t('Annotate') + '</button>',
+    '  <button class="hl-adder-btn" type="button" title="Add Highlight">' + _t('Annotate') + '</button>',
     '</div>'
 ].join('\n');
 

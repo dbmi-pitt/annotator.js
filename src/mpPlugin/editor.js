@@ -4,7 +4,6 @@ var util = require('../util');
 var Template = require('./template').Template;
 var $ = util.$;
 var Range = require('xpath-range').Range;
-
 var _t = util.gettext;
 var Promise = util.Promise;
 var NS = "annotator-editor";
@@ -52,7 +51,6 @@ var mpEditor = exports.mpEditor = Widget.extend({
 
             this.addField({
                 load: function (field, annotation, annotations) {               
-                    console.log(">>>>>>>load editor<<<<<<<");
 
                     var claim = annotation.argues;
 

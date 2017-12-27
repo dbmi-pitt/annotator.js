@@ -267,6 +267,31 @@ function main(options) {
         });
         s.hladder.attach();
 
+        // mp editor
+        s.mpeditor = new mpeditor.mpEditor({
+            extensions: options.editorExtensions,
+            onDelete: function (ann) {
+
+                currAnnotation = ann;
+                if (currFormType == "claim") { 
+                    // delete confirmation for claim
+                    $( "#dialog-claim-delete-confirm" ).show();
+                } else if (currFormType == "reviewer") {
+                    $( "#dialog-dips-delete-confirm" ).show();
+                } else {
+                    // delete confirmation for data & material
+                    $( "#dialog-data-delete-confirm" ).show();
+                }
+            }
+        });
+        s.mpeditor.attach();
+
+        // highlight editor
+        s.hleditor = new hleditor.Editor({
+            extensions: options.editorExtensions
+        });
+        s.hleditor.attach();
+
         // multi select adder (will not create annotation)
         s.crpgadder = new crpgadder.Adder({
 
@@ -303,31 +328,7 @@ function main(options) {
             }
         });
         s.cancelcrpgadder.attach();
-
-        // mp editor
-        s.mpeditor = new mpeditor.mpEditor({
-            extensions: options.editorExtensions,
-            onDelete: function (ann) {
-
-                currAnnotation = ann;
-                if (currFormType == "claim") { 
-                    // delete confirmation for claim
-                    $( "#dialog-claim-delete-confirm" ).show();
-                } else if (currFormType == "reviewer") {
-                    $( "#dialog-dips-delete-confirm" ).show();
-                } else {
-                    // delete confirmation for data & material
-                    $( "#dialog-data-delete-confirm" ).show();
-                }
-            }
-        });
-        s.mpeditor.attach();
-
-        s.hleditor = new hleditor.Editor({
-            extensions: options.editorExtensions
-        });
-        s.hleditor.attach();
-
+        
         addPermissionsCheckboxes(s.mpeditor, ident, authz);
         //addPermissionsCheckboxes(s.hleditor, ident, authz);
 
